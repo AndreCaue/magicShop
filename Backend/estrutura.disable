@@ -1,0 +1,30 @@
+app
+├── __pycache__
+├── auth
+│   ├── __pycache__
+│   ├── dependencies.py
+│   ├── email_service.py
+│   ├── jwt.py
+│   ├── routes.py
+│   └── utils.py
+├── common
+│   ├── models.py
+│   └── schemas.py
+├── core
+│   ├── __pycache__
+│   ├── config.py
+│   ├── schemas.py
+│   └── scripts
+│       └── create_master_user.py
+├── store
+│   ├── database.py
+│   ├── main.py
+│   ├── models.py
+│   └── schemas.py
+├── venv
+├── .env
+├── .gitignore
+├── app.db
+├── README.md
+├── requirements.txt
+└── start.bat
