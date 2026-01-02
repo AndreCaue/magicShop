@@ -10,6 +10,7 @@ from .store.cart import routes as cart_router
 from .common.routes import router as dropdown_router
 from .common.helpers import router as helpers_router
 from app.melhorenvio.frete.routes import router as menvio_frete_router
+from .address.routes import router as address_router
 
 # Cria tabelas do banco, se ainda não existirem
 models.Base.metadata.create_all(bind=engine)
@@ -72,6 +73,7 @@ app.include_router(cart_router.router)
 app.include_router(dropdown_router)
 app.include_router(helpers_router)
 app.include_router(menvio_frete_router) 
+app.include_router(address_router)
 
 # 👇 Rota raiz simples
 @app.get("/")
