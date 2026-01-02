@@ -1,4 +1,5 @@
-import axios from "axios";
+import api from "@/axiosInstance";
+import type { TUF } from "@/helpers/estados";
 
 export type TViaCepResponse = {
   cep: string;
@@ -7,7 +8,7 @@ export type TViaCepResponse = {
   unidade: string;
   bairro: string;
   localidade: string;
-  uf: string;
+  uf: TUF;
   estado: string;
   regiao: string;
   ibge: string;
@@ -16,14 +17,8 @@ export type TViaCepResponse = {
   siafi: string;
 };
 
-type TViaCepError = {
-  erro: true;
-};
-
 export const getViaCep = async (cep: string) => {
-  const response = await axios.get<TViaCepResponse>(
-    `https://viacep.com.br/ws/${cep}/json/`
-  );
+  const response = await api.get<TViaCepResponse>(`/cep/${cep}`);
 
   return response.data;
 };
