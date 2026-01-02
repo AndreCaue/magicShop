@@ -1,5 +1,6 @@
 import { PageContainer } from "../Home/Components/PageContainer";
-import { AccordionForm } from "./Accordion";
+import { AccordionForm } from "./AccordionForm";
+// import { AccordionForm } from "./Accordion";
 
 export const Checkout = () => {
   return (
@@ -10,6 +11,7 @@ export const Checkout = () => {
           className="border border-blue-500 col-span-2 flex justify-center"
         >
           <AccordionForm />
+          {/* <AccordionForm /> */}
         </div>
 
         <div id="total" className="border border-green-500">
