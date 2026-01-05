@@ -1,4 +1,3 @@
-# store/routes.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from typing import List
@@ -11,10 +10,6 @@ from app.schemas import UserOut
 from app.store.schemas import ProductResponse
 
 router = APIRouter(prefix="/brands", tags=["Brands"])
-
-# Todo 
-
-#tratar casos de nomes com maiúsculas/minúsculas
 
 @router.post("/register", response_model=BrandResponse, status_code=status.HTTP_201_CREATED)
 async def create_brand(
@@ -54,7 +49,6 @@ async def list_brands(
     return db.query(Brand).all()
 
 
-# GET /brands/{id} → Buscar marca por ID
 @router.get("/{brand_id}", response_model=BrandResponse)
 async def get_brand_by_id(
     brand_id: int,
@@ -65,7 +59,6 @@ async def get_brand_by_id(
         raise HTTPException(status_code=404, detail="Marca não encontrada.")
     return brand
 
-# GET /brands/{id}/products → Listar produtos de uma marca
 @router.get("/{brand_id}/products", response_model=List[ProductResponse])
 async def get_products_by_brand(
     brand_id: int,
@@ -80,26 +73,22 @@ async def get_products_by_brand(
     ).all()
     return products
 
-# PUT /brands/{brand_id} → Atualizar uma marca existente
 @router.put("/update/{brand_id}", response_model=BrandResponse)
 async def update_brand(
     brand_id: int,
-    brand_update: BrandCreate,  # Reutiliza o mesmo schema do POST (todos os campos opcionais no frontend se quiser)
+    brand_update: BrandCreate,
     db: Session = Depends(get_db),
     _: UserOut = Depends(require_master_full_access)
 ):
-    # Busca a marca existente
     brand = db.query(Brand).filter(Brand.id == brand_id).first()
     if not brand:
         raise HTTPException(status_code=404, detail="Marca não encontrada.")
 
-    # Normaliza o nome para verificar unicidade (case-insensitive)
     if brand_update.name:
         normalized_name = brand_update.name.strip().lower()
         
-        # Verifica se já existe outra marca com esse nome (excluindo a própria)
         existing_brand = db.query(Brand).filter(
-            Brand.name.ilike(normalized_name),  # ilike = case-insensitive no PostgreSQL
+            Brand.name.ilike(normalized_name),
             Brand.id != brand_id
         ).first()
         
@@ -109,10 +98,8 @@ async def update_brand(
                 detail="Já existe outra marca com este nome."
             )
 
-        # Atualiza o nome mantendo a capitalização original enviada pelo usuário
         brand.name = brand_update.name.strip()
 
-    # Atualiza os outros campos (se fornecidos)
     if brand_update.description is not None:
         brand.description = brand_update.description
     if brand_update.website is not None:
@@ -125,7 +112,6 @@ async def update_brand(
     return brand
 
 
-# DELETE /brands/{brand_id} → Remover uma marca
 @router.delete("/delete/{brand_id}", status_code=status.HTTP_200_OK)
 async def delete_brand(
     brand_id: int,
@@ -136,8 +122,6 @@ async def delete_brand(
     if not brand:
         raise HTTPException(status_code=404, detail="Marca não encontrada.")
 
-    # Opcional: Verificar se a marca tem produtos associados
-    # Se quiser impedir exclusão enquanto houver produtos:
     product_count = db.query(Product).filter(Product.brand_id == brand_id).count()
     if product_count > 0:
         raise HTTPException(

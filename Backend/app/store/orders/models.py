@@ -1,14 +1,14 @@
 from sqlalchemy import Column, Integer, Float, ForeignKey, String, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from app.database import Base  # seu Base SQLAlchemy
+from app.database import Base
 
 class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    status = Column(String, default="pending")  # pending, paid, shipped, canceled
+    status = Column(String, default="pending")  
     total = Column(Float, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)

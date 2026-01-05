@@ -18,7 +18,7 @@ async def get_brands_dropdown(db: Session = Depends(get_db), _: User = Depends(r
 @router.get("/shipping-presets", response_model=List[ShippingPresetDropdown])
 def get_shipping_presets_dropdown(
     db: Session = Depends(get_db),
-    _: User = Depends(require_master_full_access)  # BLOQUEIA NÃO-MASTER
+    _: User = Depends(require_master_full_access)
 ):
     presets = db.query(ShippingPreset.id, ShippingPreset.name)\
                 .filter(ShippingPreset.is_active == True)\

@@ -16,9 +16,8 @@ async def cotar_frete(
     cep_origem: str | None = None,
 ) -> List[CotacaoFreteResponse]:
 
-    # Garante CEP limpo (sem traço)
     cep_destino = cep_destino.replace("-", "").strip()
-    cep_origem = (cep_origem or "01001000").replace("-", "").strip()  # fallback seguro
+    cep_origem = (cep_origem or "01001000").replace("-", "").strip() 
 
     payload = {
         "from": {
@@ -31,7 +30,7 @@ async def cotar_frete(
             "height": float(altura_cm),
             "width": float(largura_cm),
             "length": float(comprimento_cm),
-            "weight": round(peso_gramas / 1000, 5)  # kg com até 5 casas
+            "weight": round(peso_gramas / 1000, 5)
         },
         "options": {
             "insurance_value": float(valor_declarado),
@@ -39,32 +38,24 @@ async def cotar_frete(
             "own_hand": False,
             "reverse": False,
             "non_commercial": False,
-            # <<< CAMPOS OBRIGATÓRIOS em 2025 >>>
-            "platform": "Minha Loja",                        # pode ser qualquer nome
-            "invoice": {                                      # campo novo e obrigatório
+            "platform": "Minha Loja",                       
+            "invoice": {                                      
                 "value": float(valor_declarado)
             }
         }
-        # Removi "services" de propósito → assim ele devolve TODAS as transportadoras disponíveis
     }
 
-    logger.info(f"Payload final enviado para Melhor Envio: {payload}")
 
     try:
         raw_response = await melhor_envio_client.post(
             "/me/shipment/calculate",
             json=payload,
-            timeout=20  # eles estão lentos às vezes
+            timeout=20
         )
-        logger.info(f"Resposta completa do Melhor Envio: {raw_response}")
 
     except Exception as e:
-        response_text = getattr(e, 'text', '') or getattr(getattr(e, 'response', None), 'text', '')
-        logger.error(f"Erro 502/4xx/5xx no Melhor Envio → {e}")
-        logger.error(f"Response body: {response_text}")
         raise
 
-    # ... resto do seu parsing continua igual
     opcoes_filtradas = []
     for item in raw_response:
         if item.get("error"):

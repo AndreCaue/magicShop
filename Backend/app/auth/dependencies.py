@@ -29,9 +29,6 @@ oauth2_scheme = OAuth2PasswordBearer(
     }
 )
 
-# ---------------------------
-# Sessão de banco
-# ---------------------------
 def get_db():
     db = SessionLocal()
     try:
@@ -41,15 +38,12 @@ def get_db():
         
 
 async def get_token_from_request(request: Request) -> str:
-    # 1️⃣ Tenta pegar do header Authorization
     auth = request.headers.get("Authorization")
     scheme, token = get_authorization_scheme_param(auth)
 
-    # 2️⃣ Se não veio no header, tenta pegar do cookie
     if not token:
         token = request.cookies.get("access_token")
 
-    # 3️⃣ Se ainda assim não há token, lança erro
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -60,41 +54,22 @@ async def get_token_from_request(request: Request) -> str:
     return token
 
 
-# ---------------------------
-# Usuário autenticado
-# ---------------------------
 def get_current_user(
     request: Request,
     security_scopes: SecurityScopes,
     db: Session = Depends(get_db),
     token: str = Depends(get_token_from_request)
 ) -> User:
-    """Obtém o usuário autenticado, via Cookie HttpOnly OU Header Bearer."""
 
-    # 🔥 Fallback: tenta pegar o token do cookie, se não veio no header
 
     logger.info(f"Headers recebidos: {dict(request.headers)}")
     logger.info(f"Cookies recebidos: {dict(request.cookies)}")
     
-    # Exceção padrão
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Token inválido ou expirado",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
-       #try:
-        #payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        #email: str = payload.get("sub")
-        #token_scopes = payload.get("scopes", [])
-        #if isinstance(token_scopes, str):
-        #    token_scopes = token_scopes.split(",")
-        #elif not isinstance(token_scopes, list):
-        #    token_scopes = []
-        #if email is None:
-        #    raise credentials_exception
-    #except JWTError:
-        #raise credentials_exception
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -110,28 +85,18 @@ def get_current_user(
         logger.error(f"Erro ao decodifcar JWT: {e}")
         raise credentials_exception
 
-    # Busca o usuário no banco
     user = db.query(User).filter(User.email == email).first()
     if not user:
         logger.warning(f"Usuário não encontrado para email {email}")
         raise credentials_exception
 
-    # Verifica escopos (opcional)
-    #for scope in security_scopes.scopes:
-     #   if scope not in token_scopes:
-      #      raise HTTPException(
-       #         status_code=status.HTTP_403_FORBIDDEN,
-        #        detail="Não autorizado para esse recurso",
-         #   )
     logger.info(f"Usuário autenticado: {user.email} | Scopes: {scopes}")
     return user
-# ---------------------------
-# Requer MASTER
-# ---------------------------
+
+
 def require_master_full_access(
     current_user: User = Depends(get_current_user)
 ) -> User:
-    """Permite acesso apenas a usuários 'master' verificados."""
     if not current_user.is_verified:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -144,18 +109,9 @@ def require_master_full_access(
             detail="Apenas usuários com papel 'master' podem acessar esta rota."
         )
 
- #   if not current_user.is_master:
-  #      raise HTTPException(
-   #         status_code=status.HTTP_403_FORBIDDEN,
-    #        detail="Apenas usuários com papel ou escopo '******' podem acessar esta rota."
-     #   )
-
     return current_user
 
 
-# ---------------------------
-# Requer BASIC ou PREMIUM
-# ---------------------------
 def require_basic_or_premium(
     current_user: User = Depends(get_current_user)
 ) -> User:
@@ -167,13 +123,7 @@ def require_basic_or_premium(
     return current_user
 
 
-# ---------------------------
-# Requerimento
-# ---------------------------
 def require_user(user: UserOut = Depends(get_current_user)) -> UserOut:
-    """
-    Dependência para rotas que precisam de usuário logado.
-    """
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,4 +1,3 @@
-# app/melhorenvio/frete/routes.py
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional

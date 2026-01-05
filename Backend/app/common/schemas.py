@@ -21,7 +21,7 @@ class ShippingPresetCreate(BaseModel):
     height_cm: float
     width_cm: float
     length_cm: float
-    is_active: bool = True  # Opcional, já que tem default no modelo
+    is_active: bool = True
 
     model_config = ConfigDict(from_attributes=True)
 

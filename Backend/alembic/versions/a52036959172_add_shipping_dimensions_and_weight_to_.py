@@ -1,10 +1,4 @@
-"""add shipping dimensions and weight to products - SQLITE 100% FUNCIONA
 
-Revision ID: a52036959172
-Revises: 
-Create Date: 2025-04-05 12:00:00.000000
-
-"""
 from alembic import op
 import sqlalchemy as sa
 
@@ -16,7 +10,6 @@ depends_on = None
 
 
 def upgrade():
-    # Só adiciona se a coluna NÃO existir (evita erro de duplicada)
     conn = op.get_bind()
     inspector = sa.inspect(conn)
     columns = [col['name'] for col in inspector.get_columns('products')]
@@ -32,7 +25,6 @@ def upgrade():
 
 
 def downgrade():
-    # Só remove se existir
     conn = op.get_bind()
     inspector = sa.inspect(conn)
     columns = [col['name'] for col in inspector.get_columns('products')]

@@ -4,14 +4,12 @@ import httpx
 from typing import Dict, Any
 import re
 
-# Cria o router para o módulo de CEP
 router = APIRouter(
     prefix="/cep",
     tags=["CEP"],
     responses={404: {"description": "Não encontrado"}},
 )
 
-# Cache simples em memória (para evitar consultas repetidas)
 cep_cache: Dict[str, Dict[str, Any]] = {}
 
 @router.get(
@@ -29,18 +27,14 @@ async def buscar_cep(
         example="13454183"
     )
 ):
-    # Remove qualquer hífen ou espaço
     cep_clean = re.sub(r"\D", "", cep)
 
-    # Validação básica (redundante com o Path, mas por segurança)
     if len(cep_clean) != 8:
         raise HTTPException(status_code=400, detail="CEP deve conter exatamente 8 dígitos numéricos")
 
-    # Verifica cache
     if cep_clean in cep_cache:
         return cep_cache[cep_clean]
 
-    # Tenta ViaCEP primeiro
     viacep_url = f"https://viacep.com.br/ws/{cep_clean}/json/"
     
     try:
@@ -49,11 +43,9 @@ async def buscar_cep(
             response.raise_for_status()
             data = response.json()
 
-            # Verifica se ViaCEP retornou erro
             if "erro" in data:
                 raise ValueError("CEP não encontrado no ViaCEP")
 
-            # Normaliza resposta
             result = {
                 "cep": data["cep"],
                 "logradouro": data["logradouro"],
@@ -70,7 +62,6 @@ async def buscar_cep(
             return result
 
     except (httpx.RequestError, httpx.HTTPStatusError, ValueError, Exception) as e:
-        # Fallback: BrasilAPI
         brasilapi_url = f"https://brasilapi.com.br/api/cep/v2/{cep_clean}"
         
         try:
@@ -79,7 +70,6 @@ async def buscar_cep(
                 response.raise_for_status()
                 data = response.json()
 
-                # Normaliza para formato compatível com ViaCEP
                 result = {
                     "cep": data["cep"],
                     "logradouro": data.get("street", ""),

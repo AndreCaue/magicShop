@@ -1,32 +1,43 @@
 from app.database import SessionLocal
 from app.models import User
-from passlib.context import CryptContext
+from app.core.auth import hash_password  # Reutiliza sua função
 from sqlalchemy.orm import Session
-#python -m app.core.scripts.create_master_user
-# Configuração do hash de senha (usando bcrypt, presente no requirements.txt)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def create_master_user(db: Session):
-    # Verifica se já existe um usuário master com scope "master"
-    master = db.query(User).filter(User.role == "master", User.scopes.contains(["master"])).first()
-    if master:
-        print("Usuário master com scope 'master' já existe.")
+    """
+    Cria usuário master inicial.
+    Configurar MASTER_EMAIL e MASTER_PASSWORD no .env
+    
+    Uso: python -m app.scripts.create_master_user
+    """
+    email = os.getenv("MASTER_EMAIL")
+    password = os.getenv("MASTER_PASSWORD")
+    
+    if not email or not password:
+        print("❌ Erro: Configure MASTER_EMAIL e MASTER_PASSWORD no .env")
+        return
+    
+    existing = db.query(User).filter(User.email == email).first()
+    if existing:
+        print(f"⚠️  Usuário {email} já existe.")
         return
 
-    # Cria o usuário master
     master_user = User(
-        email="master@teste.com",
-        password=pwd_context.hash("654321"),
+        email=email,
+        password=hash_password(password),
         role="master",
         is_verified=True,
-        scopes=["master"]  # Scope para master com permissões completas
+        scopes=["master"]
     )
     db.add(master_user)
     db.commit()
-    print("Usuário master criado com sucesso!")
+    print(f"✅ Usuário master criado: {email}")
 
 def main():
-    # Cria uma sessão do banco de dados
     db = SessionLocal()
     try:
         create_master_user(db)

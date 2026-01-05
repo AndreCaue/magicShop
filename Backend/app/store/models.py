@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, JSON  # JSON aqui!
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -17,6 +17,6 @@ class Product(Base):
     width_cm = Column(Integer, nullable=False, default=15)
     length_cm = Column(Integer, nullable=False, default=20)
 
-    image_urls = Column(JSON, nullable=True)  # JSON nativo! Perfeito!
+    image_urls = Column(JSON, nullable=True)
     brand_id = Column(Integer, ForeignKey("brands.id"), nullable=False)
     brand = relationship("Brand", back_populates="products")

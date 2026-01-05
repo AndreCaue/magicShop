@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy.orm import Session, joinedload
 from typing import List
 
-from app.auth.dependencies import get_db, require_user  # dependência de usuário logado
+from app.auth.dependencies import get_db, require_user
 from app.store.models import  Product
 from .schemas import CartResponse, CartItemResponse, AddToCartRequest, AddToCartResponse
 from .models import Cart, CartItem
@@ -12,12 +12,10 @@ from app.store.orders.models import Order, OrderItem
 router = APIRouter(prefix="/cart", tags=["Cart"])
 
 
-# Helper: calcula total do carrinho
 def calculate_cart_total(cart: Cart):
     return sum(item.total_price for item in cart.items)
 
 
-# GET /cart → retorna carrinho do usuário
 @router.get("/", response_model=CartResponse)
 def get_cart(
     user: UserOut = Depends(require_user),
@@ -26,7 +24,6 @@ def get_cart(
     cart = db.query(Cart).options(joinedload(Cart.items).joinedload(CartItem.product))\
         .filter(Cart.user_id == user.id, Cart.status == "active").first()
     if not cart:
-        # retorna carrinho vazio
         return {"id": 0, "user_id": user.id, "status": "active", "items": [], "total": 0}
     
     total = calculate_cart_total(cart)
@@ -53,7 +50,6 @@ def get_cart(
     )
 
 
-# POST /cart/add → adiciona produto
 @router.post("/add", response_model=AddToCartResponse)
 def add_to_cart(
     item: AddToCartRequest,
@@ -97,7 +93,6 @@ def add_to_cart(
     return AddToCartResponse(message="Item adicionado ao carrinho com sucesso.")
 
 
-# Update
 
 @router.put("/update", response_model=CartResponse)
 def update_cart_item(
@@ -154,13 +149,11 @@ def checkout_cart(
     if not cart or not cart.items:
         raise HTTPException(400, "Carrinho vazio.")
 
-    # Validar estoque
     for item in cart.items:
         product = db.query(Product).filter(Product.id == item.product_id).first()
         if item.quantity > product.stock:
             raise HTTPException(400, f"Estoque insuficiente para {product.name}.")
 
-    # Criar pedido (Order + OrderItems)
     order = Order(user_id=user.id, total=sum(i.total_price for i in cart.items))
     db.add(order)
     db.commit()
@@ -176,11 +169,9 @@ def checkout_cart(
         )
         db.add(order_item)
 
-        # Atualizar estoque do produto
         product = db.query(Product).filter(Product.id == item.product_id).first()
         product.stock -= item.quantity
 
-    # Fechar o carrinho
     cart.status = "closed"
     db.commit()
 

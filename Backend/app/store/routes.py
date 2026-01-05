@@ -1,16 +1,14 @@
-import logging  # Use logging em vez de print para não bagunçar o stdout
-logger = logging.getLogger(__name__)
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session, joinedload
 from typing import List
 import httpx
 import os
 
-from app.auth.dependencies import get_db, require_master_full_access  # Corrigido
+from app.auth.dependencies import get_db 
 from app.store.branch.models import Brand
 from app.store.models import Product
 from app.store.schemas import ProductCreate, ProductResponse
-from app.schemas import UserOut  # Corrigido
+from app.schemas import UserOut 
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -55,45 +53,6 @@ async def list_products(
     products = db.query(Product).options(joinedload(Product.brand)).all()
     return products
 
-# @router.post("/register", response_model=ProductResponse)
-# async def create_product(
-#     name: str = Form(...),
-#     description: str = Form(...),
-#     price: float = Form(...),
-#     stock: int = Form(...),
-#     brand_id: int = Form(...),
-#     images: List[UploadFile] = File(None),
-#     db: Session = Depends(get_db),
-#     _: UserOut = Depends(require_master_full_access)
-# ):
-#     logger.info("=== INÍCIO get_current_user ===")
-#     #logger.info(f"Token do header (oauth2_scheme): '{token}'")
-#     #logger.info(f"Headers do request: {dict(request.headers)}")  # Para ver se algo mais está chegando
-#    # logger.info(f"Cookies no request: {dict(request.cookies)}")
-
-#     brand = db.query(Brand).filter(Brand.id == brand_id).first()
-#     if not brand:
-#         raise HTTPException(status_code=404, detail="Marca não encontrada.")
-
-#     image_urls = []
-#     if images:
-#         for image in images:
-#             url = await upload_to_imgbb(image)
-#             image_urls.append(url)
-
-#     new_product = Product(
-#         name=name,
-#         description=description,
-#         price=price,
-#         stock=stock,
-#         image_urls=image_urls or None,
-#         brand_id=brand_id,
-#     )
-#     db.add(new_product)
-#     db.commit()
-#     db.refresh(new_product)
-#     return new_product
-
 @router.post("/register", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 async def create_product(
     name: str = Form(...),
@@ -127,14 +86,13 @@ async def create_product(
         width_cm=width_cm,
         length_cm=length_cm,
         brand_id=brand_id,
-        image_urls=image_urls or None  # já salva como LIST → vira JSON no banco!
+        image_urls=image_urls or None
     )
 
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
 
-    # Pydantic v2 – forma oficial e sem warnings
     return ProductResponse.model_validate(new_product, from_attributes=True)
 
 

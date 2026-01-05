@@ -5,15 +5,7 @@ from email.mime.text import MIMEText
 import os
 from dotenv import load_dotenv
 from email_validator import validate_email, EmailNotValidError
-import logging
 
-# ----------------------------
-# CONFIGURAÇÃO DE LOG
-# ----------------------------
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
-
-# Carrega variáveis do .env
 load_dotenv()
 
 def send_verification_email(to_email: str, code: str, subject: str = None):
@@ -30,19 +22,12 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
     if not all([SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, FROM_EMAIL]):
         raise ValueError("Configuração SMTP incompleta nas variáveis de ambiente.")
 
-    # ----------------------------
-    # LOG DE VERIFICAÇÃO
-    # ----------------------------
-    logger.info(f"Preparando envio de e-mail para {to_email}")
-    logger.debug(f"SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}, SMTP_USER={SMTP_USER}")
 
-    # Validar e-mail
     try:
         validate_email(to_email, check_deliverability=False)
     except EmailNotValidError as e:
         raise ValueError(f"Endereço de e-mail inválido: {str(e)}")
 
-    # Monta a mensagem
     msg = MIMEMultipart("alternative")
     msg["From"] = FROM_EMAIL
     msg["To"] = to_email
@@ -62,38 +47,28 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
     msg.attach(MIMEText(body_plain, "plain"))
     msg.attach(MIMEText(body_html, "html"))
 
-    # ----------------------------
-    # ENVIO
-    # ----------------------------
     try:
         timeout = int(os.getenv("SMTP_TIMEOUT", 10))
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=timeout) as server:
             server.starttls()
 
-            # Se estiver em modo debug, mostra logs SMTP detalhados
             if SMTP_DEBUG:
-                logger.warning("SMTP_DEBUG está ativado — logs de comunicação SMTP serão exibidos.")
                 server.set_debuglevel(1)
 
             server.login(SMTP_USER, SMTP_PASS)
             server.sendmail(FROM_EMAIL, to_email, msg.as_string())
 
-        logger.info(f"✅ E-mail enviado com sucesso para {to_email}")
 
     except SMTPAuthenticationError:
-        logger.error("❌ Falha na autenticação SMTP. Verifique usuário e senha (senha de aplicativo?).")
         raise Exception("Falha na autenticação SMTP. Verifique usuário e senha.")
     except SMTPConnectError:
-        logger.error("❌ Falha na conexão com o servidor SMTP.")
         raise Exception("Não foi possível conectar ao servidor SMTP.")
     except Exception as e:
-        logger.error(f"❌ Erro ao enviar e-mail para {to_email}: {str(e)}")
         raise Exception(f"Erro ao enviar o e-mail: {str(e)}")
     
 
 
 if __name__ == "__main__":
-    # Teste manual
     destino = input("Digite o e-mail de destino: ")
     codigo = "123456"
     try:

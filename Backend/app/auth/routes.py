@@ -30,8 +30,7 @@ def get_db():
 
 
 def generate_verification_code():
-    """Gera código numérico + hash e salt"""
-    code = str(secrets.randbelow(999999)).zfill(6)  # Ex: "083417"
+    code = str(secrets.randbelow(999999)).zfill(6)
     salt = secrets.token_bytes(16)
     hash_code = hashlib.pbkdf2_hmac("sha256", code.encode(), salt, 100_000)
     code_hash_hex = binascii.hexlify(hash_code).decode()
@@ -52,7 +51,6 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Gera e armazena código de verificação
     code, code_hash_hex, salt_hex = generate_verification_code()
     expiry = datetime.now(timezone.utc) + timedelta(minutes=15)
 
@@ -61,7 +59,6 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     new_user.code_expiry = expiry
     db.commit()
 
-    # Envia o código por e-mail
     try:
         send_verification_email(user.email, code)
     except Exception as e:
@@ -76,18 +73,15 @@ def verify_email(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
 ):
-    # Decodifica o token para pegar o email do usuário
-    payload = decode_token(token)  # Função que você já deve ter para JWT
+    payload = decode_token(token)
     email = payload.get("sub")
     if not email:
         raise HTTPException(status_code=401, detail="Usuário não autenticado")
 
-    # Busca o usuário dentro da mesma sessão
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user or not user.verification_code or not user.salt:
         raise HTTPException(status_code=400, detail="Usuário inválido ou sem código de verificação")
 
-    # Verifica o código de verificação
     salt = binascii.unhexlify(user.salt)
     hash_code = hashlib.pbkdf2_hmac("sha256", data.code.encode(), salt, 100_000)
     hash_code_hex = binascii.hexlify(hash_code).decode()
@@ -95,7 +89,6 @@ def verify_email(
     if hash_code_hex != user.verification_code:
         raise HTTPException(status_code=400, detail="Código incorreto")
 
-    # Verifica se o código expirou
     expiry = user.code_expiry
     if expiry is None:
         raise HTTPException(status_code=400, detail="Código expirado")
@@ -105,7 +98,6 @@ def verify_email(
     if datetime.now(timezone.utc) > expiry:
         raise HTTPException(status_code=400, detail="Código expirado")
 
-    # Marca como verificado e limpa dados sensíveis
     user.is_verified = True
     user.verification_code = None
     user.salt = None
@@ -122,7 +114,6 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    # Autenticação do usuário
     db_user = db.query(models.User).filter(models.User.email == form_data.username).first()
     if not db_user or not verify_password(form_data.password, db_user.password):
         raise HTTPException(
@@ -130,12 +121,10 @@ def login(
             detail="Credenciais inválidas"
         )
 
-    # Prepara scopes (garante que seja lista)
     scopes = db_user.scopes or []
     if isinstance(scopes, str):
         scopes = scopes.split(",")
 
-    # === Access Token (curto prazo) ===
     access_token = create_access_token(
         data={
             "sub": db_user.email,
@@ -144,15 +133,13 @@ def login(
         token_type="access"
     )
 
-    # === Refresh Token (longo prazo) ===
     refresh_token = create_access_token(
         data={"sub": db_user.email},
-        expires_delta=timedelta(days=7),  # Ajuste conforme necessário (7 a 30 dias)
+        expires_delta=timedelta(days=7),
         token_type="refresh",
-        include_jti=True  # Deixa a função gerar o jti automaticamente
+        include_jti=True 
     )
 
-    # Extrai jti e expiração do refresh token
     try:
         payload = decode_token(refresh_token)
         jti = payload["jti"]
@@ -163,30 +150,27 @@ def login(
             detail="Erro ao gerar refresh token"
         )
 
-    # Salva o refresh token no banco
     save_refresh_token(db=db, user_id=db_user.id, jti=jti, expires_at=expires_at)
 
-    # === Configura cookies HttpOnly ===
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=True,      # Mude para False em desenvolvimento local (http)
+        secure=True,
         samesite="lax",
-        max_age=60 * 60,  # 1 hora
+        max_age=60 * 60 * 24, # a day, 1h?
         path="/"
     )
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=True,      # Mude para False em desenvolvimento local
+        secure=True,
         samesite="lax",
-        max_age=60 * 60 * 24 * 7,  # 7 dias (ajuste conforme expires_delta acima)
+        max_age=60 * 60 * 24 * 7,
         path="/"
     )
 
-    # === Resposta para o frontend ===
     token_response = {
         "access_token": access_token,
         "token_type": "bearer",
@@ -194,7 +178,6 @@ def login(
         "is_verified": db_user.is_verified
     }
 
-    # Flag master (se aplicável)
     if "master" in scopes and getattr(db_user, "role", None) == "master":
         token_response["is_master"] = True
 
@@ -251,19 +234,15 @@ def refresh_token(
     except ValueError:
         raise HTTPException(status_code=401, detail="Refresh token inválido ou expirado")
 
-    # Verifica se o token é válido no banco (não revogado e não expirado)
     if not is_refresh_token_valid(db, jti):
         raise HTTPException(status_code=401, detail="Refresh token revogado ou expirado")
 
-    # Revoga o token antigo
     revoke_refresh_token(db, jti)
 
-    # Busca usuário
     db_user = db.query(models.User).filter(models.User.email == email).first()
     if not db_user:
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-    # Gera NOVO access token
     scopes = db_user.scopes if isinstance(db_user.scopes, list) else db_user.scopes.split(",") if db_user.scopes else []
     new_access_token = create_access_token(
         data={
@@ -275,7 +254,6 @@ def refresh_token(
         token_type="access"
     )
 
-    # Gera NOVO refresh token com rotação
     new_refresh_token = create_access_token(
         data={"sub": db_user.email},
         expires_delta=timedelta(days=30),
@@ -283,17 +261,14 @@ def refresh_token(
         include_jti=True
     )
 
-    # Salva o novo refresh token
     new_payload = decode_token(new_refresh_token)
     new_jti = new_payload["jti"]
     new_expires_at = datetime.fromtimestamp(new_payload["exp"], tz=timezone.utc)
     save_refresh_token(db, db_user.id, new_jti, new_expires_at)
 
-    # Atualiza cookies
     response.set_cookie("access_token", new_access_token, httponly=True, secure=True, samesite="lax", max_age=3600, path="/")
     response.set_cookie("refresh_token", new_refresh_token, httponly=True, secure=True, samesite="lax", max_age=60*60*24*30, path="/")
 
-    # Resposta
     token_response = {
         "access_token": new_access_token,
         "token_type": "bearer",
@@ -313,7 +288,6 @@ def logout(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user_from_cookie)
 ):
-    # Revoga todos os refresh tokens do usuário
     db.query(RefreshToken).filter(
         RefreshToken.user_id == current_user.id,
         RefreshToken.revoked == False

@@ -1,17 +1,15 @@
-"""add shipping presets table with seed data"""
 
 from alembic import op
 import sqlalchemy as sa
 
 
-revision = '20250408_presets'  # vai ser o nome do arquivo que o alembic gerou
-down_revision = 'a52036959172'  # ou a migration anterior (pode deixar None se não souber)
+revision = '20250408_presets'
+down_revision = 'a52036959172'
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
-    # Cria a tabela
     op.create_table('shipping_presets',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(length=50), nullable=False),
@@ -25,7 +23,6 @@ def upgrade():
     )
     op.create_index('ix_shipping_presets_name', 'shipping_presets', ['name'])
 
-    # SEED com os presets reais (baralhos 2025)
     presets_table = sa.table('shipping_presets',
         sa.column('name', sa.String),
         sa.column('weight_grams', sa.Integer),

@@ -1,15 +1,10 @@
-# alembic/env.py
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 
-#python -m alembic revision --autogenerate -m "add shipping presets table" // comando para criar, somente alterar nomenclatura.
-# === IMPORTA O Base E TODOS OS MODELS QUE EXISTEM NO SEU PROJETO ===
 from app.database import Base
-import app.store.models          # Product
-import app.store.branch.models   # Brand (agora está correto – ele existe!)
-# Se der erro nessa linha, troque por:
-# from app.store.branch import models  # ou apenas comente se não existir
+import app.store.models         
+import app.store.branch.models  
 
 config = context.config
 

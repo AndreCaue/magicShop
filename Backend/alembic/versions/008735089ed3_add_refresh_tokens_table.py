@@ -1,17 +1,10 @@
-"""add refresh_tokens table
 
-Revision ID: seu_novo_id_aqui
-Revises: 20250408_presets
-Create Date: 2025-12-09 16:00:00.000000
-
-"""
 from alembic import op
 import sqlalchemy as sa
 from datetime import datetime
 
-# revision identifiers, used by Alembic.
-revision = 'seu_novo_id_aqui'  # deixe o que o Alembic gerou
-down_revision = '20250408_presets'  # ou a última migração válida
+revision = 'seu_novo_id_aqui' 
+down_revision = '20250408_presets'
 branch_labels = None
 depends_on = None
 
@@ -27,7 +20,6 @@ def upgrade():
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.text("datetime('now')")),
         sa.PrimaryKeyConstraint('id')
     )
-    # Índice adicional para consultas por user_id + revoked (opcional, mas útil)
     op.create_index('ix_refresh_tokens_user_id', 'refresh_tokens', ['user_id'])
 
 

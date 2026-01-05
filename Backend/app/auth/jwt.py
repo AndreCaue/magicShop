@@ -1,7 +1,3 @@
-# auth/jwt.py
-# Módulo central de autenticação: JWT, senhas e tokens
-# Tudo relacionado a auth deve ser importado daqui
-
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
@@ -10,28 +6,19 @@ from dotenv import load_dotenv
 from .models import RefreshToken
 from sqlalchemy.orm import Session
 import uuid
+from ..core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 load_dotenv()
 
-# Configurações
-SECRET_KEY = os.getenv("JWT_SECRET", "meusegredo123")  # MUDE EM PRODUÇÃO!
-ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# ======================
-# Senhas
-# ======================
+
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-# ======================
-# Tokens JWT
-# ======================
 def create_access_token(
     data: dict,
     expires_delta: timedelta | None = None,
@@ -49,9 +36,7 @@ def create_access_token(
         to_encode["jti"] = str(uuid.uuid4())
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# ======================
-# Validação
-# ======================
+
 def decode_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

@@ -17,12 +17,11 @@ class MelhorEnvioClient:
         self.environment = env
         self.base_url = BASE_URLS.get(env, BASE_URLS["production"])
 
-        # Escolhe o token correto com base no ambiente
         if env == "sandbox":
             token = settings.MELHOR_ENVIO_TOKEN_SANDBOX
             token_name = "MELHOR_ENVIO_TOKEN_SANDBOX"
         else:
-            token = settings.MELHOR_ENVIO_TOKEN or settings.MELHOR_ENVIO_TOKEN_SANDBOX  # fallback
+            token = settings.MELHOR_ENVIO_TOKEN or settings.MELHOR_ENVIO_TOKEN_SANDBOX  
             token_name = "MELHOR_ENVIO_TOKEN"
 
         if not token:
@@ -37,7 +36,7 @@ class MelhorEnvioClient:
             headers={
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token}",  # ← CORRETO!
+                "Authorization": f"Bearer {self.token}", 
                 "User-Agent": f"MagicShop/{getattr(settings, 'APP_VERSION', '1.0')} (seuemail@gmail.com)",
             },
         )
@@ -77,5 +76,4 @@ class MelhorEnvioClient:
             raise
 
 
-# Instância única
 melhor_envio_client = MelhorEnvioClient()
