@@ -1,10 +1,7 @@
-import logging
 from typing import List, Dict, Any
 
 from .client import melhor_envio_client
 from .schemas import CotacaoFreteResponse
-
-logger = logging.getLogger(__name__)
 
 async def cotar_frete(
     cep_destino: str,

@@ -10,15 +10,10 @@ from app.schemas import UserOut
 from app.database import SessionLocal
 import os
 from dotenv import load_dotenv
-import logging
+from ..core.config import SECRET_KEY, ALGORITHM 
 
 load_dotenv()
 
-
-logger = logging.getLogger(__name__)
-
-SECRET_KEY = os.getenv("JWT_SECRET", "meusegredo123")
-ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="auth/token",
@@ -61,9 +56,6 @@ def get_current_user(
     token: str = Depends(get_token_from_request)
 ) -> User:
 
-
-    logger.info(f"Headers recebidos: {dict(request.headers)}")
-    logger.info(f"Cookies recebidos: {dict(request.cookies)}")
     
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -82,15 +74,12 @@ def get_current_user(
         if email is None:
             raise credentials_exception
     except JWTError as e:
-        logger.error(f"Erro ao decodifcar JWT: {e}")
         raise credentials_exception
 
     user = db.query(User).filter(User.email == email).first()
     if not user:
-        logger.warning(f"Usuário não encontrado para email {email}")
         raise credentials_exception
 
-    logger.info(f"Usuário autenticado: {user.email} | Scopes: {scopes}")
     return user
 
 

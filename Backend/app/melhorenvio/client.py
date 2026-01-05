@@ -1,16 +1,11 @@
 import httpx
-import logging
 from app.core.config import settings
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 BASE_URLS = {
     "production": "https://melhorenvio.com.br/api/v2",
     "sandbox": "https://sandbox.melhorenvio.com.br/api/v2",
 }
-
-
 class MelhorEnvioClient:
     def __init__(self):
         env = (settings.MELHOR_ENVIO_ENV or "production").lower()
@@ -41,10 +36,6 @@ class MelhorEnvioClient:
             },
         )
 
-        logger.info(
-            f"Melhor Envio client iniciado → {env.upper()} ({self.base_url}) "
-            f"usando token de {token_name}"
-        )
 
     async def close(self):
         await self.client.aclose()
@@ -56,10 +47,8 @@ class MelhorEnvioClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as exc:
-            logger.error(f"Erro API Melhor Envio [{exc.response.status_code}] {url}: {exc.response.text}")
             raise
         except httpx.RequestError as exc:
-            logger.error(f"Erro de conexão com Melhor Envio: {str(exc)}")
             raise
 
     async def get(self, endpoint: str, **kwargs):
@@ -69,10 +58,8 @@ class MelhorEnvioClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as exc:
-            logger.error(f"Erro API Melhor Envio [{exc.response.status_code}] {url}: {exc.response.text}")
             raise
         except httpx.RequestError as exc:
-            logger.error(f"Erro de conexão: {str(exc)}")
             raise
 
 
