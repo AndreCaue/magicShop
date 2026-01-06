@@ -1,18 +1,5 @@
-// src/components/cart/CartItem.tsx
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/Hooks/useCart";
-
-// type Props = {
-//   item: {
-//     id: string;
-//     name: string;
-//     price: number;
-//     quantity: number;
-//     image: string;
-//     variant?: string;
-//   };
-// };
 
 export default function CartItem({ item }: any) {
   const { updateQuantity, removeFromCartAction, isFetching, isMutating } =

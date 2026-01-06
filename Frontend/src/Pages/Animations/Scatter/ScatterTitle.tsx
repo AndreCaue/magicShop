@@ -6,9 +6,9 @@ const letterVariants: Variants = {
   initial: { x: 0, y: 0, rotate: 0 },
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   scattered: (i: number) => ({
-    x: (Math.random() - 0.5) * 200, // espalha horizontalmente até 200px
-    y: (Math.random() - 0.5) * 200, // espalha verticalmente até 200px
-    rotate: (Math.random() - 0.5) * 360, // gira aleatoriamente
+    x: (Math.random() - 0.5) * 200,
+    y: (Math.random() - 0.5) * 200,
+    rotate: (Math.random() - 0.5) * 360,
     transition: {
       duration: 0.6,
       ease: "easeOut",
@@ -30,7 +30,6 @@ export default function ScatterTitle({
       <motion.h1
         className=" font-bold text-white tracking-wide cursor-default select-none"
         onMouseEnter={() => setIsHovered(true)}
-        // onMouseLeave={() => setIsHovered(false)}
         style={{ display: "inline-block" }}
       >
         {text.split("").map((letter, i) => (

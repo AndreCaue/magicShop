@@ -1,4 +1,3 @@
-// components/new/CepInputForm.tsx
 import {
   FormControl,
   FormField,
@@ -24,7 +23,6 @@ type TCepInputForm = {
   isSkeletonLoading?: boolean;
   background?: "light" | "dark";
   className?: string;
-  /** Função chamada toda vez que o valor do campo muda (com máscara aplicada) */
   onChangeValue?: (value: string) => void;
   iconPlaceholder?: React.ReactElement;
 };

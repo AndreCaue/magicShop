@@ -1,4 +1,3 @@
-// src/stores/useShippingStore.ts
 import { create } from "zustand";
 
 export interface ShippingOption {
@@ -15,19 +14,17 @@ interface ShippingState {
   shippingOptions: ShippingOption[];
   selectedShipping: ShippingOption | null;
   isFreeShipping: boolean;
-  isCalculatingShipping: boolean; // Adicionado
-  shippingError: string | null; // Adicionado (opcional, mas recomendado)
+  isCalculatingShipping: boolean;
+  shippingError: string | null;
 
-  // Getters
   getFormattedCep: () => string;
 
-  // Actions
   setCep: (cep: string) => void;
   setShippingOptions: (options: ShippingOption[]) => void;
   setSelectedShipping: (option: ShippingOption | null) => void;
   setFreeShipping: (isFree: boolean) => void;
-  setIsCalculatingShipping: (isCalculating: boolean) => void; // Adicionado
-  setShippingError: (error: string | null) => void; // Adicionado
+  setIsCalculatingShipping: (isCalculating: boolean) => void;
+  setShippingError: (error: string | null) => void;
   clear: () => void;
 }
 
@@ -36,10 +33,9 @@ export const useShippingStore = create<ShippingState>((set, get) => ({
   shippingOptions: [],
   selectedShipping: null,
   isFreeShipping: false,
-  isCalculatingShipping: false, // Inicializado
-  shippingError: null, // Inicializado
+  isCalculatingShipping: false,
+  shippingError: null,
 
-  // Getter para CEP formatado
   getFormattedCep: () => {
     const state = get();
     return state.cep.length === 8
@@ -47,7 +43,6 @@ export const useShippingStore = create<ShippingState>((set, get) => ({
       : state.cep;
   },
 
-  // Actions
   setCep: (cep) => set({ cep }),
   setShippingOptions: (options) => set({ shippingOptions: options }),
   setSelectedShipping: (option) => set({ selectedShipping: option }),

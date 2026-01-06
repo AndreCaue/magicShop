@@ -30,7 +30,7 @@ export const PresetsForm = () => {
       height_cm: Number(values.height_cm),
       width_cm: Number(values.width_cm),
       length_cm: Number(values.length_cm),
-      is_active: true, // default = true / put = dinamico
+      is_active: true,
     });
 
     if (!res) return;
@@ -89,7 +89,7 @@ export const PresetsForm = () => {
               <InputForm
                 control={control}
                 label="Radio button para desativar o preset (cm)"
-                className="hidden" // edit mode
+                className="hidden"
                 name="is_active"
                 disabled={isSubmitting}
               />

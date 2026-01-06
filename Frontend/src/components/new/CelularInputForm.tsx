@@ -34,7 +34,7 @@ const celularOnlyMaskOptions = {
     /\d/,
     ")",
     " ",
-    /[6-9]/, // Obriga o 5º dígito a ser 6-9 (celular)
+    /[6-9]/,
     /\d/,
     /\d/,
     /\d/,

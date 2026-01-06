@@ -24,7 +24,7 @@ interface UploadedFile {
 type TUploadImage = {
   required?: boolean;
   label?: string;
-  maxFiles?: number; // Default 2
+  maxFiles?: number;
   isSkeletonLoading?: boolean;
   className?: string;
 };
@@ -76,7 +76,7 @@ export const UploadImage = <
             Promise.all(promises)
               .then((results: UploadedFile[]) => {
                 const updatedFiles = [...currentUploadedFiles, ...results];
-                field.onChange(updatedFiles); // Atualiza o estado do form
+                field.onChange(updatedFiles);
                 setIsUploading(false);
               })
               .catch(() => {
@@ -99,7 +99,7 @@ export const UploadImage = <
           const updatedFiles = currentUploadedFiles.filter(
             (_, index: number) => index !== indexToRemove
           );
-          field.onChange(updatedFiles); // Atualiza o estado do form
+          field.onChange(updatedFiles);
         };
 
         const currentCount = currentUploadedFiles.length;

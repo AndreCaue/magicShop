@@ -26,7 +26,7 @@ const QuantitySelector = ({
 
   useEffect(() => {
     getQuantity(quantity);
-  }, [quantity]); // verificar isso depois?
+  }, [quantity]);
 
   const decrement = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));

@@ -1,18 +1,16 @@
-// src/hooks/useCart.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addToCart,
   getCart,
   updateCartItemQuantity,
-  removeFromCart, // ← agora importado
-  clearCart, // ← agora importado
+  removeFromCart,
+  clearCart,
 } from "../Repositories/shop/cart";
 import type { Cart } from "@/global/cart";
 
 export const useCart = () => {
   const queryClient = useQueryClient();
 
-  // 1. Busca o carrinho
   const {
     data: cart,
     isLoading,
@@ -24,12 +22,10 @@ export const useCart = () => {
     refetchOnWindowFocus: true,
   });
 
-  // Invalida a query do carrinho após qualquer mutação bem-sucedida
   const invalidateCart = () => {
     queryClient.invalidateQueries({ queryKey: ["cart"] });
   };
 
-  // ---------- Mutações ----------
   const addMutation = useMutation({
     mutationFn: addToCart,
     onSuccess: invalidateCart,
@@ -51,7 +47,6 @@ export const useCart = () => {
     onSuccess: invalidateCart,
   });
 
-  // ---------- Ações expostas ----------
   const addToCartAction = (item: Parameters<typeof addToCart>[0]) => {
     addMutation.mutate(item);
   };
@@ -68,11 +63,6 @@ export const useCart = () => {
     removeMutation.mutate(itemId);
   };
 
-  const clearCartAction = () => {
-    clearMutation.mutate();
-  };
-
-  // ---------- Helpers ----------
   const items = cart?.items ?? [];
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = items.reduce(
@@ -87,18 +77,15 @@ export const useCart = () => {
     clearMutation.isPending;
 
   return {
-    // Dados do carrinho
     cart,
     items,
     totalItems,
     subtotal: subtotal.toFixed(2),
 
-    // Estados
     isLoading,
     isFetching: isFetching && !isLoading,
     isMutating,
 
-    // Ações (funções prontas para usar nos componentes)
     addToCart: addToCartAction,
     updateQuantity,
     removeFromCartAction,

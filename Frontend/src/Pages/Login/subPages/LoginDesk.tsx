@@ -1,4 +1,4 @@
-import AnimatedTitle from "@/components/new/AnimTitle";
+import AnimatedTitle from "@/components/new/AnimatedTitle";
 import { InputForm } from "@/components/new/InputForm";
 import { Form } from "@/components/ui/form";
 import { useAuth } from "@/Hooks/useAuth";
@@ -20,7 +20,6 @@ const formSchema = z.object({
 type TForm = Required<z.infer<typeof formSchema>>;
 
 export const LoginDesk = () => {
-  const [initialLoading, setInitialLoading] = useState(false);
   const navigate = useNavigate();
   const { handleLogin } = useAuth();
   const { setUser } = useUser();
@@ -36,12 +35,9 @@ export const LoginDesk = () => {
   } = form;
 
   const onSubmit = async (values: TForm) => {
-    // setIsLoading(true);
     const res = await login(values.email, values.senha);
-    // setIsLoading(false);
     if (res.error) return toast.error(res.message);
 
-    console.log(res, "response onlogion");
     const { access_token, is_verified } = res;
 
     setUser({
@@ -49,7 +45,7 @@ export const LoginDesk = () => {
       scopes: res.scopes || [],
       isMaster: res.is_master || false,
       isBasic: (res.scopes || []).includes("basic"),
-      isPremium: (res.scopes || []).includes("premium"), // passar o contexto ao realizar o login. //implementar reflesh token.
+      isPremium: (res.scopes || []).includes("premium"),
       isVerified: res.is_verified || false,
     });
 
@@ -81,7 +77,6 @@ export const LoginDesk = () => {
               name="email"
               control={control}
               background="dark"
-              isSkeletonLoading={initialLoading}
               disabled={isSubmitting}
             />
             <InputForm
@@ -90,7 +85,6 @@ export const LoginDesk = () => {
               background="dark"
               type="password"
               control={control}
-              isSkeletonLoading={initialLoading}
               disabled={isSubmitting}
             />
 

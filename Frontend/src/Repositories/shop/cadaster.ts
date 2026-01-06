@@ -21,7 +21,6 @@ interface UploadedFile {
 export const createProductCards = async (data: TProductCardParams) => {
   const formData = new FormData();
 
-  // Adiciona campos normais
   formData.append("name", data.name);
   formData.append("description", data.description);
   formData.append("price", String(data.price));
@@ -32,7 +31,6 @@ export const createProductCards = async (data: TProductCardParams) => {
   formData.append("width_cm", String(data.width_cm));
   formData.append("length_cm", String(data.length_cm));
 
-  // Adiciona imagens
   data.images_urls.forEach((imgObj) => {
     if (imgObj.file instanceof File) {
       formData.append("images", imgObj.file);
@@ -41,7 +39,7 @@ export const createProductCards = async (data: TProductCardParams) => {
 
   const response = await api.post(`/products/register`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
-    withCredentials: true, // redundante mas seguro
+    withCredentials: true,
   });
   return response.data;
 };

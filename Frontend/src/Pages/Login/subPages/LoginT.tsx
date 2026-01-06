@@ -1,5 +1,5 @@
 import useIsMobile from "@/Hooks/isMobile";
-import AnimatedTitle from "@/components/new/AnimTitle";
+import AnimatedTitle from "@/components/new/AnimatedTitle";
 
 import { useAuth } from "@/Hooks/useAuth";
 import { useEffect } from "react";

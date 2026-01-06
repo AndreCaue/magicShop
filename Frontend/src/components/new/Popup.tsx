@@ -19,8 +19,6 @@ const Popup = (props: TProps) => {
     side = "top",
     triggerClassName,
     contentClassName,
-    // onPressEnter,
-    // disableFocus,
     isChild = false,
   } = props;
 
@@ -29,22 +27,12 @@ const Popup = (props: TProps) => {
   const openPopup = () => setIsOpen(true);
   const closePopup = () => setIsOpen(false);
 
-  //   const onKeyDownClosePopover = e => {
-  //     if (e.key === 'Enter') {
-  //       !disableFocus && e.preventDefault()
-  //       closePopup()
-  //       onPressEnter()
-  //     }
-  //   }
-
   return (
     <Popover open={isOpen}>
       <PopoverTrigger
         onMouseEnter={openPopup}
         onMouseLeave={closePopup}
-        // onKeyDown={onKeyDownClosePopover}
         className={triggerClassName}
-        // tabIndex={disableFocus && -1}
         asChild={isChild}
       >
         {trigger}

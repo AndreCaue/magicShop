@@ -1,11 +1,9 @@
 import { CarouselMain } from "@/components/new/Carrosel";
 import { Club, Diamond, Heart, Spade } from "lucide-react";
 import { CardContainer } from "./Components/CardContainer";
-import { Topbar } from "@/Topbar/Topbar";
 import { toast, Toaster } from "sonner";
 import { useEffect, useState } from "react";
 import { VerifyDialog } from "./Components/VerifyDialog";
-import { AppSidebar } from "@/components/Sidebar/Sidebar";
 
 const initialLocalStorage = localStorage.getItem("is_verify") === "true";
 
@@ -30,11 +28,9 @@ export const Home = () => {
   };
 
   useEffect(() => {
-    // Atualiza o estado com base no localStorage na montagem do componente
     const verified = localStorage.getItem("is_verify") === "true";
     setIsVerified(verified);
 
-    // Mostra o toast apenas se não estiver verificado
     if (!verified) {
       handleToastDuration();
     }

@@ -10,8 +10,6 @@ interface InputProps extends React.ComponentProps<"input"> {
   background?: "light" | "dark";
 }
 
-//  "flex h-10 w-full border-b bg-transparent px-3 py-1 text-white text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none  disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {

@@ -55,9 +55,7 @@ const mockImages = {
 export const MainAcessorios = () => {
   return (
     <>
-      <div
-      //n mexer
-      >
+      <div>
         <div className="flex flex-col gap-20 overflow-x-hidden">
           <div className="py-10 overflow-x-hidden">
             <EachCarousel

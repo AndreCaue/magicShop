@@ -2,7 +2,7 @@ import { PageContainer } from "@/Pages/Home/Components/PageContainer";
 import { ItemList } from "./Components/ItemList";
 import blueBy from "../../../assets/BicycleBlue.png";
 import bluebyDec from "../../../assets/blue-bicycle-decline.png";
-import AnimatedTitle from "@/components/new/AnimTitle";
+import AnimatedTitle from "@/components/new/AnimatedTitle";
 
 const mockImages = {
   data: [
@@ -79,17 +79,3 @@ export const Bicycle = () => {
     </PageContainer>
   );
 };
-
-/*
-      <div className="grid gap-5 border max-h-screen -py-20 px-20">
-        <div
-          className="flex flex-wrap gap-2"
-          //overflow-hidden
-        >
-          {mockImages.data.length &&
-            mockImages.data.map((item, index) => (
-              <ItemList key={index} items={item} />
-            ))}
-        </div>
-      </div>
-*/

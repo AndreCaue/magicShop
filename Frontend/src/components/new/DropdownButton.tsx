@@ -16,7 +16,7 @@ type TDropdownButton = {
   label: string;
   options: TValue[];
   onChangeValue?: () => void;
-  onSelect?: (value: TValue) => void; // callback quando selecionar
+  onSelect?: (value: TValue) => void;
 };
 
 export const DropdownButton = ({
@@ -55,7 +55,7 @@ export const DropdownButton = ({
           <DropdownMenuItem
             key={idx}
             className="hover:bg-slate-100 hover:cursor-pointer"
-            onSelect={() => onSelect?.(opt)} // pega o valor ao selecionar
+            onSelect={() => onSelect?.(opt)}
           >
             {opt.text}
           </DropdownMenuItem>

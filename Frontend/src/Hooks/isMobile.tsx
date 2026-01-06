@@ -15,17 +15,14 @@ function useIsMobile(breakpoint = 767) {
       setIsMobile(mediaQuery.matches);
     };
 
-    // Inicializa o estado
     handleChange();
 
-    // Adiciona listener eficiente para mudanças na media query
     mediaQuery.addEventListener("change", handleChange);
 
-    // Limpa o listener ao desmontar o componente
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
-  }, [breakpoint]); // Re-executa se o breakpoint mudar
+  }, [breakpoint]);
 
   return isMobile;
 }

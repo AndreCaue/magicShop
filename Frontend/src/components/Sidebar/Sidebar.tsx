@@ -126,7 +126,7 @@ export function AppSidebar() {
       },
       {
         id: 12,
-        title: "Logout", // se não tiver logado será login
+        title: "Logout",
         url: "/login",
       },
     ],

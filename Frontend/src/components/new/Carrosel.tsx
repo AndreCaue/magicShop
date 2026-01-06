@@ -9,7 +9,7 @@ import Autoplay from "embla-carousel-autoplay";
 type TCarouselMain = {
   children: React.ReactNode;
 };
-//♠♥♦♣
+
 export const CarouselMain = ({ children }: TCarouselMain) => {
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })

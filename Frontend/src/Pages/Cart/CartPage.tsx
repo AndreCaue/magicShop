@@ -1,4 +1,3 @@
-// src/components/cart/CartPage.tsx
 import { Link } from "react-router-dom";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
@@ -28,18 +27,14 @@ export default function CartPage() {
           <CartEmpty />
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Lista de itens */}
             <div className="lg:col-span-2 space-y-6">
               {items.map((item) => (
                 <CartItem key={`${item.id}-${item.variant}`} item={item} />
               ))}
             </div>
 
-            {/* Resumo (sticky no desktop) */}
             <div className="lg:sticky lg:top-6 h-fit">
-              <CartSummary
-              // items={items}
-              />
+              <CartSummary />
             </div>
           </div>
         )}

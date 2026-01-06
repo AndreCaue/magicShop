@@ -59,12 +59,7 @@ const InputOTPForm = <
               </FormLabel>
 
               <FormControl>
-                <InputOTP
-                  maxLength={6}
-                  {...field}
-                  //   onChange={(value) => onChangeValue?.(value)}
-                  {...props}
-                >
+                <InputOTP maxLength={6} {...field} {...props}>
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />

@@ -2,7 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true, // envia o cookie HttpOnly automaticamente
+  withCredentials: true,
 });
 
 export const getCart = async () => {
@@ -28,7 +28,7 @@ export const updateCartItemQuantity = async ({
   const response = await api.put<any>("/cart/update", {
     cart_item_id: product_id,
     quantity,
-  }); // parei aqui
+  });
 
   return response.data;
 };

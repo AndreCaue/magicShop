@@ -1,5 +1,3 @@
-// src/types/cart.ts
-
 export type CartItem = {
   id: string;
   product_id: string;
@@ -10,7 +8,7 @@ export type CartItem = {
   total_price: number;
 
   /** Dimensões e pesos */
-  weight: number; // em gramas
+  weight: number;
   width: number;
   length: number;
   height: number;

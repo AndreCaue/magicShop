@@ -11,18 +11,8 @@ export const Diamonds = ({ children }: TDiamonds) => {
     navigate("/baralhos");
   };
   return (
-    <div
-      // style={{ backgroundColor: "#FF0000" }}
-      className="   flex justify-center items-center cursor-pointer"
-    >
+    <div className="   flex justify-center items-center cursor-pointer">
       <Diamond size={250} rotate={45} className="" />
-      {/* <button
-        type="button"
-        onClick={handleClick}
-        className="cursor-pointer w-full h-full justify-center flex items-center"
-      >
-        {children}
-      </button> */}
     </div>
   );
 };

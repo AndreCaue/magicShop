@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Forgot = () => {
   const isMobile = useIsMobile();
-  const [email, setEmail] = useState("teste@email.com"); //fazer email//hook.
+  const [email, setEmail] = useState("teste@email.com"); // to do
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 

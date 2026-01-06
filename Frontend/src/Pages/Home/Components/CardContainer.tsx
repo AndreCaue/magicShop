@@ -25,23 +25,6 @@ export const CardContainer = ({
   const handleClick = () => {
     navigate(`shop/${goTo}`);
   };
-  /*
-  fetch("http://localhost:8000/auth/token", {
-  method: "POST",
-  body: new URLSearchParams({ username: email, password }),
-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  credentials: 'include'
-});
-
-fetch("http://localhost:8000/auth/basic-area", { credentials: 'include' })
-  */
-
-  // const onClick = async () => {
-  //   //função chama para validar.
-  //   const res = await isValidEmail();
-
-  //   console.log(res, "teste");
-  // };
 
   return (
     <Card>

@@ -12,7 +12,6 @@ export const fetchAddressByCep = async (
 ) => {
   if (cep.length < 8) return;
 
-  // const cleaned = cep.replace(/\D/g, "");
   const response = await getViaCep(cep);
 
   if (response) {
@@ -23,53 +22,6 @@ export const fetchAddressByCep = async (
     setValue("complemento", response.complemento || "");
   }
 };
-
-// const handleCepChange = async (value: string) => {
-//   const cleanedCep = value.replace(/\D/g, "");
-//   setCep(cleanedCep);
-//   setError(null);
-
-//   if (cleanedCep.length !== 8) {
-//     setShippingOptions([]);
-//     setSelectedShipping(null);
-//     return;
-//   }
-
-//   setLoading(true);
-
-//   try {
-//     const payload = {
-//       cep_destino: cleanedCep,
-//       peso_gramas: items[0]?.weight || 500,
-//       largura_cm: items[0]?.width || 16,
-//       altura_cm: items[0]?.height || 6,
-//       comprimento_cm: items[0]?.length || 23,
-//       valor_declarado: items[0]?.unit_price || 0,
-//       cep_origem: "13454056",
-//     };
-
-//     const options: ShippingOption[] = (await getShippingPrice(payload)).data;
-
-//     if (options.length === 0) {
-//       setError("Nenhuma opção de entrega disponível para este CEP");
-//       setShippingOptions([]);
-//       setSelectedShipping(null);
-//     } else {
-//       setShippingOptions(options);
-//       const cheapest = options.reduce((prev, curr) =>
-//         curr.preco < prev.preco ? curr : prev
-//       );
-//       setSelectedShipping(cheapest);
-//     }
-//   } catch (err) {
-//     console.error("Erro ao calcular frete:", err);
-//     setError("Erro ao calcular frete. Tente novamente.");
-//     setShippingOptions([]);
-//     setSelectedShipping(null);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
 
 export const UseCalculateShipping = () => {
   const { items } = useCart();

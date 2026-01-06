@@ -1,8 +1,6 @@
-// AnimatedTitle.tsx
 import React from "react";
 import styled from "styled-components";
 
-// Interface para as props customizadas (polimórficas)
 interface AnimatedTitleProps {
   text: string | undefined;
   level?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
@@ -12,7 +10,6 @@ interface AnimatedTitleProps {
   style?: React.CSSProperties;
 }
 
-// Interface apenas para os props usados no styled-component
 interface StyledTitleProps {
   size?: "small" | "medium" | "large";
   align?: "left" | "center" | "right";
@@ -72,7 +69,7 @@ const AnimatedTitle: React.FC<AnimatedTitleProps> = ({
 }) => {
   return (
     <AnimatedTitleStyled
-      as={level} // Passa o 'as' diretamente aqui (resolve o erro de tipagem)
+      as={level}
       size={size}
       align={align}
       className={className}

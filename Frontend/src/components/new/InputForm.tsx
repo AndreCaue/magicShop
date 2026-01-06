@@ -48,7 +48,6 @@ const InputForm = <
   isSkeletonLoading,
   background = "light",
   disabled,
-  // ...props
 }: TInputForm & UseControllerProps<TFieldValues, TName>) => {
   return (
     <FormField
@@ -92,7 +91,6 @@ const InputForm = <
                   type={type}
                   icon={iconPlaceholder}
                   disabled={disabled}
-                  // {...props}
                 />
               </FormControl>
               <FormMessage />

@@ -35,9 +35,7 @@ export const AccordionForm = () => {
   });
 
   const { setValue, watch } = form;
-  //parei aqui.
-  //valor do cep não atualiza automaticamente ao setar value pelo zustend.
-  // não retrocede de aba.
+
   useEffect(() => {
     if (user?.email) setValue("email", user.email);
   }, [user, setValue]);
@@ -60,6 +58,9 @@ export const AccordionForm = () => {
 
   const canOpenStep = (step: TStep) =>
     step === activeStep || completedSteps.includes(step);
+  //parei aqui em webhook do backend.
+  //preciso fazer deploy.
+  // migrar banco.
 
   return (
     <Accordion

@@ -235,8 +235,6 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
                     placeholder="Pesquisar"
                     data-testid="searchCommandInputBottom"
                     autoFocus
-                    // className="group-data-[side='top']:hidden" // caso o dropdown quebre o layout top or bottom
-                    // searchIconStyle="group-data-[side='top']:hidden"
                     aria-label={searchAriaLabel}
                     role="search"
                   />
@@ -271,16 +269,6 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
                       ))}
                     </CommandGroup>
                   </CommandList>
-
-                  {/* <CommandInput
-                    placeholder="Pesquisar"
-                    data-testid="searchCommandInputTop"
-                    autoFocus
-                    className="group-data-[side='bottom']:hidden"
-                    searchIconStyle="group-data-[side='bottom']:hidden" // caso o dropdown quebre o layout top or bottom
-                    aria-label={searchAriaLabel}
-                    role="search"
-                  /> */}
                 </Command>
               </PopoverContent>
             </Popover>

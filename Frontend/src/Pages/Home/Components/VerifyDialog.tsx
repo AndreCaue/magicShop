@@ -34,7 +34,7 @@ export const VerifyDialog = ({ isOpen, setIsOpen }: TVerifyDialog) => {
 
   const { handleSubmit, control, watch } = form;
   const valueInput = watch("verifyCode");
-  //066 534
+
   const onSubmit = async () => {
     setIsLoading(true);
     const res = await verifyValidationEmail(valueInput);

@@ -51,7 +51,7 @@ export const verifyValidationEmail = async (code: string) => {
       { code },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Token JWT
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );

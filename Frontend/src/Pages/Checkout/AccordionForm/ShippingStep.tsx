@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { type TStep, type TForm } from "../types";
 import type { UseFormReturn } from "react-hook-form";
 import { useShippingStore } from "@/stores/useShippingStore";
+import { motion } from "framer-motion";
 
 type Props = {
   goToNextStep: (current: TStep, next: TStep) => Promise<void>;
@@ -26,6 +27,7 @@ export default function ShippingStep({
     shippingOptions,
     isFreeShipping,
     isCalculatingShipping,
+    setSelectedShipping,
     shippingError,
   } = useShippingStore();
 
@@ -57,7 +59,6 @@ export default function ShippingStep({
       </AccordionTrigger>
 
       <AccordionContent className="flex flex-col gap-6 px-5 pb-8">
-        {/* Mensagem de frete grátis */}
         {isFreeShipping ? (
           <div className="p-6 bg-green-50 border border-green-300 rounded-lg text-center">
             <p className="text-2xl font-bold text-green-800">
@@ -68,7 +69,6 @@ export default function ShippingStep({
             </p>
           </div>
         ) : isCalculatingShipping ? (
-          /* Loading */
           <div className="text-center py-8">
             <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600" />
             <p className="mt-4 text-gray-600">
@@ -76,52 +76,71 @@ export default function ShippingStep({
             </p>
           </div>
         ) : shippingOptions.length > 0 ? (
-          /* Lista de opções de frete */
           <RadioGroup
             value={watch("frete_opcao") ?? ""}
             onValueChange={(value) => {
               setValue("frete_opcao", value, { shouldValidate: true });
+
               const selected = shippingOptions.find((opt) => opt.id === value);
               if (selected) {
-                // Opcional: atualizar store se necessário
-                // setSelectedShipping(selected);
+                setSelectedShipping(selected);
               }
             }}
-            className="space-y-3"
+            className="space-y-2 py-3 border-t border-b"
           >
-            <div className="space-y-3">
-              {shippingOptions.map((option) => (
-                <label
+            {shippingOptions.map((option) => {
+              const isSelected = watch("frete_opcao") === option.id;
+
+              return (
+                <motion.label
                   key={option.id}
-                  className={cn(
-                    "flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all",
-                    watch("frete_opcao") === option.id
-                      ? "border-green-500 bg-green-50"
-                      : "border-gray-300 hover:bg-gray-50"
-                  )}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center justify-between cursor-pointer py-2 hover:bg-gray-50 rounded-lg px-2 -mx-2 select-none"
                 >
-                  <div className="flex items-center gap-4">
-                    <RadioGroupItem value={option.id} />
+                  <RadioGroupItem value={option.id} className="hidden" />
+
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        isSelected ? "border-indigo-600" : "border-gray-300"
+                      }`}
+                    >
+                      {isSelected && (
+                        <motion.span
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-indigo-600 text-xs"
+                        >
+                          ♠
+                        </motion.span>
+                      )}
+                    </div>
+
                     <div>
-                      <p className="font-medium">
+                      <p className="font-medium text-sm">
                         {option.nome} - {option.empresa}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-500">
                         Entrega em até {option.prazo_dias} dias úteis
                       </p>
                     </div>
                   </div>
-                  <span className="font-bold text-lg">
+
+                  <span className="font-semibold text-sm">
                     {option.preco === 0
                       ? "Grátis"
                       : `R$ ${option.preco.toFixed(2).replace(".", ",")}`}
                   </span>
-                </label>
-              ))}
-            </div>
+                </motion.label>
+              );
+            })}
           </RadioGroup>
         ) : (
-          /* Erro */
           <div className="text-center py-8 text-orange-600">
             <p className="font-medium">Não foi possível calcular o frete</p>
             <p className="text-sm mt-2">
@@ -130,7 +149,6 @@ export default function ShippingStep({
           </div>
         )}
 
-        {/* Botão Prosseguir */}
         <div className="flex justify-end mt-6">
           <NewButton
             label="Ir para Pagamento"

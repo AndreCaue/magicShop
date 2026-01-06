@@ -2,7 +2,6 @@ import { EachCarousel } from "./Components/LojaCarousel";
 
 import { useEffect, useState } from "react";
 import { getListOfProducts } from "@/Repositories/shop/getters";
-//https://ibb.co/0kJYCmL - link gerado de imagme.
 
 interface IBrand {
   descricao: string;
@@ -24,7 +23,6 @@ export interface IProduct {
 }
 
 export const MainBaralhos = () => {
-  // const { user } = useUser();
   const [products, setProducts] = useState<IProduct[]>([]);
 
   useEffect(() => {
@@ -36,20 +34,9 @@ export const MainBaralhos = () => {
 
   return (
     <>
-      <div
-      //n mexer
-      >
+      <div>
         <div className="py-10 overflow-x-hidden">
           <EachCarousel data={products} mainTitle="BICYCLE" timer={3500} />
-
-          {/* <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} />
-          <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} />
-          <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} />
-          <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} />
-          <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} />
-          <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} />
-          <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} />
-          <EachCarousel data={mockImages.data} mainTitle="COPAG" timer={3000} /> */}
         </div>
       </div>
     </>

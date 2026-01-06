@@ -1,4 +1,3 @@
-// src/components/cart/CartEmpty.tsx
 import { Link } from "react-router-dom";
 
 export default function CartEmpty() {

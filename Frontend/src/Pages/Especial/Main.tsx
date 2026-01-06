@@ -28,7 +28,6 @@ type TTags = (typeof tabList)[number]["key"];
 export const MainEspecial = () => {
   const [tab, setTab] = useState<TTags>("baralhos");
 
-  // 🔥 Objeto de mapeamento entre tag e componente
   const tabContent: Record<TTags, React.JSX.Element> = {
     baralhos: <BaralhoForm />,
     acessorios: <div>Acessórios em breve...</div>,

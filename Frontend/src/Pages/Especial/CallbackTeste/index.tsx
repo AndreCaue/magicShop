@@ -1,7 +1,5 @@
-// src/pages/Callback.jsx   (ou .tsx)
 import { useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom"; // Vite + React Router v6
-// Se você usa Next.js, troque por useRouter + useSearchParams do next/navigation
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 export default function Callback() {
   const [searchParams] = useSearchParams();
@@ -9,16 +7,13 @@ export default function Callback() {
 
   const code = searchParams.get("code");
   const error = searchParams.get("error");
-  //https://sandbox.melhorenvio.com.br/oauth/authorize?client_id=7611&redirect_uri=https%3A%2F%2Fzinky-caroll-unflurried.ngrok-free.dev%2Fcallback&response_type=code&scope=shipping-calculate%20shipping-checkout%20shipping-generate%20shipping-tracking
   useEffect(() => {
-    // Caso tenha dado erro no OAuth
     if (error) {
       alert(`Erro na autorização: ${error}`);
       navigate("/");
       return;
     }
 
-    // Se chegou aqui com o code → troca por token
     if (code) {
       const trocarCodePorToken = async () => {
         try {
@@ -31,11 +26,11 @@ export default function Callback() {
               },
               body: new URLSearchParams({
                 grant_type: "authorization_code",
-                client_id: "7611", // ← seu client_id
-                client_secret: "v5xsIXbTd0yzIN8OetRBnlUWRT6TlsxGz4wfBawJ", // ← cole aqui (nunca commit no git!)
+                client_id: "7611",
+                client_secret: "v5xsIXbTd0yzIN8OetRBnlUWRT6TlsxGz4wfBawJ",
                 code: code,
                 redirect_uri:
-                  "https://zinky-caroll-unflurried.ngrok-free.dev/callback", // ← exatamente o mesmo do painel
+                  "https://zinky-caroll-unflurried.ngrok-free.dev/callback",
               }),
             }
           );
@@ -43,8 +38,7 @@ export default function Callback() {
           const data = await response.json();
 
           if (data.access_token) {
-            // Salva os tokens (você pode usar zustand, context ou localStorage)
-            localStorage.setItem("me_access_token", data.access_token); // parei aqui (grok)
+            localStorage.setItem("me_access_token", data.access_token);
             localStorage.setItem("me_refresh_token", data.refresh_token || "");
             localStorage.setItem(
               "me_token_expires",

@@ -1,4 +1,3 @@
-// src/components/cart/CartSummary.tsx
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/Hooks/useCart";
@@ -28,7 +27,6 @@ export default function CartSummary() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Sincroniza frete grátis com o subtotal atual
   const currentIsFreeShipping = Number(subtotal) > 250;
   useEffect(() => {
     setFreeShipping(currentIsFreeShipping);
@@ -96,7 +94,6 @@ export default function CartSummary() {
           <span className="font-medium">R$ {subtotal.replace(".", ",")}</span>
         </div>
 
-        {/* Frete */}
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="flex items-center gap-2">
@@ -122,7 +119,6 @@ export default function CartSummary() {
             )}
           </div>
 
-          {/* Campo CEP */}
           <Input
             placeholder="Digite seu CEP"
             value={useShippingStore.getState().getFormattedCep()}
@@ -131,21 +127,18 @@ export default function CartSummary() {
             className="text-base text-black"
           />
 
-          {/* Incentivo */}
           {!canProceedToCheckout && (
             <p className="text-sm text-gray-600 -mt-2 text-center">
               Digite seu CEP acima para calcular o frete e liberar o checkout
             </p>
           )}
 
-          {/* Mensagem frete grátis */}
           {isFreeShipping && (
             <p className="text-sm text-green-600 font-medium -mt-2">
               🎉 Parabéns! Você ganhou frete grátis
             </p>
           )}
 
-          {/* Erro */}
           {error && (
             <p className="text-sm text-red-600 flex items-center gap-2 -mt-2">
               <AlertCircle className="w-4 h-4" />
@@ -153,7 +146,6 @@ export default function CartSummary() {
             </p>
           )}
 
-          {/* Opções de frete */}
           {shippingOptions.length > 0 && !isFreeShipping && (
             <div className="space-y-2 py-3 border-t border-b">
               {shippingOptions.map((option) => {
@@ -216,7 +208,6 @@ export default function CartSummary() {
           )}
         </div>
 
-        {/* Total */}
         <div className="border-t pt-4">
           <div className="flex justify-between text-xl font-bold">
             <span>Total</span>
@@ -226,7 +217,6 @@ export default function CartSummary() {
           </div>
         </div>
 
-        {/* Botão Checkout */}
         <Link
           to="/checkout"
           className={cn(

@@ -16,8 +16,8 @@ module.exports = {
         pureRed: "#FF0000",
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"], // fonte global
-        display: ["Poppins", "sans-serif"], // títulos de produto
+        sans: ["Inter", "sans-serif"],
+        display: ["Poppins", "sans-serif"],
       },
     },
   },

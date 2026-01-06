@@ -18,7 +18,6 @@ export function useViaCep(cep: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  // Remove tudo que não for número
   const clearCEP = cep.replace(/\D/g, "");
 
   useEffect(() => {
@@ -51,7 +50,6 @@ export function useViaCep(cep: string) {
       }
     };
 
-    // Debounce de 600ms para não floodar a API
     const timeout = setTimeout(buscarCep, 600);
     return () => clearTimeout(timeout);
   }, [clearCEP]);

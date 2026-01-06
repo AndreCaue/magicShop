@@ -1,4 +1,3 @@
-// src/components/checkout/AccordionForm/PaymentStep.tsx
 import {
   AccordionItem,
   AccordionTrigger,
@@ -17,7 +16,7 @@ import PaymentSummary from "./PaymentSummary";
 type Props = {
   canOpenStep: (step: TStep) => boolean;
   form: UseFormReturn<TForm>;
-  onSubmit: () => void; // Função que será chamada ao clicar em "Finalizar"
+  onSubmit: () => void;
 };
 
 export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
@@ -30,7 +29,6 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
 
   const selectedMethod = watch("pagamento");
 
-  // Limpa campos do cartão quando muda o método de pagamento
   useEffect(() => {
     if (selectedMethod !== "cartao") {
       setValue("numero_cartao", "", { shouldValidate: true });
@@ -84,7 +82,6 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
       </AccordionTrigger>
 
       <AccordionContent className="flex flex-col gap-6 px-5 pb-8">
-        {/* Seleção de método */}
         <RadioGroup
           value={selectedMethod ?? ""}
           onValueChange={(value) =>
@@ -95,7 +92,6 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
           className="space-y-3"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Pix */}
             <label
               className={cn(
                 "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all text-center",
@@ -112,7 +108,6 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
               </p>
             </label>
 
-            {/* Cartão */}
             <label
               className={cn(
                 "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all text-center",
@@ -127,7 +122,6 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
               <p className="text-sm text-gray-600 mt-1">Até 12x sem juros</p>
             </label>
 
-            {/* Boleto */}
             <label
               className={cn(
                 "flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all text-center",
@@ -146,7 +140,6 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
           </div>
         </RadioGroup>
 
-        {/* Formulário de cartão (condicional) */}
         {selectedMethod === "cartao" && (
           <div className="mt-6 space-y-5 bg-gray-50 p-6 rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -203,13 +196,10 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
           </div>
         )}
 
-        {/* Resumo e botão final */}
         <div className="mt-8 pt-6 border-t">
           <div className="flex justify-between items-center text-lg font-medium mb-6">
             <span>Total a pagar:</span>
-            <span className="text-green-700 text-2xl">
-              R$ {/* totalComFrete.toFixed(2) */ "0,00"}
-            </span>
+            <span className="text-green-700 text-2xl">R$ {"0,00"}</span>
           </div>
 
           <NewButton
@@ -230,7 +220,7 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
           form={form}
           onSubmit={onSubmit}
           total={150}
-          isSubmitting={isSubmitting} // opcional, se você controlar estado de loading
+          isSubmitting={isSubmitting}
         />
       </AccordionContent>
     </AccordionItem>

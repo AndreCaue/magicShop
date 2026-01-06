@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { LoginDesk } from "../Login/subPages/LoginDesk";
 import { cn } from "@/lib/utils";
 
-// Baralho único embaralhado uma única vez no build
 const deck = [
   "A♠",
   "2♠",
@@ -15,7 +14,6 @@ const deck = [
   "7♠",
   "8♠",
   "9♠",
-  //"10♠",
   "J♠",
   "Q♠",
   "K♠",
@@ -28,7 +26,6 @@ const deck = [
   "7♥",
   "8♥",
   "9♥",
-  //"10♥",
   "J♥",
   "Q♥",
   "K♥",
@@ -41,7 +38,6 @@ const deck = [
   "7♦",
   "8♦",
   "9♦",
-  //"10♦",
   "J♦",
   "Q♦",
   "K♦",
@@ -54,7 +50,6 @@ const deck = [
   "7♣",
   "8♣",
   "9♣",
-  //"10♣",
   "J♣",
   "Q♣",
   "K♣",
@@ -64,19 +59,19 @@ export default function MatrixDeckRain() {
   return (
     <div className="relative inset-0 bg-black overflow-hidden w-screen">
       {deck.map((card, i) => {
-        const chars = [...card]; // ex: ["1","0","♦"] ou ["A","♠"]
-        const suit = chars[chars.length - 1]; // último caractere = naipe
+        const chars = [...card];
+        const suit = chars[chars.length - 1];
         const value = chars.slice(0, -1).join("");
 
         const isRed = card.includes("♥") || card.includes("♦");
-        const hue = isRed ? 0 : 160; // vermelho ou verde puro
-        const duration = 12 + (i % 17); // 12s a 28s (variação sutil)
-        const delay = (i * 0.35) % 15; // cascata perfeita
-        const left = 2 + (i * 100) / deck.length + Math.sin(i) * 10; // distribuição uniforme + leve onda
+        const hue = isRed ? 0 : 160;
+        const duration = 12 + (i % 17);
+        const delay = (i * 0.35) % 15;
+        const left = 2 + (i * 100) / deck.length + Math.sin(i) * 10;
 
         return (
           <motion.div
-            key={card} // chave perfeita = zero re-renders
+            key={card}
             className="absolute"
             style={{
               left: `${left}%`,
@@ -134,11 +129,9 @@ export default function MatrixDeckRain() {
         );
       })}
 
-      {/* Overlay Matrix clássico - 100% CSS, zero custo */}
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-b from-transparent via-green-950/30 to-black" />
       <div className="pointer-events-none fixed inset-0 bg-black/40" />
 
-      {/* Seu conteúdo */}
       <div className="relative z-10 flex h-screen items-center justify-center">
         <LoginDesk />
       </div>

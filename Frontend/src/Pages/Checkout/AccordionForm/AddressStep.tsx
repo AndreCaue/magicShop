@@ -1,4 +1,3 @@
-// src/components/checkout/AccordionForm/AddressStep.tsx
 import {
   AccordionItem,
   AccordionTrigger,
@@ -78,11 +77,9 @@ export default function AddressStep({
     })();
   }, [cepFromStore, form.setValue]);
 
-  //if re-render cep is not found, do it manually
   const handleCalculateShipping = async (value: string) => {
     const cleanedCep = value.replace(/\D/g, "");
     setCep(cleanedCep);
-    // setError(null);
 
     if (cleanedCep.length !== 8) {
       setShippingOptions([]);
@@ -104,7 +101,6 @@ export default function AddressStep({
       const options: ShippingOption[] = (await getShippingPrice(payload)).data;
 
       if (options.length === 0) {
-        // setError("Nenhuma opção de entrega disponível para este CEP");
         setShippingOptions([]);
         setSelectedShipping(null);
       } else {
@@ -116,7 +112,6 @@ export default function AddressStep({
       }
     } catch (err) {
       console.error("Erro ao calcular frete:", err);
-      // setError("Erro ao calcular frete. Tente novamente.");
       setShippingOptions([]);
       setSelectedShipping(null);
     }

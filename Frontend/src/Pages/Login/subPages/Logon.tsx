@@ -42,7 +42,7 @@ export const Logon = () => {
       scopes: res.scopes || [],
       isMaster: res.is_master || false,
       isBasic: (res.scopes || []).includes("basic"),
-      isPremium: (res.scopes || []).includes("premium"), // passar o contexto ao realizar o login. //implementar reflesh token.
+      isPremium: (res.scopes || []).includes("premium"),
       isVerified: res.is_verified || false,
     });
 

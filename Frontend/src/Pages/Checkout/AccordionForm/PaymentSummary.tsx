@@ -7,8 +7,8 @@ import type { UseFormReturn } from "react-hook-form";
 type Props = {
   form: UseFormReturn<TForm>;
   onSubmit: () => void;
-  total: number; // Total a pagar (incluindo frete e descontos)
-  isSubmitting?: boolean; // Para mostrar loading no botão
+  total: number;
+  isSubmitting?: boolean;
 };
 
 export default function PaymentSummary({
@@ -43,23 +43,17 @@ export default function PaymentSummary({
 
   return (
     <div className="mt-8 pt-6 border-t border-gray-200">
-      {/* Resumo */}
       <div className="space-y-4 mb-6">
         <div className="flex justify-between text-base font-medium">
           <span>Subtotal (produtos)</span>
           <span>{formatCurrency(total - 20)}</span>{" "}
-          {/* Exemplo: ajuste conforme seu cálculo real */}
         </div>
 
         <div className="flex justify-between text-base font-medium">
           <span>Frete</span>
-          <span>
-            {total === 0 ? "Grátis" : formatCurrency(20)}{" "}
-            {/* Exemplo: ajuste com frete real */}
-          </span>
+          <span>{total === 0 ? "Grátis" : formatCurrency(20)} </span>
         </div>
 
-        {/* Exemplo de desconto (opcional) */}
         {/* <div className="flex justify-between text-base font-medium text-green-600">
           <span>Desconto (cupom)</span>
           <span>-R$ 50,00</span>
@@ -71,7 +65,6 @@ export default function PaymentSummary({
         </div>
       </div>
 
-      {/* Botão Finalizar */}
       <NewButton
         label={getButtonLabel()}
         icon={<CircleArrowRight />}

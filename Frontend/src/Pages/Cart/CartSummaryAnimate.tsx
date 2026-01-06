@@ -1,4 +1,3 @@
-// src/components/cart/CartSummary.tsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -88,7 +87,6 @@ export default function CartSummaryAnimate() {
           <span className="font-medium">R$ {subtotal.replace(".", ",")}</span>
         </div>
 
-        {/* Frete */}
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="flex items-center gap-2">
@@ -125,7 +123,6 @@ export default function CartSummaryAnimate() {
             )}
           </div>
 
-          {/* Campo CEP */}
           <Input
             placeholder="Digite seu CEP"
             value={cep.replace(/(\d{5})(\d{3})/, "$1-$2")}
@@ -134,7 +131,6 @@ export default function CartSummaryAnimate() {
             className="text-base text-black"
           />
 
-          {/* Mensagens */}
           {isFreeShipping && (
             <motion.p
               initial={{ opacity: 0, y: -10 }}
@@ -156,7 +152,6 @@ export default function CartSummaryAnimate() {
             </motion.p>
           )}
 
-          {/* Lista de opções com animação */}
           <AnimatePresence>
             {shippingOptions.length > 0 && !isFreeShipping && (
               <motion.div
@@ -228,7 +223,6 @@ export default function CartSummaryAnimate() {
           </AnimatePresence>
         </div>
 
-        {/* Total com animação */}
         <div className="border-t pt-4">
           <div className="flex justify-between text-xl font-bold">
             <span>Total</span>
@@ -244,7 +238,6 @@ export default function CartSummaryAnimate() {
           </div>
         </div>
 
-        {/* Botões */}
         <Link
           to="/checkout"
           className="w-full mt-6 bg-indigo-600 text-white py-4 rounded-lg font-medium hover:bg-indigo-700 transition text-center block"

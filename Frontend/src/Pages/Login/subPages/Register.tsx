@@ -48,7 +48,6 @@ export const Register = () => {
     toast.success("Cadastro realizado. Verique seu email!");
     navigate("/login");
   };
-  //392336
   useEffect(() => {
     if (!isLoggedIn) return;
     navigate("/");
@@ -91,7 +90,6 @@ export const Register = () => {
             />
 
             <NewButton label="Cadastrar" disabled={isSubmitting || isLoading} />
-            {/* button e disabled? */}
             <Link
               className="text-3xl text-center hover:text-white hover:scale-105"
               to={"/login"}

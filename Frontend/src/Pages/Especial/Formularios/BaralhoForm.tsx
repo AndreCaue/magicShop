@@ -29,15 +29,15 @@ const formSchema = z.object({
   images_urls: z.array(
     z.object({
       name: z.string().min(1, "Nome do arquivo é obrigatório"),
-      url: z.url("URL inválida"), // Valida se é uma URL válida (data URL no caso)
+      url: z.url("URL inválida"),
       file: z
         .instanceof(File, { error: "Deve ser um arquivo válido" })
         .refine(
-          (file) => file.size <= 5 * 1024 * 1024, // Ex: máx. 5MB
+          (file) => file.size <= 5 * 1024 * 1024,
           "Arquivo muito grande (máx. 5MB)"
         )
         .refine(
-          (file) => file.type.startsWith("image/"), // Só imagens
+          (file) => file.type.startsWith("image/"),
           "Apenas arquivos de imagem são permitidos"
         ),
     })
@@ -87,8 +87,6 @@ export const BaralhoForm = () => {
     setIsLoading(false);
   }, []);
 
-  // const teste = async (id: number) => await getShippingPresetsById(id);
-
   const handleChangePresets = async (v: number) => {
     if (!v) {
       form.reset({
@@ -113,7 +111,6 @@ export const BaralhoForm = () => {
     console.log(values, "teste");
 
     const res = await createProductCards({
-      // dando 401 não autorizado
       ...values,
       price: Number(values.price),
       stock: Number(values.stock),
@@ -198,7 +195,7 @@ export const BaralhoForm = () => {
                 className="w-full"
                 name="models"
                 onChangeValue={handleChangePresets}
-                options={deckModels} // chamar função de get e passar id
+                options={deckModels}
                 isSkeletonLoading={isLoading}
               />
             </div>

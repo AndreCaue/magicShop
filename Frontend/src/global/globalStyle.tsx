@@ -1,1 +1,1 @@
-export const initialStile = "h-screen w-screen py-20"; //15
+export const initialStile = "h-screen w-screen py-20";

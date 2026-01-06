@@ -13,7 +13,6 @@ export type User = {
   isVerified: boolean;
 };
 
-// const apiUrl = import.meta.env.VITE_API_URL;
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -28,13 +27,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         scopes: response.data.scopes || [],
         isMaster: response.data.is_master || false,
         isBasic: (response.data.scopes || []).includes("basic"),
-        isPremium: (response.data.scopes || []).includes("premium"), // passar o contexto ao realizar o login. //implementar reflesh token.
+        isPremium: (response.data.scopes || []).includes("premium"), 
         isVerified: response.data.is_verified || false,
       });
     } catch (error) {
       console.log(error, "err");
-      setUser(null); // usuário não logado ou token inválido
-      navigate("/"); // remover se precis.
+      setUser(null);
+      navigate("/");.
     }
   };
 
@@ -50,7 +49,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const logout = () => {
-    // Limpa cookie via backend ou front-end (se possível)
     document.cookie =
       "access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
     setUser(null);
