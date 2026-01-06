@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 type TQuantitySelector = {
   maxQuantity: number;

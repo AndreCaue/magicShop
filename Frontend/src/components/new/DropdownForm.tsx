@@ -27,11 +27,9 @@ import type {
 import { cn } from "@/lib/utils";
 import Popup from "./Popup";
 import { InputRightIcons } from "../utils/InputRightIcons";
-import { isTruthyOrZero } from "@/helpers/generics";
+import { isTruthyOrZero, type IDropdownOption } from "@/helpers/generics";
 
-export type TOptionsSelectForm = {
-  text: string;
-  value: number;
+export type TOptionsSelectForm = IDropdownOption & {
   searchValue?: string;
 };
 

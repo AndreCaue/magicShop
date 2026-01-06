@@ -12,6 +12,7 @@ export const Home = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  console.log(isVerified); // change later
   const handleVerifyEmail = () => {
     setIsOpen(true);
   };

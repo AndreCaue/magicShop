@@ -49,7 +49,7 @@ type TItem = {
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { isLoggedIn, handleLogout } = useAuth();
+  const { handleLogout } = useAuth();
   const { user } = useUser();
 
   const handleClickLogout = (URL: string) => {

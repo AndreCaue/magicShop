@@ -4,8 +4,7 @@ import { useState } from "react";
 
 const letterVariants: Variants = {
   initial: { x: 0, y: 0, rotate: 0 },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  scattered: (i: number) => ({
+  scattered: () => ({
     x: (Math.random() - 0.5) * 200,
     y: (Math.random() - 0.5) * 200,
     rotate: (Math.random() - 0.5) * 360,

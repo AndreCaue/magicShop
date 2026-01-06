@@ -6,7 +6,6 @@ import ScatterBtn from "@/Pages/Animations/Scatter/ScatterBtn";
 import { login } from "@/Services/authService";
 import { useUser } from "@/Services/userService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";

@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import { getShippingPresetsById } from "@/Repositories/shop/getters";
+import { formatedToDrop, type IDropdownOption } from "@/helpers/generics";
 
 const formSchema = z.object({
   name: z.string(),
@@ -46,14 +47,10 @@ const formSchema = z.object({
 
 type TForm = z.infer<typeof formSchema>;
 
-const formatedToDrop = (arr: any) => {
-  return arr?.map((x) => ({ text: x.descricao || x.name, value: x.id })) || [];
-};
-
 export const BaralhoForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [branchs, setBranchs] = useState([]);
-  const [deckModels, setDeckModels] = useState([]);
+  const [branchs, setBranchs] = useState<IDropdownOption[]>([]);
+  const [deckModels, setDeckModels] = useState<IDropdownOption[]>([]);
 
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),

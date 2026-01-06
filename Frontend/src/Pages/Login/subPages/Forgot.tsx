@@ -1,11 +1,10 @@
 import useIsMobile from "@/Hooks/isMobile";
 import { useAuth } from "@/Hooks/useAuth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Forgot = () => {
   const isMobile = useIsMobile();
-  const [email, setEmail] = useState("teste@email.com"); // to do
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
@@ -22,7 +21,10 @@ export const Forgot = () => {
           <h1 className="text-4xl">EM MANUTENÇÃO</h1>
           <h1 className="text-4xsl text-center">Aguarde</h1>
 
-          <b className="text-white">Em caso de necessidade: {email}</b>
+          <b className="text-white">
+            Em caso de necessidade: mcd.magica.cartas@gmail.columns-md <br /> :
+            Tratar com André
+          </b>
         </div>
       ) : (
         <div> desktop</div>

@@ -46,8 +46,9 @@ export const UseCalculateShipping = () => {
       if (options.length === 0) return;
 
       setShippingOptions(options);
-      const cheapest = options.reduce((prev, curr) =>
-        curr.preco < prev.preco ? curr : prev
+      const cheapest = options.reduce(
+        (prev: { preco: number }, curr: { preco: number }) =>
+          curr.preco < prev.preco ? curr : prev
       );
       setSelectedShipping(cheapest);
       setValue("frete_opcao", cheapest.id, { shouldValidate: true });

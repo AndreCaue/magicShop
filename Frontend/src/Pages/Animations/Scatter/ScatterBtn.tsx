@@ -3,8 +3,8 @@ import { motion, type Variants } from "framer-motion";
 
 const letterVariants: Variants = {
   initial: { x: 0, y: 0, rotate: 0 },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  scattered: (i: number) => ({
+
+  scattered: () => ({
     x: (Math.random() - 0.5) * 800,
     y: (Math.random() - 0.5) * 800,
     rotate: (Math.random() - 0.5) * 360,

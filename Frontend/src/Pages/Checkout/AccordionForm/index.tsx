@@ -34,7 +34,7 @@ export const AccordionForm = () => {
     },
   });
 
-  const { setValue, watch } = form;
+  const { setValue } = form;
 
   useEffect(() => {
     if (user?.email) setValue("email", user.email);
