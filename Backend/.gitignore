@@ -2,5 +2,23 @@
 # Certificados Efí (nunca versionar)
 *.p12
 *.pfx
+*.rem
 certs/
 backend/certs/
+
+# Node (Frontend)
+Frontend/node_modules/
+Frontend/.next/
+Frontend/out/
+
+# Python (Backend)
+Backend/__pycache__/
+Backend/*.pyc
+Backend/.venv/
+Backend/env/
+Backend/venv/
+Backend/dev.db  # importante: não subir o SQLite local
+
+# Geral
+.env
+.DS_Store
