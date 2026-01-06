@@ -21,4 +21,5 @@ Backend/dev.db  # importante: não subir o SQLite local
 
 # Geral
 .env
+.db
 .DS_Store

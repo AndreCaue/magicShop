@@ -13,7 +13,6 @@ export type User = {
   isVerified: boolean;
 };
 
-
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
@@ -27,13 +26,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         scopes: response.data.scopes || [],
         isMaster: response.data.is_master || false,
         isBasic: (response.data.scopes || []).includes("basic"),
-        isPremium: (response.data.scopes || []).includes("premium"), 
+        isPremium: (response.data.scopes || []).includes("premium"),
         isVerified: response.data.is_verified || false,
       });
     } catch (error) {
       console.log(error, "err");
       setUser(null);
-      navigate("/");.
+      navigate("/");
     }
   };
 
