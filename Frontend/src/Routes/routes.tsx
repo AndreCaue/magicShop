@@ -11,7 +11,6 @@ import { EspecialRoutes } from "./EspecialRoutes";
 import { Layout } from "@/Layout";
 import { LoginT } from "@/Pages/Login/subPages/LoginT";
 import CartPage from "@/Pages/Cart/CartPage";
-import Callback from "@/Pages/Especial/CallbackTeste";
 import { Checkout } from "@/Pages/Checkout/Checkout";
 import Maze from "@/Pages/Games/Maze/Maze";
 
@@ -21,7 +20,6 @@ export const AppRoutes = () => {
       <Route path="/login" element={<LoginT />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot_password" element={<Forgot />} />
-      <Route path="/callback" element={<Callback />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
