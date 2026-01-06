@@ -73,6 +73,5 @@ if __name__ == "__main__":
     codigo = "123456"
     try:
         send_verification_email(destino, codigo)
-        print("E-mail de teste enviado com sucesso ✅")
     except Exception as e:
         print("Erro:", e)

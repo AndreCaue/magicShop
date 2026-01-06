@@ -15,7 +15,7 @@ class CartItemResponse(BaseModel):
     length: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CartResponse(BaseModel):
@@ -26,7 +26,7 @@ class CartResponse(BaseModel):
     total: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AddToCartRequest(BaseModel):

@@ -12,12 +12,14 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
 
-    DATABASE_URL: str = "sqlite:///./dev.db"
+    DATABASE_URL_DEV: str | None = None
+    DATABASE_URL_PROD: str | None = None
+    DATABASE_URL: str | None = None  
 
-    MELHOR_ENVIO_TOKEN: str | None = None  
-    MELHOR_ENVIO_TOKEN_SANDBOX: str  
+    MELHOR_ENVIO_TOKEN: str | None = None
+    MELHOR_ENVIO_TOKEN_SANDBOX: str
     MELHOR_ENVIO_ENV: Literal["production", "sandbox"] = "sandbox"
 
     model_config = SettingsConfigDict(
@@ -28,6 +30,13 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+if settings.ENVIRONMENT == "production":
+    if not settings.DATABASE_URL_PROD:
+        raise ValueError("DATABASE_URL_PROD precisa estar definida em produção!")
+    settings.DATABASE_URL = settings.DATABASE_URL_PROD
+else:
+    settings.DATABASE_URL = settings.DATABASE_URL_DEV or "sqlite:///./app.db"
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM

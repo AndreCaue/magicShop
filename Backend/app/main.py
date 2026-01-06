@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
+
 from . import models
 from .database import engine
 from .auth import routes as auth_routes
@@ -12,9 +13,13 @@ from .common.helpers import router as helpers_router
 from app.melhorenvio.frete.routes import router as menvio_frete_router
 from .address.routes import router as address_router
 from .payment.routes import router as payment_router
-models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(docs_url="/docs", title="Minha Loja Backend")
+from .core.config import settings
+
+if settings.ENVIRONMENT == "development":
+    models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI(docs_url="/docs", title=f"{settings.APP_NAME}")
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -39,7 +44,6 @@ async def sanitize_logs(request: Request, call_next):
                 .replace("access_token=", "access_token=[REDACTED]")
         )
 
-        print(f"{request.method} {request.url.path} body:", sanitized)
     except Exception:
         pass
 

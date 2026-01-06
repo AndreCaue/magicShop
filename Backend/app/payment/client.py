@@ -8,10 +8,6 @@ class EfiClient:
         client_secret = os.getenv("EFI_CLIENT_SECRET")
         cert_path = os.getenv("EFI_CERTIFICATE_PATH")
 
-        print(f"Cert path configurado: {cert_path}")
-        print(f"Arquivo existe? {os.path.exists(cert_path)}")
-        print(f"Tamanho do arquivo: {os.path.getsize(cert_path) if os.path.exists(cert_path) else 'N/A'} bytes")
-
         if not all([client_id, client_secret, cert_path]):
             raise ValueError("Credenciais ou certificado EFI não configurados")
 

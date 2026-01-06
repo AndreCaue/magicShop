@@ -18,12 +18,10 @@ def create_master_user(db: Session):
     password = os.getenv("MASTER_PASSWORD")
     
     if not email or not password:
-        print("❌ Erro: Configure MASTER_EMAIL e MASTER_PASSWORD no .env")
         return
     
     existing = db.query(User).filter(User.email == email).first()
     if existing:
-        print(f"⚠️  Usuário {email} já existe.")
         return
 
     master_user = User(
@@ -35,7 +33,6 @@ def create_master_user(db: Session):
     )
     db.add(master_user)
     db.commit()
-    print(f"✅ Usuário master criado: {email}")
 
 def main():
     db = SessionLocal()
