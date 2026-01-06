@@ -12,7 +12,6 @@ import { Layout } from "@/Layout";
 import { LoginT } from "@/Pages/Login/subPages/LoginT";
 import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
-import Maze from "@/Pages/Games/Maze/Maze";
 
 export const AppRoutes = () => {
   return (
@@ -28,7 +27,6 @@ export const AppRoutes = () => {
           <Route path="/conteudo/*" element={<Conteudo />} />
           <Route path="/carrinho/" element={<CartPage />} />
           <Route path="/checkout/" element={<Checkout />} />
-          <Route element={<Maze />} path="/game" />
         </Route>
 
         <Route path="*" element={<Navigate to={"/"} replace />} />
