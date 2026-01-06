@@ -18,6 +18,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   const fetchUser = async () => {
+    if (!user) return;
     try {
       const response = await api.get(`/auth/me`);
 
