@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     MELHOR_ENVIO_TOKEN_SANDBOX: str
     MELHOR_ENVIO_ENV: Literal["production", "sandbox"] = "sandbox"
 
+    CREATE_TABLES: bool
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
