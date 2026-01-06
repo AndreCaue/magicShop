@@ -58,7 +58,7 @@ async def sanitize_logs(request: Request, call_next):
 #allow_origins=["https://seu-dominio.com"] -> Produção.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "https://doceilusao.vercel.app/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
