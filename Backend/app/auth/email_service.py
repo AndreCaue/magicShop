@@ -31,7 +31,7 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
     msg = MIMEMultipart("alternative")
     msg["From"] = FROM_EMAIL
     msg["To"] = to_email
-    msg["Subject"] = subject or os.getenv("EMAIL_SUBJECT", "Código de Verificação - Minha Loja")
+    msg["Subject"] = subject or os.getenv("EMAIL_SUBJECT", "Código de Verificação - Loja de mágica Doce Ilusão")
 
     body_plain = f"Seu código de verificação é: {code}\nEle irá expirar em 15 minutos."
     body_html = f"""
