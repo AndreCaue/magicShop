@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const GRID_SIZE = 15;
 const WALL = 1;
-const EMPTY = 0;
+// const EMPTY = 0;
 
 const initialMaze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
