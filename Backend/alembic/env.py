@@ -17,7 +17,6 @@ if not DATABASE_URL:
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-print(f"🔍 Conectando ao banco: {DATABASE_URL[:30]}...")
 
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
