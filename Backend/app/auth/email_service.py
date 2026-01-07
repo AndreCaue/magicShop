@@ -4,7 +4,7 @@ import os
 resend.api_key = os.getenv("RESEND_API_KEY")
 
 def send_verification_email(to_email: str, code: str, subject: str = None):
-    from_email = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
+    from_email = os.getenv("FROM_EMAIL", "Doce Ilusão <lojamagica@doceilusao.store>")
     subject = subject or "Código de Verificação - Loja de mágica Doce Ilusão"
 
     html_body = f"""
