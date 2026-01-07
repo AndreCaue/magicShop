@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import User
-from app.auth import hash_password
+from app.auth.jwt import hash_password
 
 load_dotenv()
 
