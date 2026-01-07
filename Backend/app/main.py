@@ -19,7 +19,7 @@ from .core.config import settings
 if settings.ENVIRONMENT == "development":
     models.Base.metadata.create_all(bind=engine)
 
-if settings.CREATE_TABLES:
+if settings.CREATE_TABLES == 'true':
     models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(docs_url="/docs", title=f"{settings.APP_NAME}")
