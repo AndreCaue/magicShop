@@ -6,13 +6,13 @@ import os
 load_dotenv()
 
 DATABASE_URL = (
-    os.getenv("DATABASE_URL_PROD") or 
+    os.getenv("DATABASE_URL") or 
     os.getenv("DATABASE_URL_DEV") or 
     "sqlite:///./app.db"
 )
 
 if not DATABASE_URL or DATABASE_URL == "":
-    raise ValueError("DATABASE_URL não configurada! Configure DATABASE_URL ou DATABASE_URL_PROD")
+    raise ValueError("DATABASE_URL não configurada! Configure DATABASE_URL ou DATABASE_URL")
 
 print(f"🔍 Conectando ao banco: {DATABASE_URL[:20]}...")  # Log para debug
 

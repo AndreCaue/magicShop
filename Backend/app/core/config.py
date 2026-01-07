@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
 
     DATABASE_URL_DEV: str | None = None
-    DATABASE_URL_PROD: str | None = None
     DATABASE_URL: str | None = None  
 
     MELHOR_ENVIO_TOKEN: str | None = None
@@ -34,9 +33,9 @@ class Settings(BaseSettings):
 settings = Settings()
 
 if settings.ENVIRONMENT == "production":
-    if not settings.DATABASE_URL_PROD:
-        raise ValueError("DATABASE_URL_PROD precisa estar definida em produção!")
-    settings.DATABASE_URL = settings.DATABASE_URL_PROD
+    if not settings.DATABASE_URL:
+        raise ValueError("DATABASE_URL precisa estar definida em produção!")
+    settings.DATABASE_URL = settings.DATABASE_URL
 else:
     settings.DATABASE_URL = settings.DATABASE_URL_DEV or "sqlite:///./app.db"
 
