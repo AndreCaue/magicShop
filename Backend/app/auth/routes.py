@@ -62,7 +62,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
         send_verification_email(user.email, code)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao enviar e-mail: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao enviar e-mail123: {str(e)}")
 
     return schemas.UserOut.model_validate(new_user)
 
