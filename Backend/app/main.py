@@ -31,6 +31,7 @@ async def custom_swagger_ui_html():
         swagger_ui_parameters={"persistAuthorization": True, "tryItOutEnabled": True}
     )
 
+
 @app.middleware("http")
 async def sanitize_logs(request: Request, call_next):
     

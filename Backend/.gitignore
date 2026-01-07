@@ -18,6 +18,8 @@ Backend/.venv/
 Backend/env/
 Backend/venv/
 Backend/dev.db  # importante: não subir o SQLite local
+#Script
+core/scripts/create_master_user.py
 
 # Geral
 .env
