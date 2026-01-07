@@ -64,7 +64,7 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
     except SMTPConnectError:
         raise Exception("Não foi possível conectar ao servidor SMTP.")
     except Exception as e:
-        raise Exception(f"Erro ao enviar o e-mail: {str(e)}")
+        raise Exception(f"Erro ao enviar o e-mail: {str(e)}") # Parei aqui -> verificar velocidade da request. e como melhorar. 
     
 
 
