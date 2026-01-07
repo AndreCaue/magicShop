@@ -20,6 +20,7 @@ def create_master_user(db: Session):
     if not email or not password:
         return
     
+    
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         return
