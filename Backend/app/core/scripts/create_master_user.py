@@ -34,7 +34,7 @@ def create_master_user(db: Session):
     try:
         master_user = User(
             email=email.lower(),
-            hashed_password=hash_password(password),  
+            password=hash_password(password),  
             role="master",              
             is_verified=True,           
             scopes=["master"],          
