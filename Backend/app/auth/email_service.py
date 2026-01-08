@@ -20,15 +20,12 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
 
     # 📧 FROM EMAIL (separado por ambiente)
     if settings.ENVIRONMENT == "production":
-        from_email = (
-            os.getenv("FROM_EMAIL")
-            or "Doce Ilusão <lojamagica@doceilusao.store>"
-        )
+         from_email = "Doce Ilusão <lojamagica@doceilusao.store>"
     else:
         from_email = (
             os.getenv("FROM_EMAIL_DEV")
             or os.getenv("FROM_EMAIL")
-            or "Doce Ilusão <lojamagica@doceilusao.store>"
+            or "Doce Ilusão <mcd.magica.cartas@doceilusao.store>"
         )
 
     print("FROM_EMAIL:", from_email)
