@@ -1,4 +1,3 @@
-import AnimatedTitle from "@/components/new/AnimatedTitle";
 import { InputForm } from "@/components/new/InputForm";
 import { Form } from "@/components/ui/form";
 import { useAuth } from "@/Hooks/useAuth";
@@ -7,9 +6,13 @@ import { login } from "@/Services/authService";
 import { useUser } from "@/Services/userService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
+import "./index.css";
+import { cn } from "@/lib/utils";
+import { Lock, User } from "lucide-react";
+import { SmokeLink } from "@/components/new/Teste";
 
 const formSchema = z.object({
   email: z.string(),
@@ -18,7 +21,7 @@ const formSchema = z.object({
 
 type TForm = Required<z.infer<typeof formSchema>>;
 
-export const LoginDesk = () => {
+export const LoginDesktop = () => {
   const navigate = useNavigate();
   const { handleLogin } = useAuth();
   const { setUser } = useUser();
@@ -57,14 +60,44 @@ export const LoginDesk = () => {
 
   return (
     <div className="text-white items-center flex h-screen w-full justify-center">
-      <div className=" w-1/3 border border-slate-600 rounded grid grid-rows-4">
+      <div className=" w-1/3  rounded grid grid-rows-4">
         <div className="col-span-2 justify-center flex items-center">
-          <AnimatedTitle
-            text="L O G I N"
-            level="h1"
-            size="medium"
-            align="center"
-          />
+          <div
+            style={{
+              background:
+                "linear-gradient(45deg, #f9f6ec, #88a1a8, #502940, #790614, #0d0c0c)",
+            }}
+            className="flex h-20 w-20 place-self-center rotate-45"
+          >
+            <span
+              style={{
+                fontFamily: "'Road Rage', sans-serif",
+                fontWeight: 400,
+                fontStyle: "normal",
+                fontSize: "100px",
+              }}
+              className={cn(
+                "text-slate-200 absolute -bottom-8 left-[25%] -rotate-45",
+                "ex564"
+              )}
+            >
+              D
+            </span>
+            <span
+              style={{
+                fontFamily: "'Road Rage', sans-serif",
+                fontWeight: 400,
+                fontStyle: "normal",
+                fontSize: "100px",
+              }}
+              className={cn(
+                "text-white absolute left-[40%] -bottom-7 rotate-40",
+                "ex564"
+              )}
+            >
+              I
+            </span>
+          </div>
         </div>
         <Form {...form}>
           <form
@@ -75,6 +108,7 @@ export const LoginDesk = () => {
               label="Email"
               name="email"
               control={control}
+              iconPlaceholder={<User />}
               background="dark"
               disabled={isSubmitting}
             />
@@ -83,6 +117,7 @@ export const LoginDesk = () => {
               name="senha"
               background="dark"
               type="password"
+              iconPlaceholder={<Lock />}
               control={control}
               disabled={isSubmitting}
             />
@@ -94,19 +129,13 @@ export const LoginDesk = () => {
               onClick={() => console.log("a")}
             />
 
-            <div className="flex flex-col mt-2 gap-4 text-center">
-              <Link
-                to={"/forgot_password"}
-                className="text-white hover:text-black text-center"
-              >
-                Esqueceu sua senha ?
-              </Link>
-              <Link
-                className="text-3xl text-white text-center  hover:scale-110 transition-all duration-300"
-                to={"/register"}
-              >
-                Registrar-se
-              </Link>
+            <div className="flex flex-col mt-2 gap-8 text-center">
+              <SmokeLink
+                goTo={"/forgot_password"}
+                textLabel="Esqueceu sua senha ?"
+              />
+
+              <SmokeLink goTo={"/register"} textLabel="Registrar-se" />
             </div>
           </form>
         </Form>

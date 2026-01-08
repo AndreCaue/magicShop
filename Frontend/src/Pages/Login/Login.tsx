@@ -1,10 +1,10 @@
 import useIsMobile from "@/Hooks/isMobile";
 import AnimatedTitle from "@/components/new/AnimatedTitle";
-import { Logon } from "./subPages/Logon";
+import { Logon } from "./subPages/LoginMobile";
 import { useAuth } from "@/Hooks/useAuth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LoginDesk } from "./subPages/LoginDesk";
+import { LoginDesk } from "./subPages/LoginDesktop";
 import MatrixDeckRainUltimate from "../Animations/MatrixDeckRain";
 
 export const Login = () => {

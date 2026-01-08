@@ -49,8 +49,7 @@ export default function CartSummary() {
     }
 
     setLoading(true);
-    // parei no railway.
-    // preciso pegar o reposotirio do github.
+
     try {
       const payload = {
         cep_destino: cleanedCep,

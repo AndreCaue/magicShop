@@ -9,14 +9,14 @@ import { Conteudo } from "./Conteudo";
 import MasterProtectedRouter from "@/Security/MasterProtectedRouter";
 import { EspecialRoutes } from "./EspecialRoutes";
 import { Layout } from "@/Layout";
-import { LoginT } from "@/Pages/Login/subPages/LoginT";
+import { Login } from "@/Pages/Login/subPages/Login";
 import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
 
 export const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/login" element={<LoginT />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot_password" element={<Forgot />} />
 

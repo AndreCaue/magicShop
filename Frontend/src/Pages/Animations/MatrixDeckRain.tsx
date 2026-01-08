@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LoginDesk } from "../Login/subPages/LoginDesk";
+// import { LoginDesk } from "../Login/subPages/LoginDesk";
 import { cn } from "@/lib/utils";
+import type React from "react";
 
 const deck = [
   "A♠",
@@ -55,7 +56,11 @@ const deck = [
   "K♣",
 ].sort(() => Math.random() - 0.5);
 
-export default function MatrixDeckRain() {
+type TMatrixDeckRain = {
+  children: React.JSX.Element;
+};
+
+export default function MatrixDeckRain({ children }: TMatrixDeckRain) {
   return (
     <div className="relative inset-0 bg-black overflow-hidden w-screen">
       {deck.map((card, i) => {
@@ -133,7 +138,8 @@ export default function MatrixDeckRain() {
       <div className="pointer-events-none fixed inset-0 bg-black/40" />
 
       <div className="relative z-10 flex h-screen items-center justify-center">
-        <LoginDesk />
+        {children}
+        {/* <LoginDesk /> */}
       </div>
     </div>
   );
