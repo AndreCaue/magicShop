@@ -12,7 +12,7 @@ import z from "zod";
 import "./index.css";
 import { cn } from "@/lib/utils";
 import { Lock, User } from "lucide-react";
-import { SmokeLink } from "@/components/new/Teste";
+import { SmokeLink } from "@/components/new/SmokeLink";
 
 const formSchema = z.object({
   email: z.string(),
