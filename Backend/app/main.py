@@ -51,7 +51,7 @@ async def sanitize_logs(request: Request, call_next):
     response = await call_next(request)
     return response
 
-
+ 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
