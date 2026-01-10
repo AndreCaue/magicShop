@@ -3,7 +3,7 @@ import { Home } from "@/Pages/Home/Home";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Shop } from "./Shop";
 import ProtectedRoute from "@/Security/ProtectedRoute";
-import { Forgot } from "@/Pages/Login/subPages/Forgot";
+import { ForgotPasswordPage } from "@/Pages/Login/subPages/ForgotPassword/Forgot";
 import { Register } from "@/Pages/Login/subPages/Register";
 import { Conteudo } from "./Conteudo";
 import MasterProtectedRouter from "@/Security/MasterProtectedRouter";
@@ -18,7 +18,7 @@ export const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/forgot_password" element={<Forgot />} />
+      <Route path="/forgot_password" element={<ForgotPasswordPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>

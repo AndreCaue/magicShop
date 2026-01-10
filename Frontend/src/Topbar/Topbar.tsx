@@ -28,7 +28,6 @@ const conteudoOptions = [
 export const Topbar = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-  // const { user } = useUser(); later
   const { cart } = useCart();
 
   const totalItems = cart?.items?.length ?? 0;

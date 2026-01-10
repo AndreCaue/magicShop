@@ -7,31 +7,38 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
+
   (error) => {
-    if (error.response?.status === 401) {
-      const event = new Event("unauthorizedaa");
-      window.dispatchEvent(event);
+    const defaultMessage = "Ocorreu um erro inesperado. Tente novamente.";
 
-      toast.error("Sessão expirada. Você será redirecionado para o login.");
-    } else if (error.response?.status === 403) {
-      toast.error("Você não tem permissão para realizar esta ação.");
-    } else if (error.response?.status >= 500) {
-      toast.error("Erro no servidor. Tente novamente mais tarde.");
-    } else if (!error.response) {
-      toast.error(
-        "Erro de conexão. Verifique sua internet ou tente novamente."
-      );
+    let message = defaultMessage;
+
+    if (error.response) {
+      const { status, data } = error.response;
+
+      if (status === 401) {
+        window.dispatchEvent(new Event("unauthorizedaa"));
+        message = "Sessão expirada. Você será redirecionado para o login.";
+      } else if (status === 403) {
+        message = "Você não tem permissão para realizar esta ação.";
+      } else if (status >= 500) {
+        message = "Erro no servidor. Tente novamente mais tarde.";
+      } else {
+        message =
+          data?.message ||
+          data?.error ||
+          data?.detail ||
+          data?.title ||
+          defaultMessage;
+      }
+    } else if (error.request) {
+      message = "Erro de conexão. Verifique sua internet ou tente novamente.";
     } else {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.response?.data?.detail ||
-        error.message ||
-        "Ocorreu um erro inesperado.";
+      message = error.message || defaultMessage;
+    }
 
+    if (!error.config?.silent) {
       toast.error(message);
     }
 

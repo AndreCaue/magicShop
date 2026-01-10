@@ -32,16 +32,8 @@ type TGetCadastroParams = {
 };
 
 export const createCadastro = async (params: TGetCadastroParams) => {
-  try {
-    const response = await api.post(`/auth/register`, { ...params });
-    return response?.data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    const catchMessage =
-      err.response.data.detail || "Erro ao realizar cadastro";
-
-    return { error: catchMessage };
-  }
+  const response = await api.post(`/auth/register`, { ...params });
+  return response?.data;
 };
 
 export const verifyValidationEmail = async (code: string) => {
@@ -59,4 +51,9 @@ export const verifyValidationEmail = async (code: string) => {
   } catch (err) {
     toast.error(err as string);
   }
+};
+
+export const forgotPasswordEmail = async (email: string) => {
+  const response = await api.post("/auth/forgot-password", { email });
+  return response?.data;
 };

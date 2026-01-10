@@ -27,7 +27,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative flex items-center">
         {icon && (
-          <div className="absolute left-3 flex items-center pointer-events-none">
+          <div
+            className={cn(
+              "absolute left-3 flex items-center pointer-events-none",
+              background === "light"
+                ? "text-black placeholder:text-black/50"
+                : "text-white"
+            )}
+          >
             {icon}
           </div>
         )}

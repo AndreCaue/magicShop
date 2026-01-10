@@ -10,9 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 import "./index.css";
-import { cn } from "@/lib/utils";
 import { Lock, User } from "lucide-react";
 import { SmokeLink } from "@/components/new/SmokeLink";
+import { LogoTitle } from "./Components/LogoTitle";
 
 const formSchema = z.object({
   email: z.string(),
@@ -59,45 +59,10 @@ export const LoginDesktop = () => {
   };
 
   return (
-    <div className="text-white items-center flex h-screen w-full justify-center">
+    <div className="items-center flex h-screen w-full justify-center">
       <div className=" w-1/3  rounded grid grid-rows-4">
         <div className="col-span-2 justify-center flex items-center">
-          <div
-            style={{
-              background:
-                "linear-gradient(45deg, #f9f6ec, #88a1a8, #502940, #790614, #0d0c0c)",
-            }}
-            className="flex h-20 w-20 place-self-center rotate-45"
-          >
-            <span
-              style={{
-                fontFamily: "'Road Rage', sans-serif",
-                fontWeight: 400,
-                fontStyle: "normal",
-                fontSize: "100px",
-              }}
-              className={cn(
-                "text-slate-200 absolute -bottom-8 left-[25%] -rotate-45",
-                "ex564"
-              )}
-            >
-              D
-            </span>
-            <span
-              style={{
-                fontFamily: "'Road Rage', sans-serif",
-                fontWeight: 400,
-                fontStyle: "normal",
-                fontSize: "100px",
-              }}
-              className={cn(
-                "text-white absolute left-[40%] -bottom-7 rotate-40",
-                "ex564"
-              )}
-            >
-              I
-            </span>
-          </div>
+          <LogoTitle />
         </div>
         <Form {...form}>
           <form

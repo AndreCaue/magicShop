@@ -23,11 +23,32 @@ const smokeVariants: Variants = {
 type TSmokeLink = {
   textLabel: string;
   goTo: string;
+  isMobile?: boolean;
 };
 
-export const SmokeLink = ({ goTo, textLabel }: TSmokeLink) => {
+export const SmokeLink = ({ goTo, textLabel, isMobile }: TSmokeLink) => {
   const controls = useAnimation();
 
+  if (isMobile)
+    return (
+      <motion.div
+        whileTap={{
+          scale: 0.96,
+          opacity: 0.7,
+          filter: "blur(1.5px)",
+        }}
+        transition={{
+          duration: 0.15,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+      >
+        <Link to={goTo} className="text-white text-center block">
+          {textLabel}
+        </Link>
+      </motion.div>
+    );
+
+  // Desktop
   return (
     <div
       className="relative flex self-center w-fit"

@@ -6,24 +6,25 @@ import { login } from "@/Services/authService";
 import { useUser } from "@/Services/userService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, User } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
-import MobileForgotLink from "@/components/new/Teste";
+import { SmokeLink } from "@/components/new/SmokeLink";
+import { LogoTitle } from "./Components/LogoTitle";
 
 const formSchema = z.object({
-  email: z.string(),
+  email: z.string().nonempty(),
   senha: z.string(),
 });
 
 type TForm = Required<z.infer<typeof formSchema>>;
 
 export const LoginMobile = () => {
-  const [isLoading, setIsLoading] = useState(false);
-
   const form = useForm<TForm>({ resolver: zodResolver(formSchema) });
+  const {
+    formState: { isSubmitting },
+  } = form;
   const { handleLogin } = useAuth();
   const { setUser } = useUser();
 
@@ -31,9 +32,7 @@ export const LoginMobile = () => {
 
   const { control, handleSubmit } = form;
   const onSubmit = async (values: TForm) => {
-    setIsLoading(true);
     const res = await login(values.email, values.senha);
-    setIsLoading(false);
     if (res.error) return toast.error(res.message);
 
     const { access_token, is_verified } = res;
@@ -58,47 +57,15 @@ export const LoginMobile = () => {
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-4">
-          <div
-            style={{
-              background:
-                "linear-gradient(45deg, #f9f6ec, #88a1a8, #502940, #790614, #0d0c0c)",
-            }}
-            className="flex h-20 w-20 place-self-center my-20 rotate-45" // rotate-45
-          >
-            <span
-              style={{
-                fontFamily: "'Road Rage', sans-serif",
-                fontWeight: 400,
-                fontStyle: "normal",
-                fontSize: "100px",
-              }}
-              className=" text-slate-200 absolute -bottom-8 left-[25%] -rotate-45"
-              // -rotate-45
-            >
-              D
-            </span>
-            <span
-              style={{
-                fontFamily: "'Road Rage', sans-serif",
-                fontWeight: 400,
-                fontStyle: "normal",
-                fontSize: "100px",
-              }}
-              className="text-white absolute left-[40%] -bottom-7 rotate-40 "
-            >
-              I
-            </span>
-          </div>
+          <LogoTitle isMobile />
 
           <InputForm
             name="email"
             control={control}
-            placeholder="Email"
             iconPlaceholder={<User />}
             type="email"
             background="dark"
-            isSkeletonLoading={isLoading}
-            disabled={isLoading}
+            disabled={isSubmitting}
           />
           <InputForm
             name="senha"
@@ -106,21 +73,18 @@ export const LoginMobile = () => {
             iconPlaceholder={<Lock />}
             type="password"
             background="dark"
-            isSkeletonLoading={isLoading}
-            disabled={isLoading}
+            disabled={isSubmitting}
           />
 
-          <NewButton disabled={isLoading} label="Acessar" />
+          <NewButton disabled={isSubmitting} label="Acessar" />
 
-          <div className="flex flex-col mt-2 -mb-20 gap-40 text-center">
-            <MobileForgotLink /> {/* Teste em produção. */}
-            {/* <Link
-              className="text-3xl text-white hover:text-black hover:scale-110 transition-all duration-300"
-              to={"/register"}
-            >
-              Registrar-se
-            </Link> */}
-            <MobileForgotLink />
+          <div className="flex flex-col mt-2 -mb-20 gap-8 text-center">
+            <SmokeLink
+              goTo="/forgot_password"
+              textLabel="Esqueceu a senha ? "
+              isMobile
+            />
+            <SmokeLink goTo="/register" textLabel="Registrar-se" isMobile />
           </div>
         </div>
       </form>
