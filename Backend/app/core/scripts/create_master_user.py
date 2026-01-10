@@ -14,13 +14,14 @@ def create_master_user(db: Session):
     Requer as variáveis de ambiente:
     - MASTER_EMAIL
     - MASTER_PASSWORD
+    python -m app.core.scripts.create_master_user
     """
     email = os.getenv("MASTER_EMAIL")
     password = os.getenv("MASTER_PASSWORD")
 
     print("=== Iniciando criação do usuário master ===")
     print(f"MASTER_EMAIL: {email or 'NÃO DEFINIDO'}")
-    print(f"MASTER_PASSWORD: {'DEFINIDA' if password else 'NÃO DEFINIDA'}")
+    print(f"MASTER_PASSWORD: {password  if password else 'NÃO DEFINIDA'}")
 
     if not email or not password:
         print("ERRO: MASTER_EMAIL ou MASTER_PASSWORD não estão definidas. Pulando criação.")
@@ -34,7 +35,7 @@ def create_master_user(db: Session):
     try:
         master_user = User(
             email=email.lower(),
-            password=hash_password(password),  
+            password=hash_password(password),   #remover hash_password em dev
             role="master",              
             is_verified=True,           
             scopes=["master"],          

@@ -13,6 +13,7 @@ from .common.helpers import router as helpers_router
 from app.melhorenvio.frete.routes import router as menvio_frete_router
 from .address.routes import router as address_router
 from .payment.routes import router as payment_router
+from .core.routes import router as test_router
 
 from .core.config import settings
 
@@ -74,6 +75,7 @@ app.include_router(helpers_router)
 app.include_router(menvio_frete_router) 
 app.include_router(address_router)
 app.include_router(payment_router)
+app.include_router(test_router)
 
 @app.get("/")
 def home():

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Security, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Security, Response, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
@@ -8,10 +8,12 @@ import binascii
 from uuid import uuid4
 
 from .. import models, schemas
+from .schemas import ForgotPasswordRequest, ResetPasswordRequest
 from ..database import SessionLocal
 from .dependencies import get_current_user, get_current_user_from_cookie
-from .email_service import send_verification_email
-from .jwt import decode_token, hash_password, verify_password, create_access_token, save_refresh_token, RefreshToken, revoke_refresh_token, is_refresh_token_valid
+from .email_service import send_verification_email, send_reset_password_email
+from .jwt import decode_token, hash_password, verify_password, create_access_token, save_refresh_token, RefreshToken, revoke_refresh_token, is_refresh_token_valid, create_reset_password_token, verify_reset_password_token
+from ..core.config import settings
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -62,7 +64,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
         send_verification_email(user.email, code)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao enviar e-mail123: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao enviar e-mail: {str(e)}")
 
     return schemas.UserOut.model_validate(new_user)
 
@@ -108,6 +110,55 @@ def verify_email(
 
     return schemas.VerifyEmailResponse(message="E-mail verificado com sucesso!")
 
+
+@router.post("/forgot-password")
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    user = db.query(models.User).filter(models.User.email == request.email.lower()).first()
+    
+    if not user:
+        return {"message": "Se o e-mail estiver cadastrado, enviaremos um link de recuperação."}
+
+
+    reset_token = create_reset_password_token(user_id=user.id)
+
+    if settings.ENVIRONMENT == 'production':
+     reset_link = f"https://doceilusao.store/redefinir-senha?token={reset_token}"
+    else:
+     reset_link = f"http://localhost:5173/redefinir-senha?token={reset_token}"
+
+    background_tasks.add_task(
+        send_reset_password_email,
+        to_email=user.email,
+        username=user.email,  # to do
+        reset_link=reset_link,
+    )
+
+    return {"message": "Se o e-mail estiver cadastrado, enviaremos um link de recuperação."}
+
+@router.post("/reset-password")
+def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    user_id = verify_reset_password_token(request.token)
+
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    hashed_password = hash_password(request.new_password) 
+
+    user.password = hashed_password
+    user.updated_at = datetime.now(timezone.utc)
+
+    db.commit()
+
+    return {"message": "Senha redefinida com sucesso!"}
+
 @router.post("/token", response_model=schemas.Token)
 def login(
     response: Response,
@@ -152,15 +203,6 @@ def login(
 
     save_refresh_token(db=db, user_id=db_user.id, jti=jti, expires_at=expires_at)
 
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="lax",
-        max_age=60 * 60 * 24, # a day, 1h?
-        path="/"
-    )
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -293,9 +335,24 @@ def logout(
         RefreshToken.revoked == False
     ).update({RefreshToken.revoked: True})
     db.commit()
+    
 
-    response.delete_cookie("access_token")
-    response.delete_cookie("refresh_token")
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        httponly=True,
+        secure=True,
+        samesite="strict"         # ou "strict" se não precisar cross-site "lax" cross
+    )
+    
+    response.delete_cookie(
+        key="refresh_token",
+        path="/",
+        httponly=True,
+        secure=True,
+        samesite="strict"
+    )
+
     return {"message": "Logout global realizado com sucesso"}
 
 @router.get("/me")

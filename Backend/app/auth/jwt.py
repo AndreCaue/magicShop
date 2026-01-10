@@ -4,8 +4,10 @@ from jose import JWTError, jwt
 import os
 from dotenv import load_dotenv
 from .models import RefreshToken
+from ..core.config import settings
 from sqlalchemy.orm import Session
 import uuid
+from fastapi import HTTPException
 from ..core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 load_dotenv()
@@ -69,3 +71,28 @@ def is_refresh_token_valid(db: Session, jti: str) -> bool:
         RefreshToken.expires_at > datetime.now(timezone.utc)
     ).first()
     return token is not None
+
+
+def create_reset_password_token(user_id: int) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=30)
+    to_encode = {
+        "exp": expire,
+        "sub": str(user_id),
+        "type": "password_reset"
+    }
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+def verify_reset_password_token(token: str) -> int:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        
+        if payload.get("type") != "password_reset":
+            raise HTTPException(status_code=400, detail="Token inválido")
+        
+        user_id: str = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Token inválido")
+        
+        return int(user_id)
+    except JWTError:
+        raise HTTPException(status_code=400, detail="Token inválido ou expirado")

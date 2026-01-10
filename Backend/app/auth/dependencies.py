@@ -50,13 +50,11 @@ async def get_token_from_request(request: Request) -> str:
 
 
 def get_current_user(
-    request: Request,
     security_scopes: SecurityScopes,
     db: Session = Depends(get_db),
-    token: str = Depends(get_token_from_request)
+    token: str = Depends(get_token_from_request),
 ) -> User:
 
-    
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Token inválido ou expirado",
@@ -65,37 +63,52 @@ def get_current_user(
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        if payload.get("type") != "access":
+            raise credentials_exception
+        
+
         email: str = payload.get("sub")
-        scopes = payload.get("scopes", [])
-        if isinstance(scopes, str):
-            scopes = scopes.split(",")
-        elif not isinstance(scopes, list):
-            scopes = []
+        token_scopes = payload.get("scopes", [])
+
+        if isinstance(token_scopes, str):
+            token_scopes = token_scopes.split(",")
+
         if email is None:
             raise credentials_exception
-    except JWTError as e:
+
+    except JWTError:
         raise credentials_exception
 
     user = db.query(User).filter(User.email == email).first()
     if not user:
         raise credentials_exception
 
+    for scope in security_scopes.scopes:
+        if scope not in token_scopes:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permissão insuficiente",
+            )
+
     return user
+
+
+def is_master_user(user: User) -> bool:
+    return (
+        user.is_master
+        and user.is_verified
+        and "master" in user.scopes
+    )
 
 
 def require_master_full_access(
     current_user: User = Depends(get_current_user)
 ) -> User:
-    if not current_user.is_verified:
+    if not is_master_user(current_user):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Usuário não verificado. Verifique seu e-mail para continuar."
-        )
-    
-    if not getattr(current_user, "is_master", False):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Apenas usuários com papel 'master' podem acessar esta rota."
+            status_code=403,
+            detail="Acesso restrito a usuários master verificados."
         )
 
     return current_user
@@ -107,7 +120,7 @@ def require_basic_or_premium(
     if not any(scope in (current_user.scopes or []) for scope in ["basic", "premium"]):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Requer acesso basic ou premium"
+            detail="Requer acesso basic"
         )
     return current_user
 
