@@ -12,12 +12,12 @@ export const Login = () => {
   const isMobile = useIsMobile();
 
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  const { isAuthenticated } = useAuth();
   useEffect(() => {
-    if (!isLoggedIn) return;
+    if (!isAuthenticated) return;
     navigate("/");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
+  }, [isAuthenticated]);
 
   return (
     <>

@@ -2,8 +2,8 @@ import { Home } from "@/Pages/Home/Home";
 
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Shop } from "./Shop";
-import ProtectedRoute from "@/Security/ProtectedRoute";
-import { ForgotPasswordPage } from "@/Pages/Login/subPages/ForgotPassword/Forgot";
+import { PrivateRoute } from "@/Security/ProtectedRoute";
+import { ForgotPassword } from "@/Pages/Login/subPages/ForgotPassword/Forgot";
 import { Register } from "@/Pages/Login/subPages/Register";
 import { Conteudo } from "./Conteudo";
 import MasterProtectedRouter from "@/Security/MasterProtectedRouter";
@@ -12,15 +12,19 @@ import { Layout } from "@/Layout";
 import { Login } from "@/Pages/Login/subPages/Login";
 import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
+import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/RecoveryPassword";
 
 export const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/forgot_password" element={<ForgotPasswordPage />} />
+      <Route path="/forgot_password" element={<ForgotPassword />} />
+      <Route path="/reset_password" element={<RecoveryPassword />} />
 
-      <Route element={<ProtectedRoute />}>
+      {/* <Route path="/" element={<Home />} />
+      <Route path="/shop/*" element={<Shop />} /> */}
+      <Route element={<PrivateRoute />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/shop/*" element={<Shop />} />

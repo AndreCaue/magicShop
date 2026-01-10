@@ -7,9 +7,6 @@ export const Acessorios = () => {
     <Routes>
       <Route element={<MainAcessorios />} path="/" />
       <Route element={<Branch />} path="branch/*" />
-      {/* <Route element={<Baralhos />} path="baralhos" />
-      <Route element={<Baralhos />} path="baralhos" />
-      <Route element={<Baralhos />} path="baralhos" /> */}
     </Routes>
   );
 };

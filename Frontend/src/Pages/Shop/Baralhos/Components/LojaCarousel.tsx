@@ -51,11 +51,8 @@ export const EachCarousel = ({
               <div className="p-2 border w-full">
                 <Card className="border-0 shadow-md">
                   <CardContent className="p-4 flex flex-col h-[225px]">
-                    {/* Container das duas imagens */}
                     <div className="relative w-full h-24 mb-4 rounded-lg overflow-hidden bg-gray-100">
-                      {/* Grid com as duas imagens lado a lado */}
                       <div className="grid grid-cols-2 h-full gap-1">
-                        {/* Primeira imagem */}
                         <div className="overflow-hidden rounded-l-lg">
                           <img
                             src={item.image_urls[0]}
@@ -65,7 +62,6 @@ export const EachCarousel = ({
                           />
                         </div>
 
-                        {/* Segunda imagem (se existir) */}
                         {item.image_urls[1] ? (
                           <div className="overflow-hidden rounded-r-lg">
                             <img
@@ -76,16 +72,13 @@ export const EachCarousel = ({
                             />
                           </div>
                         ) : (
-                          /* Placeholder se só tiver uma foto */
                           <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-r-lg" />
                         )}
                       </div>
 
-                      {/* Hover overlay opcional (fica bonito) */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors pointer-events-none" />
                     </div>
 
-                    {/* Nome e preço */}
                     <div className="text-lg font-semibold text-center underline hover:text-primary transition-colors">
                       <Link to={`${currentPath}/product/${item?.id}`}>
                         {item.name}
@@ -95,24 +88,6 @@ export const EachCarousel = ({
                       {item.price}
                     </b>
                   </CardContent>
-                  {/* <CardContent className="p-4 flex flex-col items-center h-[225px]">
-                    <div className="relative w-full h-24 mb-4 overflow-hidden">
-                      {item.image_urls.map((img, index) => (
-                        <img
-                          key={index}
-                          src={img}
-                          alt={`${img}-img`}
-                          className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-300 hover:scale-105"
-                        />
-                      ))}
-                    </div>
-                    <div className="text-lg font-semibold text-center underline">
-                      <Link to={`${currentPath}/product/${item?.id}`}>
-                        {item.name}
-                      </Link>
-                    </div>
-                    <b className="text-base text-center mt-2">{item.price}</b>
-                  </CardContent> */}
                 </Card>
               </div>
             </CarouselItem>

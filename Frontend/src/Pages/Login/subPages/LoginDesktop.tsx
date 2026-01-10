@@ -2,8 +2,6 @@ import { InputForm } from "@/components/new/InputForm";
 import { Form } from "@/components/ui/form";
 import { useAuth } from "@/Hooks/useAuth";
 import ScatterBtn from "@/Pages/Animations/Scatter/ScatterBtn";
-import { login } from "@/Services/authService";
-import { useUser } from "@/Services/userService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +11,8 @@ import "./index.css";
 import { Lock, User } from "lucide-react";
 import { SmokeLink } from "@/components/new/SmokeLink";
 import { LogoTitle } from "./Components/LogoTitle";
+import { getValidationLogin } from "@/Repositories/auth";
+import type { TUser } from "@/Pages/Provider/AuthProvider";
 
 const formSchema = z.object({
   email: z.string(),
@@ -23,8 +23,7 @@ type TForm = Required<z.infer<typeof formSchema>>;
 
 export const LoginDesktop = () => {
   const navigate = useNavigate();
-  const { handleLogin } = useAuth();
-  const { setUser } = useUser();
+  const { login } = useAuth();
 
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),
@@ -37,22 +36,26 @@ export const LoginDesktop = () => {
   } = form;
 
   const onSubmit = async (values: TForm) => {
-    const res = await login(values.email, values.senha);
+    const res = await getValidationLogin({
+      username: values.email,
+      password: values.senha,
+    });
+
     if (res.error) return toast.error(res.message);
 
     const { access_token, is_verified } = res;
-
-    setUser({
+    console.log("passei aqui");
+    const userData: TUser = {
       email: values.email,
       scopes: res.scopes || [],
       isMaster: res.is_master || false,
       isBasic: (res.scopes || []).includes("basic"),
       isPremium: (res.scopes || []).includes("premium"),
       isVerified: res.is_verified || false,
-    });
+    };
 
+    login(access_token, userData);
     localStorage.setItem("is_verify", is_verified);
-    handleLogin(access_token);
 
     toast.success("Login efetuado com sucesso");
     navigate("/");

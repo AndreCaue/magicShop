@@ -1,8 +1,7 @@
 import { DropdownButton, type TValue } from "@/components/new/DropdownButton";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useAuth } from "@/Hooks/useAuth";
-// import { useUser } from "@/Services/userService";
+// import { useAuth } from "@/Hooks/useAuth";
 import { ShoppingCartIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/Logo LM.png";
@@ -27,7 +26,7 @@ const conteudoOptions = [
 
 export const Topbar = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  // const { isLoggedIn } = useAuth();
   const { cart } = useCart();
 
   const totalItems = cart?.items?.length ?? 0;
@@ -56,8 +55,6 @@ export const Topbar = () => {
   //     navigate("/login");
   //   }
   // };
-
-  if (!isLoggedIn) return <></>;
 
   return (
     <div>

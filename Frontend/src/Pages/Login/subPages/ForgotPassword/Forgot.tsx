@@ -1,8 +1,8 @@
 import useIsMobile from "@/Hooks/isMobile";
-import { ForgetForm } from "../Components/ForgetForm";
+import { ForgetForm } from "./Components/ForgetForm";
 import { BottomSimbols, TopSimbols } from "./Components/Simbols";
 
-export const ForgotPasswordPage = () => {
+export const ForgotPassword = () => {
   const isMobile = useIsMobile();
 
   if (isMobile)

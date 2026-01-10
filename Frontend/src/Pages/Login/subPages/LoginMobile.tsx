@@ -2,16 +2,16 @@ import { NewButton } from "@/components/new/NewButton";
 import { InputForm } from "@/components/new/InputForm";
 import { Form } from "@/components/ui/form";
 import { useAuth } from "@/Hooks/useAuth";
-import { login } from "@/Services/authService";
-import { useUser } from "@/Services/userService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, User } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 import { SmokeLink } from "@/components/new/SmokeLink";
 import { LogoTitle } from "./Components/LogoTitle";
+import { getValidationLogin } from "@/Repositories/auth";
+import type { TUser } from "@/Pages/Provider/AuthProvider";
 
 const formSchema = z.object({
   email: z.string().nonempty(),
@@ -25,32 +25,38 @@ export const LoginMobile = () => {
   const {
     formState: { isSubmitting },
   } = form;
-  const { handleLogin } = useAuth();
-  const { setUser } = useUser();
+  const { login } = useAuth();
 
+  const { state } = useLocation();
   const navigate = useNavigate();
 
   const { control, handleSubmit } = form;
   const onSubmit = async (values: TForm) => {
-    const res = await login(values.email, values.senha);
+    const res = await getValidationLogin({
+      username: values.email,
+      password: values.senha,
+    });
+
     if (res.error) return toast.error(res.message);
 
     const { access_token, is_verified } = res;
 
-    setUser({
+    const userData: TUser = {
       email: values.email,
       scopes: res.scopes || [],
       isMaster: res.is_master || false,
       isBasic: (res.scopes || []).includes("basic"),
       isPremium: (res.scopes || []).includes("premium"),
       isVerified: res.is_verified || false,
-    });
+    };
+
+    login(access_token, userData);
 
     localStorage.setItem("is_verify", is_verified);
-    handleLogin(access_token);
 
     toast.success("Login efetuado com sucesso");
-    navigate("/");
+    const redirectTo = state?.from?.pathname || "/";
+    navigate(redirectTo, { replace: true });
   };
 
   return (

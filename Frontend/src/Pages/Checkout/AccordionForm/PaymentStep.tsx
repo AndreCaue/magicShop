@@ -187,7 +187,7 @@ export default function PaymentStep({ canOpenStep, form, onSubmit }: Props) {
               >
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>
-                    {n}x de R$ {/* total / n */ (100).toFixed(2)}
+                    {n}x de R$ {(100).toFixed(2)}
                     {n > 1 ? " sem juros" : ""}
                   </option>
                 ))}

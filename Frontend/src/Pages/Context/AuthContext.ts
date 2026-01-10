@@ -1,11 +1,13 @@
 import { createContext } from "react";
+import type { TUser } from "../Provider/AuthProvider";
 
-export type AuthContextType = {
-  isLoggedIn: boolean;
-  handleLogin: (token: string) => void;
-  handleLogout: () => void;
+type AuthContextType = {
+  isAuthenticated: boolean;
+  user: TUser | null;
+  loading: boolean;
+  login: (token: string, userData: TUser) => void;
+  logout: () => void;
 };
-
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );

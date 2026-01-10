@@ -72,20 +72,6 @@ const InputOTPForm = <
                     <InputOTPSlot index={5} />
                   </InputOTPGroup>
                 </InputOTP>
-                {/* <InputOTP
-                  {...field}
-                  placeholder={placeholder}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    if (restrictInput)
-                      event.target.value = event.target.value.replace(
-                        restrictInput,
-                        ""
-                      );
-                    field.onChange(event);
-                    onChangeValue?.(event.target.value);
-                  }}
-                  maxLength={maxLength}
-                /> */}
               </FormControl>
               <FormMessage />
             </>

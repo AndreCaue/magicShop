@@ -69,7 +69,6 @@ export const Home = () => {
           <Club size={300} className="fill-black" strokeWidth={1} />
         </CardContainer>
       </CarouselMain>
-
       {isOpen && <VerifyDialog isOpen={isOpen} setIsOpen={setIsOpen} />}
     </>
   );

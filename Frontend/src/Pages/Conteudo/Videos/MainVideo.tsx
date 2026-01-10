@@ -1,9 +1,9 @@
 // to do
 
-import { useUser } from "@/Services/userService";
+import { useAuth } from "@/Hooks/useAuth";
 
 export const MainVideo = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
 
   console.log(user, "popopopo1");
 

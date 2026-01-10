@@ -21,10 +21,6 @@ import { Skeleton } from "../ui/skeleton";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
 
-/* -------------------------------------------------------------------------- */
-/*                                   Types                                    */
-/* -------------------------------------------------------------------------- */
-
 type TCheckbox = CheckboxIndicatorProps & {
   label?: string;
   required?: boolean;
@@ -33,10 +29,6 @@ type TCheckbox = CheckboxIndicatorProps & {
   className?: string;
   isSkeletonLoading?: boolean;
 };
-
-/* -------------------------------------------------------------------------- */
-/*                         Custom Visual Checkbox                              */
-/* -------------------------------------------------------------------------- */
 
 type CustomCheckboxProps = {
   checked: boolean;
@@ -56,10 +48,6 @@ const CustomCheckbox = ({ checked }: CustomCheckboxProps) => {
     </div>
   );
 };
-
-/* -------------------------------------------------------------------------- */
-/*                               Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 const CheckboxForm = <
   TFieldValues extends FieldValues = FieldValues,
@@ -135,7 +123,6 @@ const CheckboxForm = <
                     >
                       <FormControl>
                         <label className="flex cursor-pointer items-center gap-2">
-                          {/* Checkbox real (Radix) */}
                           <Checkbox
                             {...props}
                             className="sr-only"
@@ -145,7 +132,6 @@ const CheckboxForm = <
                             }
                           />
 
-                          {/* Checkbox visual */}
                           <CustomCheckbox checked={checked} />
 
                           <span className="select-none text-sm">

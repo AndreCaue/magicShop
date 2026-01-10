@@ -19,7 +19,6 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "@/Services/userService";
 import {
   Collapsible,
   CollapsibleContent,
@@ -49,11 +48,10 @@ type TItem = {
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { handleLogout } = useAuth();
-  const { user } = useUser();
+  const { logout, user } = useAuth();
 
   const handleClickLogout = (URL: string) => {
-    handleLogout();
+    logout();
     navigate(URL);
   };
 

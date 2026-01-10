@@ -1,12 +1,18 @@
-import { useAuthLogin } from "@/Hooks/Auth";
-import { Outlet, Navigate } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "@/Hooks/useAuth";
+import { SimbolLoading } from "./CustomLoading/SimbolLoading";
 
-export default function ProtectedRoute() {
-  const { isLoggedIn } = useAuthLogin();
-
-  if (isLoggedIn === null) {
-    return <div>Carregando...</div>;
+export const PrivateRoute = () => {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+  console.log(loading, "looping inifito");
+  if (loading) {
+    return <SimbolLoading />;
   }
 
-  return isLoggedIn ? <Outlet /> : <Navigate to="/login" replace />;
-}
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
+};

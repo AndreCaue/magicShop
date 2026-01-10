@@ -54,11 +54,6 @@ export default function PaymentSummary({
           <span>{total === 0 ? "Grátis" : formatCurrency(20)} </span>
         </div>
 
-        {/* <div className="flex justify-between text-base font-medium text-green-600">
-          <span>Desconto (cupom)</span>
-          <span>-R$ 50,00</span>
-        </div> */}
-
         <div className="flex justify-between items-center text-xl font-bold border-t border-gray-200 pt-4">
           <span>Total a pagar</span>
           <span className="text-green-700">{formatCurrency(total)}</span>

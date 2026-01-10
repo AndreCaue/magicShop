@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Accordion } from "@/components/ui/accordion";
 import { Form } from "@/components/ui/form";
 import { useState, useEffect } from "react";
-import { useUser } from "@/Services/userService";
 import { useShippingStore } from "@/stores/useShippingStore";
 import { formSchema } from "../schema";
 import { STEP_FIELDS, type TForm, type TStep } from "../types";
@@ -11,9 +10,10 @@ import ClientStep from "./ClientStep";
 import AddressStep from "./AddressStep";
 import ShippingStep from "./ShippingStep";
 import PaymentStep from "./PaymentStep";
+import { useAuth } from "@/Hooks/useAuth";
 
 export const AccordionForm = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { cep: cepFromStore } = useShippingStore();
   const [activeStep, setActiveStep] = useState<TStep>("cliente");
   const [completedSteps, setCompletedSteps] = useState<TStep[]>([]);
