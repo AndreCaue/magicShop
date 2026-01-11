@@ -52,7 +52,7 @@ export const ForgetForm = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="px-10 lg:px-0"
+        className="py-4 lg:px-0"
       >
         <Card className="max-w-sm min-w-sm text-white  bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 md:-rotate-45">
           <CardHeader className="space-y-1">

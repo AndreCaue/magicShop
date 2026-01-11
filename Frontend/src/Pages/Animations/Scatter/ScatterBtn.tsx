@@ -24,7 +24,7 @@ export default function ScatterBtn({
 }: {
   text: string;
   className?: string;
-  onClick: () => void;
+  onClick?: () => void;
   typeBtn?: "submit" | "button" | "reset" | undefined;
   isSubmitting?: boolean;
 }) {
@@ -32,7 +32,7 @@ export default function ScatterBtn({
     <div className={cn("text-center w-full border h-fit  ", className)}>
       <button
         type={typeBtn}
-        onClick={() => onClick()}
+        onClick={() => onClick?.()}
         className="cursor-pointer"
       >
         <motion.h1

@@ -69,8 +69,10 @@ const InputForm = <
                     : "text-white placeholder:text-white"
                 )}
               >
-                {label}
-                {required && <span className="text-red-500">*</span>}
+                <>
+                  {label}
+                  {required && <span className="text-red-500">*</span>}
+                </>
               </FormLabel>
 
               <FormControl>

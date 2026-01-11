@@ -38,24 +38,6 @@ export const Topbar = () => {
     navigate(`conteudo/${v.text}`);
   };
 
-  // const handleClick = (v: TValue) => {
-  //   navigate("/");
-  //                                                  later
-  //   switch (v.value) {
-  //     case 1:
-  //       handleLogout();
-  //       navigate("/login");
-  //       break;
-  //     case 9:
-  //       navigate("/master");
-  //   }
-
-  //   if (v.value === 1) {
-  //     handleLogout();
-  //     navigate("/login");
-  //   }
-  // };
-
   return (
     <div>
       <header className="fixed left-0 top-0 right-0 z-10 bg-white grid grid-cols-3 h-20 text-black">

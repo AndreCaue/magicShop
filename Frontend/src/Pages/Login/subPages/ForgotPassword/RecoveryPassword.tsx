@@ -1,15 +1,10 @@
 import useIsMobile from "@/Hooks/isMobile";
 
-// import { useSearchParams } from "react-router-dom";
 import { BottomSimbols, TopSimbols } from "./Components/Simbols";
 import { RecoveryForm } from "./Components/RecoveryForm";
 
 export const RecoveryPassword = () => {
   const isMobile = useIsMobile();
-  // const [searchParams] = useSearchParams();
-  // const token = searchParams.get("token");
-  // console.log(token); // parei aqui
-
   if (isMobile)
     return (
       <div>

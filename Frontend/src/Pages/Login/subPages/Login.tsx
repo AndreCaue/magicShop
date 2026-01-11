@@ -1,12 +1,11 @@
 import useIsMobile from "@/Hooks/isMobile";
-// import AnimatedTitle from "@/components/new/AnimatedTitle";
 
 import { useAuth } from "@/Hooks/useAuth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import MatrixDeckRain from "@/Pages/Animations/MatrixDeckRain";
 import { LoginMobile } from "./LoginMobile";
 import { LoginDesktop } from "./LoginDesktop";
+import InverseMatrixDeck from "@/Pages/Animations/ReverseMatrixDeck";
 
 export const Login = () => {
   const isMobile = useIsMobile();
@@ -22,13 +21,13 @@ export const Login = () => {
   return (
     <>
       {isMobile ? (
-        <MatrixDeckRain>
+        <InverseMatrixDeck>
           <LoginMobile />
-        </MatrixDeckRain>
+        </InverseMatrixDeck>
       ) : (
-        <MatrixDeckRain>
+        <InverseMatrixDeck>
           <LoginDesktop />
-        </MatrixDeckRain>
+        </InverseMatrixDeck>
       )}
     </>
   );

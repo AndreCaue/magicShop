@@ -4,7 +4,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Shop } from "./Shop";
 import { PrivateRoute } from "@/Security/ProtectedRoute";
 import { ForgotPassword } from "@/Pages/Login/subPages/ForgotPassword/Forgot";
-import { Register } from "@/Pages/Login/subPages/Register";
 import { Conteudo } from "./Conteudo";
 import MasterProtectedRouter from "@/Security/MasterProtectedRouter";
 import { EspecialRoutes } from "./EspecialRoutes";
@@ -13,6 +12,7 @@ import { Login } from "@/Pages/Login/subPages/Login";
 import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
 import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/RecoveryPassword";
+import { Register } from "@/Pages/Login/subPages/Register/Register";
 
 export const AppRoutes = () => {
   return (

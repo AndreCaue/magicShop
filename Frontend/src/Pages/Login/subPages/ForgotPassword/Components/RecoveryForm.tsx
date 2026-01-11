@@ -12,7 +12,6 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { PassInput } from "@/components/new/PassInput";
-import { Lock } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { recoveryPassword } from "@/Repositories/auth";
@@ -81,7 +80,7 @@ export const RecoveryForm = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="px-10 lg:px-0"
+        className="py-4 lg:px-0"
       >
         <Card className="max-w-sm min-w-sm text-white  bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 md:-rotate-45">
           <CardHeader className="space-y-1">
@@ -98,7 +97,6 @@ export const RecoveryForm = () => {
                 type="password"
                 placeholder="Senha"
                 disabled={isSubmitting}
-                iconPlaceholder={<Lock />}
               />
 
               <PassInput
@@ -107,7 +105,6 @@ export const RecoveryForm = () => {
                 placeholder="Confirme a senha"
                 type="password"
                 disabled={isSubmitting}
-                iconPlaceholder={<Lock />}
               />
 
               <NewButton label="Enviar" disabled={isSubmitting} />

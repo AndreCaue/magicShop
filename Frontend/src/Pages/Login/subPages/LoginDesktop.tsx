@@ -44,7 +44,7 @@ export const LoginDesktop = () => {
     if (res.error) return toast.error(res.message);
 
     const { access_token, is_verified } = res;
-    console.log("passei aqui");
+
     const userData: TUser = {
       email: values.email,
       scopes: res.scopes || [],
@@ -91,10 +91,9 @@ export const LoginDesktop = () => {
             />
 
             <ScatterBtn
-              text="Submit"
+              text="Abre-te Sésamo"
               className="cursor-pointer hover:bg-black"
               isSubmitting={isSubmitting}
-              onClick={() => console.log("a")}
             />
 
             <div className="flex flex-col mt-2 gap-8 text-center">

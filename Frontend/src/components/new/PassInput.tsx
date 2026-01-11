@@ -14,6 +14,7 @@ import type {
 } from "react-hook-form";
 import type React from "react";
 import { useState } from "react";
+import { Lock } from "lucide-react";
 
 type TInputForm = {
   required?: boolean;
@@ -23,7 +24,6 @@ type TInputForm = {
   isSkeletonLoading?: boolean;
   placeholder?: string;
   background?: "dark" | "light";
-  iconPlaceholder?: React.ReactElement;
   className?: string;
   type?: string;
 };
@@ -37,7 +37,6 @@ const PassInput = <
   control,
   name,
   required,
-  iconPlaceholder,
   onChangeValue,
   placeholder = "Digite ...",
   restrictInput,
@@ -81,7 +80,7 @@ const PassInput = <
                     onChangeValue?.(event.target.value);
                   }}
                   typeInput="inputpass"
-                  icon={iconPlaceholder}
+                  icon={<Lock />}
                   onClick={onClickEye}
                   toggleEye={showPassword}
                   {...props}

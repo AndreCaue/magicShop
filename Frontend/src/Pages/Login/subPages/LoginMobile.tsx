@@ -1,4 +1,3 @@
-import { NewButton } from "@/components/new/NewButton";
 import { InputForm } from "@/components/new/InputForm";
 import { Form } from "@/components/ui/form";
 import { useAuth } from "@/Hooks/useAuth";
@@ -12,9 +11,10 @@ import { SmokeLink } from "@/components/new/SmokeLink";
 import { LogoTitle } from "./Components/LogoTitle";
 import { getValidationLogin } from "@/Repositories/auth";
 import type { TUser } from "@/Pages/Provider/AuthProvider";
+import ScatterBtn from "@/Pages/Animations/Scatter/ScatterBtn";
 
 const formSchema = z.object({
-  email: z.string().nonempty(),
+  email: z.string(),
   senha: z.string(),
 });
 
@@ -82,7 +82,11 @@ export const LoginMobile = () => {
             disabled={isSubmitting}
           />
 
-          <NewButton disabled={isSubmitting} label="Acessar" />
+          <ScatterBtn
+            text="Abre-te Sésamo"
+            className="cursor-pointer hover:bg-black"
+            isSubmitting={isSubmitting}
+          />
 
           <div className="flex flex-col mt-2 -mb-20 gap-8 text-center">
             <SmokeLink
