@@ -1,59 +1,33 @@
-import { InputForm } from "@/components/new/InputForm";
-import { NewButton } from "@/components/new/NewButton";
-import { Form } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
-import z from "zod";
+import useIsMobile from "@/Hooks/isMobile";
 
-const formSchema = z.object({
-  validationToken: z.string(),
-  new_password: z.string(),
-  confirm_password: z.string(),
-});
+// import { useSearchParams } from "react-router-dom";
+import { BottomSimbols, TopSimbols } from "./Components/Simbols";
+import { RecoveryForm } from "./Components/RecoveryForm";
 
 export const RecoveryPassword = () => {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
+  const isMobile = useIsMobile();
+  // const [searchParams] = useSearchParams();
+  // const token = searchParams.get("token");
+  // console.log(token); // parei aqui
 
-  console.log(token); // parei aqui
-
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-  });
-
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = form;
-
-  const onSubmit = () => {};
+  if (isMobile)
+    return (
+      <div>
+        <TopSimbols />
+        <RecoveryForm />
+        <BottomSimbols />
+      </div>
+    );
 
   return (
-    <div className="border border-red-500">
-      <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <InputForm
-            control={control}
-            name="new_password"
-            background="dark"
-            disabled={isSubmitting}
-            iconPlaceholder={<Lock />}
-          />
-
-          <InputForm
-            control={control}
-            name="confirm_password"
-            background="dark"
-            disabled={isSubmitting}
-            iconPlaceholder={<Lock />}
-          />
-
-          <NewButton label="Confirmar" disabled={isSubmitting} />
-        </form>
-      </Form>
+    <div
+      className="flex md:h-[500px] md:w-[500px]  px-24 justify-center items-center rotate-45"
+      style={{
+        background:
+          "linear-gradient(45deg, #f9f6ec, #88a1a8, #502940, #790614, #0d0c0c)",
+      }}
+    >
+      <RecoveryForm />
     </div>
   );
 };

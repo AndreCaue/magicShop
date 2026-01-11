@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { motion, useAnimation, type Variants } from "framer-motion";
 import { Link } from "react-router-dom";
 
@@ -24,9 +25,15 @@ type TSmokeLink = {
   textLabel: string;
   goTo: string;
   isMobile?: boolean;
+  className?: string;
 };
 
-export const SmokeLink = ({ goTo, textLabel, isMobile }: TSmokeLink) => {
+export const SmokeLink = ({
+  goTo,
+  textLabel,
+  isMobile,
+  className,
+}: TSmokeLink) => {
   const controls = useAnimation();
 
   if (isMobile)
@@ -37,6 +44,7 @@ export const SmokeLink = ({ goTo, textLabel, isMobile }: TSmokeLink) => {
           opacity: 0.7,
           filter: "blur(1.5px)",
         }}
+        className={className}
         transition={{
           duration: 0.15,
           ease: [0.4, 0, 0.2, 1],
@@ -51,12 +59,12 @@ export const SmokeLink = ({ goTo, textLabel, isMobile }: TSmokeLink) => {
   // Desktop
   return (
     <div
-      className="relative flex self-center w-fit"
+      className={cn("relative flex self-center", className)}
       onMouseEnter={() => controls.start("hover")}
       onMouseLeave={() => controls.start("initial")}
     >
       <motion.div variants={smokeVariants} initial="initial" animate={controls}>
-        <Link to={goTo} className="text-white text-center block">
+        <Link to={goTo} className={"text-white text-center flex"}>
           {textLabel}
         </Link>
       </motion.div>

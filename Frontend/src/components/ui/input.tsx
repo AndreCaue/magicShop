@@ -55,7 +55,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         {typeInput === "inputpass" && (
           <Eye
-            className="absolute right-0 text-white hover:text-white/50 hover:cursor-pointer"
+            className="absolute right-0 text-white hover:text-white/50 hover:cursor-pointer mx-2"
             onClick={() => onClick?.()}
           />
         )}

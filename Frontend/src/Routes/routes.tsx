@@ -20,7 +20,7 @@ export const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot_password" element={<ForgotPassword />} />
-      <Route path="/reset_password" element={<RecoveryPassword />} />
+      <Route path="/reset_password/:token?" element={<RecoveryPassword />} />
 
       {/* <Route path="/" element={<Home />} />
       <Route path="/shop/*" element={<Shop />} /> */}
@@ -32,8 +32,6 @@ export const AppRoutes = () => {
           <Route path="/carrinho/" element={<CartPage />} />
           <Route path="/checkout/" element={<Checkout />} />
         </Route>
-
-        <Route path="*" element={<Navigate to={"/"} replace />} />
       </Route>
 
       <Route element={<MasterProtectedRouter />}>

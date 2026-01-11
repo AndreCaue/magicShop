@@ -57,3 +57,13 @@ export const forgotPasswordEmail = async (email: string) => {
   const response = await api.post("/auth/forgot-password", { email });
   return response?.data;
 };
+
+type TRecoveryParams = {
+  token: string;
+  new_password: string;
+};
+
+export const recoveryPassword = async (params: TRecoveryParams) => {
+  const response = await api.post("/auth/reset-password", params);
+  return response.data;
+};

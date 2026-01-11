@@ -22,6 +22,7 @@ type TInputForm = {
   onChangeValue?: (value: string) => void;
   isSkeletonLoading?: boolean;
   placeholder?: string;
+  background?: "dark" | "light";
   iconPlaceholder?: React.ReactElement;
   className?: string;
   type?: string;

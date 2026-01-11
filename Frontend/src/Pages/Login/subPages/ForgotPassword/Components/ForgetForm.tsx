@@ -1,5 +1,4 @@
 import { InputForm } from "@/components/new/InputForm";
-import { NewButton } from "@/components/new/NewButton";
 import {
   Card,
   CardContent,
@@ -16,6 +15,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 import { SmokeLink } from "@/components/new/SmokeLink";
+import { CounterButton } from "@/components/new/CounterButton";
+import { useCountdown } from "@/Hooks/useCountdown";
 
 const formSchema = z.object({
   email: z.string(),
@@ -25,6 +26,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export const ForgetForm = () => {
   const [sendedEmail, setSendedEmail] = useState(false);
+  const { count, isCounting, start } = useCountdown(90);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -41,6 +43,7 @@ export const ForgetForm = () => {
     if (!res) return;
     toast.success(res.message);
     setSendedEmail(true);
+    start();
   };
 
   return (
@@ -51,7 +54,7 @@ export const ForgetForm = () => {
         transition={{ duration: 0.5 }}
         className="px-10 lg:px-0"
       >
-        <Card className="max-w-sm text-white  bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 lg:-rotate-45">
+        <Card className="max-w-sm min-w-sm text-white  bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 md:-rotate-45">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">
               Esqueceu sua senha?
@@ -70,9 +73,17 @@ export const ForgetForm = () => {
                 disabled={isSubmitting}
               />
 
-              <NewButton label="Enviar" disabled={isSubmitting} />
+              <CounterButton
+                label="Enviar"
+                disabled={isSubmitting || isCounting}
+                counting={count}
+              />
 
-              <SmokeLink goTo="/login" textLabel="Voltar para login" isMobile />
+              <SmokeLink
+                goTo="/login"
+                textLabel="Voltar para login"
+                className="w-full justify-center"
+              />
             </form>
           </CardContent>
           {sendedEmail && (

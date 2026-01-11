@@ -24,7 +24,7 @@ type TForm = Required<z.infer<typeof formSchema>>;
 export const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  const { isAuthenticated } = useAuth();
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),
   });
@@ -48,11 +48,12 @@ export const Register = () => {
     toast.success("Cadastro realizado. Verique seu email!");
     navigate("/login");
   };
+
   useEffect(() => {
-    if (!isLoggedIn) return;
+    if (!isAuthenticated) return;
     navigate("/");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
+  }, [isAuthenticated]);
 
   return (
     <div>
