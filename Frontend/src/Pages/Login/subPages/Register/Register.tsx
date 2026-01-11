@@ -117,7 +117,7 @@ export const Register = () => {
             <div className="flex flex-col justify-center gap-10">
               <NewButton
                 label="Cadastrar"
-                className="bg-transparent text-white"
+                className="bg-transparent text-white hover:bg-transparent"
                 disabled={isSubmitting || isLoading}
               />
               <SmokeLink textLabel="Ir para Login" goTo={"/login"} />

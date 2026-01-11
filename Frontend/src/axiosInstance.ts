@@ -4,6 +4,8 @@ let currentAccessToken: string | null = null;
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (token: string | null) => void;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   reject: (err: any) => void;
 }> = [];
 
@@ -11,6 +13,7 @@ export const setAccessToken = (token: string | null) => {
   currentAccessToken = token;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const processQueue = (error: any = null, token: string | null = null) => {
   failedQueue.forEach((prom) =>
     error ? prom.reject(error) : prom.resolve(token)
