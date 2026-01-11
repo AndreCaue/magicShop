@@ -126,9 +126,9 @@ async def forgot_password(
     reset_token = create_reset_password_token(user_id=user.id)
 
     if settings.ENVIRONMENT == 'production':
-     reset_link = f"https://doceilusao.store/reset-password?token={reset_token}"
+     reset_link = f"https://doceilusao.store/reset_password?token={reset_token}"
     else:
-     reset_link = f"http://localhost:5173/reset-password?token={reset_token}"
+     reset_link = f"http://localhost:5173/reset_password?token={reset_token}"
 
     background_tasks.add_task(
         send_reset_password_email,
