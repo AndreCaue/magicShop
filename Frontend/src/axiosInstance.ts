@@ -1,5 +1,4 @@
 import axios from "axios";
-import { toast } from "sonner";
 
 let currentAccessToken: string | null = null;
 let isRefreshing = false;
