@@ -10,6 +10,7 @@ let failedQueue: Array<{
 }> = [];
 
 export const setAccessToken = (token: string | null) => {
+  console.log("cheguei aqui na parte do token");
   currentAccessToken = token;
 };
 
@@ -73,11 +74,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshRes = await axios.post(
-          `${import.meta.env.VITE_API_URL}auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
+        const refreshRes = await api.post("/auth/refresh", {});
 
         const newAccessToken = refreshRes.data.access_token;
         setAccessToken(newAccessToken);
