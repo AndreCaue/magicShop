@@ -1,93 +1,121 @@
 import { DropdownButton, type TValue } from "@/components/new/DropdownButton";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-// import { useAuth } from "@/Hooks/useAuth";
 import { ShoppingCartIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/Logo LM.png";
 import { useCart } from "@/Hooks/useCart";
+import { LogoTopbar } from "./Components/LogoTopbar";
+import { motion } from "framer-motion";
 
-const opt = [
-  {
-    text: "Baralhos",
-    value: 1,
-  },
-  {
-    text: "Acessórios",
-    value: 2,
-  },
+const shopOptions = [
+  { text: "Baralhos", value: 1 },
+  { text: "Acessórios", value: 2 },
   { text: "Gimmick", value: 3 },
 ];
 
-const conteudoOptions = [
+const contentOptions = [
   { text: "Vídeos", value: 1 },
   { text: "Livros", value: 2 },
 ];
 
+const symbols = ["♠", "♥", "♦", "♣"];
+
 export const Topbar = () => {
   const navigate = useNavigate();
-  // const { isLoggedIn } = useAuth();
   const { cart } = useCart();
 
   const totalItems = cart?.items?.length ?? 0;
 
-  const handleShopRedirect = (v: TValue) => {
-    navigate(`shop/${v.text}`);
-  };
-  const handleConteudoRedirect = (v: TValue) => {
-    navigate(`conteudo/${v.text}`);
-  };
+  const redirect = (path: string) => (v: TValue) =>
+    navigate(`/${path}/${v.text}`);
 
   return (
-    <div>
-      <header className="fixed left-0 top-0 right-0 z-10 bg-white grid grid-cols-3 h-20 text-black">
-        <div className="col-span-3 grid grid-cols-9 gap-10  ">
-          <button className="col-span-2 grid lg:grid-cols-2  cursor-pointer hover:scale-105">
-            <img
-              alt="logo"
-              src={logo}
-              className="h-10 w-10 rounded-full mx-3 hover:scale-105 place-self-center"
-            />
-            <div className="text-start hover:scale-105 hidden lg:flex shrink-1">
-              Mágica Cartas e Distribuição
-            </div>
-          </button>
+    <header className="fixed top-0 inset-x-0 z-50 bg-white border-b">
+      {/* Linha principal */}
+      <div className="flex h-20 items-center justify-between px-6 gap-6">
+        {/* Esquerda */}
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="lg:hidden" />
 
-          <div className="col-span-5">
-            <Input />
-          </div>
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-3 hover:opacity-80 transition"
+          >
+            <LogoTopbar />
 
-          <div className="col-span-2 grid grid-cols-2 place-items-center">
-            <div className="hidden lg:flex">Olá Usuário</div>
-            <button
-              className="relative w-fit h-12 hover:scale-110 cursor-pointer justify-center"
-              onClick={() => navigate("/carrinho")}
+            <motion.div
+              className="hidden lg:flex gap-2 text-lg text-black/70"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: { staggerChildren: 0.2 },
+                },
+              }}
             >
-              <ShoppingCartIcon />
-
-              {totalItems > 0 && (
-                <span className="absolute flex items-center justify-center top-1 -right-1 bg-red-500 h-4 w-4 rounded-full text-xs text-white">
-                  {totalItems}
-                </span>
-              )}
-            </button>
-          </div>
+              {symbols.map((s) => (
+                <motion.span
+                  key={s}
+                  variants={{
+                    hidden: { opacity: 0, y: 6 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: {
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        duration: 0.8,
+                      },
+                    },
+                  }}
+                >
+                  {s}
+                </motion.span>
+              ))}
+            </motion.div>
+          </button>
         </div>
 
+        {/* Centro */}
+        <div className="hidden md:block flex-1 max-w-lg">
+          <Input placeholder="Buscar produtos, vídeos ou livros…" />
+        </div>
+
+        {/* Direita */}
+        <div className="flex items-center gap-6">
+          <span className="hidden lg:block text-sm text-muted-foreground">
+            Olá, Usuário
+          </span>
+
+          <button
+            onClick={() => navigate("/carrinho")}
+            className="relative hover:scale-105 transition"
+            aria-label="Carrinho"
+          >
+            <ShoppingCartIcon />
+
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                {totalItems}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Linha secundária */}
+      <nav className="hidden lg:flex items-center justify-center gap-8 h-12 text-sm">
         <DropdownButton
           label="Loja"
-          options={opt}
-          onSelect={handleShopRedirect}
-        ></DropdownButton>
-
-        <SidebarTrigger className="border h-full w-full cursor-pointer" />
-
+          options={shopOptions}
+          onSelect={redirect("shop")}
+        />
         <DropdownButton
           label="Conteúdo"
-          options={conteudoOptions}
-          onSelect={handleConteudoRedirect}
-        ></DropdownButton>
-      </header>
-    </div>
+          options={contentOptions}
+          onSelect={redirect("conteudo")}
+        />
+      </nav>
+    </header>
   );
 };

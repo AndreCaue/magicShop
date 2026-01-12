@@ -6,7 +6,6 @@
 // import { useCart } from "@/Hooks/useCart";
 // import { LogoTopbar } from "./Components/LogoTopbar";
 // import { motion } from "framer-motion";
-// import { SimbolLoading } from "@/Security/CustomLoading/SimbolLoading";
 
 // const opt = [
 //   {
@@ -123,3 +122,4 @@
 //     </div>
 //   );
 // };
+// //
