@@ -83,7 +83,7 @@ export const LoginMobile = () => {
           />
 
           <ScatterBtn
-            text="Abre-te Sésamo"
+            text="Acessar"
             className="cursor-pointer hover:bg-black"
             isSubmitting={isSubmitting}
           />
