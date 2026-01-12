@@ -356,7 +356,7 @@ def logout(
     return {"message": "Logout global realizado com sucesso"}
 
 @router.get("/me")
-def read_users_me(current_user: models.User = Depends(get_current_user_from_cookie)):
+def read_users_me(current_user: models.User = Depends(get_current_user)):
     return {
         "email": current_user.email,
         "scopes": current_user.scopes,
