@@ -138,7 +138,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent className="py-20 min-w-[250px]">
+          <SidebarGroupContent className="lg:py-20 min-w-[250px]">
             <SidebarMenu>
               {(user?.isMaster ? masterItems : items).map((item, index) => (
                 <Collapsible className="group/collapsible" key={index + 1}>
@@ -174,6 +174,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {/* Footer */}
       <SidebarFooter>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

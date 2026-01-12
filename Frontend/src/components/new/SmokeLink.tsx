@@ -64,7 +64,7 @@ export const SmokeLink = ({
       onMouseLeave={() => controls.start("initial")}
     >
       <motion.div variants={smokeVariants} initial="initial" animate={controls}>
-        <Link to={goTo} className={"text-white text-center flex"}>
+        <Link to={goTo} className={"text-black text-center flex"}>
           {textLabel}
         </Link>
       </motion.div>

@@ -17,7 +17,7 @@ export const CarouselMain = ({ children }: TCarouselMain) => {
   return (
     <Carousel
       plugins={[plugin.current]}
-      className="w-full max-w-xs"
+      className="w-full max-w-xs lg:mt-25"
       opts={{ loop: true }}
     >
       <CarouselContent>
