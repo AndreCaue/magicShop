@@ -309,7 +309,17 @@ def refresh_token(
     save_refresh_token(db, db_user.id, new_jti, new_expires_at)
 
     response.set_cookie("access_token", new_access_token, httponly=True, secure=True, domain=".doceilusao.store",samesite="none", max_age=3600, path="/")
-    response.set_cookie("refresh_token", new_refresh_token, httponly=True, secure=True, domain=".doceilusao.store", samesite="none", max_age=60*60*24*30, path="/")
+    # response.set_cookie("refresh_token", new_refresh_token, httponly=True, secure=True, domain=".doceilusao.store", samesite="none", max_age=60*60*24*30, path="/")
+    response.set_cookie(
+    key="refresh_token",
+    value=new_refresh_token,
+    httponly=True,
+    secure=True,
+    samesite="none",
+    domain=".magicshop.com",
+    path="/auth/refresh",
+    max_age=60 * 60 * 24 * 30,
+)
 
     token_response = {
         "access_token": new_access_token,
