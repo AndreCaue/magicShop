@@ -16,13 +16,11 @@ export type TUser = {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<TUser | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const loadUser = async () => {
     try {
-      setLoading(true);
-
       const response = await api.get("/auth/me");
 
       const userData: TUser = {
@@ -82,6 +80,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     window.addEventListener("unauthorized", handleUnauthorized);
     return () => window.removeEventListener("unauthorized", handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
+    const bootstrapAuth = async () => {
+      try {
+        const response = await api.post("/auth/refresh");
+        const accessToken = response.data.access_token;
+
+        setAccessToken(accessToken);
+        await loadUser();
+      } catch {
+        setAccessToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    bootstrapAuth();
   }, []);
 
   return (

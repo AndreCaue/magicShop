@@ -10,7 +10,6 @@ let failedQueue: Array<{
 }> = [];
 
 export const setAccessToken = (token: string | null) => {
-  console.log("cheguei aqui na parte do token");
   currentAccessToken = token;
 };
 
@@ -44,12 +43,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    const authRoutes = [
-      "/auth/token",
-      "/auth/login",
-      "/auth/refresh",
-      "/auth/logout",
-    ];
+    const authRoutes = ["/auth/token", "/auth/login", "/auth/logout"];
 
     if (authRoutes.some((route) => originalRequest.url?.includes(route))) {
       return Promise.reject(error);

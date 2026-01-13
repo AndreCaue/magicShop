@@ -5,11 +5,11 @@ import { SimbolLoading } from "./CustomLoading/SimbolLoading";
 export const PrivateRoute = () => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
-  console.log(loading, "looping inifito");
   if (loading) {
     return <SimbolLoading />;
   }
 
+  console.log(isAuthenticated, "Autenticado?");
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

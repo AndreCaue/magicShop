@@ -1,4 +1,4 @@
-import { type TValue } from "@/components/new/DropdownButton";
+// import { type TValue } from "@/components/new/DropdownButton";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ShoppingCartIcon, SearchIcon } from "lucide-react";
@@ -9,16 +9,16 @@ import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { SmokeTabs } from "./Components/SmokeTabs";
 
-const SHOP_OPTIONS = [
-  { text: "Baralhos", value: 1 },
-  { text: "Acessórios", value: 2 },
-  { text: "Gimmick", value: 3 },
-];
+// const SHOP_OPTIONS = [
+//   { text: "Baralhos", value: 1 },
+//   { text: "Acessórios", value: 2 },
+//   { text: "Gimmick", value: 3 },
+// ];
 
-const CONTENT_OPTIONS = [
-  { text: "Vídeos", value: 1 },
-  { text: "Livros", value: 2 },
-];
+// const CONTENT_OPTIONS = [
+//   { text: "Vídeos", value: 1 },
+//   { text: "Livros", value: 2 },
+// ];
 
 const CARD_SYMBOLS = ["♠", "♥", "♦", "♣"] as const;
 
@@ -91,13 +91,13 @@ export const Topbar = () => {
     [cart?.items?.length]
   );
 
-  const handleShopRedirect = (v: TValue) => {
-    navigate(`/shop/${v.text.toLowerCase()}`);
-  };
+  // const handleShopRedirect = (v: TValue) => {
+  //   navigate(`/shop/${v.text.toLowerCase()}`);
+  // };
 
-  const handleConteudoRedirect = (v: TValue) => {
-    navigate(`/conteudo/${v.text.toLowerCase()}`);
-  };
+  // const handleConteudoRedirect = (v: TValue) => {
+  //   navigate(`/conteudo/${v.text.toLowerCase()}`);
+  // };
 
   const handleLogoClick = () => {
     navigate("/");
