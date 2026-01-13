@@ -54,7 +54,7 @@ export const LoginDesktop = () => {
       isVerified: res.is_verified || false,
     };
 
-    login(access_token, userData);
+    await login(access_token, userData);
     localStorage.setItem("is_verify", is_verified);
 
     toast.success("Login efetuado com sucesso");

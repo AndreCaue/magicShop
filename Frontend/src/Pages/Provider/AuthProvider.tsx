@@ -43,11 +43,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = (token: string, userData: TUser) => {
+  const login = async (token: string, userData: TUser) => {
     setAccessToken(token);
     setUser(userData);
     setIsAuthenticated(true);
-    loadUser();
+    await loadUser();
   };
 
   const logout = async () => {
