@@ -101,6 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     bootstrapAuth();
   }, []);
+
   return (
     <AuthContext.Provider
       value={{ isAuthenticated, user, loading, login, logout }}
