@@ -308,13 +308,15 @@ def refresh_token(
     new_expires_at = datetime.fromtimestamp(new_payload["exp"], tz=timezone.utc)
     save_refresh_token(db, db_user.id, new_jti, new_expires_at)
 
+    _prod = settings.ENVIRONMENT == 'production'
+
     response.set_cookie(
     key="refresh_token",
     value=new_refresh_token,
     httponly=True,
-    secure=True,
+    secure=_prod,
     samesite="lax", #none
-    domain=".doceilusao.store",
+    domain='.doceilusao.store' if _prod else None, # Desabilitar para dev, não envia kookie
     path="/",
     max_age=60 * 60 * 24 * 30,
 )
