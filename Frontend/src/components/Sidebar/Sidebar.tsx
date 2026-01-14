@@ -1,11 +1,10 @@
 import {
-  Calendar,
-  Home,
-  Inbox,
-  Search,
   Settings,
   User2,
   Database,
+  ShoppingCart,
+  MonitorPlay,
+  GamepadDirectional,
 } from "lucide-react";
 
 import {
@@ -42,6 +41,7 @@ type TItem = {
         id: number;
         title: string;
         url: string;
+        disabled?: boolean;
       }[]
     | undefined;
 };
@@ -58,40 +58,58 @@ export function AppSidebar() {
   const items: TItem[] = [
     {
       id: 1,
-      title: "Home",
+      title: "Loja",
       url: "/",
-      icon: Home,
+      icon: ShoppingCart,
       subItem: [
         {
+          id: 10,
+          title: "Baralhos",
+          url: "/loja/baralhos",
+        },
+        {
           id: 11,
-          title: "Subitem",
-          url: "/",
+          title: "Acessórios",
+          url: "/loja/acessorios",
+        },
+        {
+          id: 12,
+          title: "Trukes",
+          url: "/loja/trukes",
+        },
+        {
+          id: 13,
+          title: "Marcas",
+          url: "/loja/marcas",
         },
       ],
     },
     {
       id: 2,
-      title: "Inbox",
-      url: "#",
-      icon: Inbox,
+      title: "Conteúdo",
+      url: "/conteudo",
+      icon: MonitorPlay, //cambiar
+      subItem: [
+        { id: 20, title: "Vídeos", url: "/conteudo/videos" },
+        { id: 21, title: "E-Books", url: "/conteudo/books" },
+      ],
     },
     {
       id: 3,
-      title: "Calendar",
-      url: "#",
-      icon: Calendar,
+      title: "Jogos",
+      url: "/jogos",
+      icon: GamepadDirectional,
+      subItem: [{ id: 30, title: "Jogos", url: "/jogos" }],
     },
-    {
-      id: 4,
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
+
     {
       id: 5,
       title: "Settings",
       url: "#",
       icon: Settings,
+      subItem: [
+        { id: 50, title: "Em desenvolvimento", url: "/", disabled: true },
+      ],
     },
   ];
 
@@ -117,11 +135,6 @@ export function AppSidebar() {
     url: "/login",
     icon: User2,
     subItem: [
-      {
-        id: 14,
-        title: "Configurações",
-        url: "/",
-      },
       {
         id: 12,
         title: "Logout",
@@ -160,6 +173,8 @@ export function AppSidebar() {
                           >
                             <SidebarMenuButton
                               onClick={() => handleClickNavigate(sub.url)}
+                              disabled={sub.disabled || false}
+                              className="cursor-pointer"
                             >
                               <span className="mx-2 rotate-90">♠</span>
                               {sub.title}

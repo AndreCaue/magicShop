@@ -16,6 +16,7 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
+import { UserTopbar } from "./Components/User/UserTopbar";
 
 const formSchema = z.object({
   search: z.string(),
@@ -26,6 +27,9 @@ type TForm = z.infer<typeof formSchema>;
 export const Topbar = () => {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("");
+  const navigate = useNavigate();
+  const { cart } = useCart();
+  const { user } = useAuth();
 
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),
@@ -43,10 +47,6 @@ export const Topbar = () => {
     { id: "jogos", label: "Jogos" },
   ];
 
-  const navigate = useNavigate();
-  const { cart } = useCart();
-  const { user } = useAuth();
-
   const totalItems = useMemo(
     () => cart?.items?.length ?? 0,
     [cart?.items?.length]
@@ -60,11 +60,13 @@ export const Topbar = () => {
     navigate("/carrinho");
   };
 
+  // const handleUserClick = () => {};
+
   const onSubmit = () => {};
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
-      <div className="flex items-center justify-between h-16 px-4 lg:px-6 max-w-[1600px] mx-auto">
+      <div className="flex items-center justify-between h-16 px-4 lg:px-2 max-w-[1600px] mx-auto">
         <button
           onClick={handleLogoClick}
           className="flex items-center gap-3 group transition-transform hover:scale-[1.02] active:scale-[0.98]"
@@ -93,21 +95,33 @@ export const Topbar = () => {
         </div>
 
         <div className="flex items-center gap-2 lg:gap-4">
-          <span className="hidden lg:flex lg:flex-col lg:text-center text-sm text-gray-600">
-            Seja Bem Vindo!
-            <span className="truncate w-12 mx-auto">{user?.email}</span>
-          </span>
+          <UserTopbar
+            userEmail={user?.email ?? ""}
+            label=""
+            // fazer logout, tirar label, onClick
+            options={[{ text: "logout", value: 1 }]}
+          />
 
           <button
             onClick={handleCartClick}
-            className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors active:scale-95"
+            className="relative p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors active:scale-95"
             aria-label={`Carrinho de compras com ${totalItems} ${totalItems === 1 ? "item" : "itens"}`}
           >
-            <ShoppingCartIcon className="w-5 h-5 text-gray-700" />
+            <ShoppingCartIcon className="w-5 h-5 text-gray-700 " />
             <CartBadge count={totalItems} />
           </button>
 
-          <SidebarTrigger className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden" />
+          {/* <button
+            onClick={handleCartClick}
+            className="relative p-2 hidden lg:flex -mr-5 rounded-lg hover:bg-gray-100 transition-colors active:scale-95 cursor-pointer"
+          > */}
+          {/* <User2 className="w-5 h-5 text-gray-700" /> */}
+          {/* </button> */}
+
+          <SidebarTrigger
+            //active for premium
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
+          />
         </div>
       </div>
 
