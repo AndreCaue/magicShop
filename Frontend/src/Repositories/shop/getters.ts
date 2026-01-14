@@ -10,11 +10,6 @@ export const getIndividualProducts = async (id: number) => {
   return response.data;
 };
 
-export const getCart = async () => {
-  const response = await api.get("/cart");
-  return response.data;
-};
-
 interface IGetShippingPresetsResponse {
   height_cm: number;
   id: number;
