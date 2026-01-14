@@ -4,7 +4,12 @@ import { MainVideo } from "@/Pages/Conteudo/Videos/MainVideo";
 export const Conteudo = () => {
   return (
     <Routes>
-      <Route element={<MainVideo />} path="/*" />
+      <Route element={<MainVideo />} path="/videos" />
+      <Route
+        element={<MainVideo />}
+        path="/books"
+        //create
+      />
     </Routes>
   );
 };

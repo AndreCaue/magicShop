@@ -35,7 +35,6 @@ export const SmokeButton = ({
   className,
   isActive = false,
 }: TSmokeButton) => {
-  // Mobile version - sem efeito smoke, apenas feedback tátil
   if (isMobile) {
     return (
       <motion.button
@@ -49,12 +48,11 @@ export const SmokeButton = ({
           ease: [0.4, 0, 0.2, 1],
         }}
         className={cn(
-          "text-white text-center px-4 py-2 rounded-lg transition-colors relative overflow-hidden",
+          "text-white text-center px-4 py-2 rounded-lg transition-colors relative overflow-hidden hover:cursor-pointer",
           isActive && "bg-white/20",
           className
         )}
       >
-        {/* Indicador de tab ativa no mobile */}
         {isActive && (
           <motion.div
             layoutId="mobile-active-tab"
@@ -67,16 +65,14 @@ export const SmokeButton = ({
     );
   }
 
-  // Desktop version - com efeito smoke
   return (
     <button
       onClick={onClick}
       className={cn(
-        "relative flex self-center px-4 py-2 rounded-lg min-w-[80px] justify-center",
+        "relative flex self-center px-4 py-1 rounded-lg min-w-[80px] justify-center hover:cursor-pointer",
         className
       )}
     >
-      {/* Texto com efeito smoke quando ativo */}
       <motion.span
         variants={smokeVariants}
         initial="initial"
@@ -86,19 +82,17 @@ export const SmokeButton = ({
         {textLabel}
       </motion.span>
 
-      {/* Indicador de tab ativa com ícone (aparece depois do smoke) */}
       {isActive && (
         <motion.div
           className="absolute inset-0 flex flex-col items-center justify-center gap-1"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{
-            delay: 0.5, // Aparece depois do smoke
+            delay: 0.5,
             duration: 0.4,
             ease: "easeOut",
           }}
         >
-          {/* Ícone de carta */}
           <motion.span
             className="text-sm"
             initial={{ y: -10, opacity: 0 }}
@@ -113,7 +107,6 @@ export const SmokeButton = ({
             ♦️
           </motion.span>
 
-          {/* Barra indicadora */}
           <motion.div
             layoutId="desktop-active-tab"
             className="h-0.5 bg-black rounded-full"

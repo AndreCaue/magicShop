@@ -5,8 +5,16 @@ import { Acessorios } from "./Acessorios";
 export const Shop = () => {
   return (
     <Routes>
-      <Route element={<Baralhos />} path="baralhos/*" />
-      <Route element={<Acessorios />} path="/Acessórios/*" />
+      <Route
+        //add Main before jsxName
+        //parei aqui
+        element={<Baralhos />}
+        path="baralhos/*"
+      />
+      <Route element={<Acessorios />} path="/acessorios/*" />
+      <Route element={<Acessorios />} path="/trukes/*" />
+      <Route element={<Acessorios />} path="/marcas/*" />
+      {/* <Route path="/" element={<MainJogo />} /> */}
     </Routes>
   );
 };

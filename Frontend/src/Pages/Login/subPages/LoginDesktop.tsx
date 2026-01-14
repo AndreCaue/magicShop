@@ -91,7 +91,7 @@ export const LoginDesktop = () => {
             />
 
             <ScatterBtn
-              text="Abre-te Sésamo"
+              text="Entrar na Ilusão"
               className="cursor-pointer hover:bg-black"
               isSubmitting={isSubmitting}
             />
