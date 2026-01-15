@@ -1,7 +1,6 @@
-import { EachCarousel } from "./Components/LojaCarousel";
-
 import { useEffect, useState } from "react";
 import { getListOfProducts } from "@/Repositories/shop/getters";
+import DisplayContent from "../Display/DisplayContent";
 
 interface IBrand {
   descricao: string;
@@ -33,12 +32,10 @@ export const MainBaralhos = () => {
   }, []);
 
   return (
-    <>
-      <div>
-        <div className="py-10 overflow-x-hidden">
-          <EachCarousel data={products} mainTitle="BICYCLE" timer={3500} />
-        </div>
-      </div>
-    </>
+    <DisplayContent
+      title="Playing Cards"
+      subTitle="Cada baralho uma experiência."
+      //brand + product
+    />
   );
 };

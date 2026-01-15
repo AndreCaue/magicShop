@@ -2,7 +2,7 @@ interface IBrand {
   name: string;
   description: string;
   website: string;
-  logo_url: string;
+  logo_url: string; // usado como icon
   id: number;
 }
 

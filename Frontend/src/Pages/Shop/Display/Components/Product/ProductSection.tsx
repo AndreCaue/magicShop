@@ -1,17 +1,5 @@
 import { motion } from "framer-motion";
 
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-};
-
-type BrandSectionProps = {
-  brand: string;
-  products: Product[];
-};
-
 const cardMotion = {
   rest: {
     y: 20,
@@ -35,7 +23,19 @@ const glowMotion = {
   hover: { opacity: 0.35, scale: 1.3, transition: { duration: 1.1 } },
 };
 
-export function BrandSection({ brand, products }: BrandSectionProps) {
+type TProduct = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+};
+
+type TBrandSectionProps = {
+  brand: string;
+  products: TProduct[];
+};
+
+export const ProductSection = ({ brand, products }: TBrandSectionProps) => {
   return (
     <section className="py-24 md:py-32">
       <motion.h2
@@ -57,7 +57,6 @@ export function BrandSection({ brand, products }: BrandSectionProps) {
             whileHover="hover"
             animate="rest"
           >
-            {/* brilho mágico sutil */}
             <motion.div
               variants={glowMotion}
               className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-600/20 via-transparent to-fuchsia-600/10 pointer-events-none"
@@ -100,47 +99,4 @@ export function BrandSection({ brand, products }: BrandSectionProps) {
       </div>
     </section>
   );
-}
-
-// Página principal (exemplo)
-export default function MinimalMagicStore() {
-  const sampleTheory11 = [
-    {
-      id: "1",
-      name: "Artisan",
-      price: 149,
-      image:
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-    },
-    {
-      id: "2",
-      name: "Monarchs",
-      price: 129,
-      image:
-        "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?w=800",
-    },
-    // ...
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-900 to-black text-white">
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_25%,#7c3aed20_0%,transparent_50%)]" />
-      </div>
-
-      <div className="relative pt-32 pb-40">
-        <motion.h1
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.6 }}
-          className="text-5xl md:text-7xl font-thin tracking-[0.15em] text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-300 to-purple-300/60"
-        >
-          M A G I C
-        </motion.h1>
-
-        <BrandSection brand="Theory11" products={sampleTheory11} />
-        {/* <BrandSection brand="Ellusionist" products={...} /> */}
-      </div>
-    </div>
-  );
-}
+};

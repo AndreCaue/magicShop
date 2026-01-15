@@ -16,6 +16,7 @@ import {
   SidebarMenu,
   SidebarFooter,
   SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 import {
@@ -49,6 +50,7 @@ type TItem = {
 export function AppSidebar() {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const { setOpenMobile } = useSidebar();
 
   const handleClickLogout = (URL: string) => {
     logout();
@@ -145,13 +147,14 @@ export function AppSidebar() {
 
   const handleClickNavigate = (URL: string) => {
     navigate(URL);
+    setOpenMobile(false);
   };
 
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent className="lg:py-20 min-w-[250px]">
+          <SidebarGroupContent className="md:py-20 min-w-[250px]">
             <SidebarMenu>
               {(user?.isMaster ? masterItems : items).map((item, index) => (
                 <Collapsible className="group/collapsible" key={index + 1}>
