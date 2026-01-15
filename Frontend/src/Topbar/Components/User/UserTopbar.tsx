@@ -9,15 +9,25 @@ import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { User2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+type TCustomValue = TValue & {
+  disabled?: boolean;
+};
+
 type TUserTopbar = {
   label: string;
-  options: TValue[];
+  options: TCustomValue[];
   userEmail: string;
   onChangeValue?: () => void;
   onSelect?: (value: TValue) => void;
+  className?: string;
 };
 
-export const UserTopbar = ({ options, onSelect, userEmail }: TUserTopbar) => {
+export const UserTopbar = ({
+  options,
+  onSelect,
+  userEmail,
+  className,
+}: TUserTopbar) => {
   const ref = useRef(null);
   const [size, setSize] = useState(0);
 
@@ -33,32 +43,39 @@ export const UserTopbar = ({ options, onSelect, userEmail }: TUserTopbar) => {
   }, []);
 
   return (
-    <DropdownMenu>
-      <span className="hidden lg:flex lg:flex-col lg:text-center text-sm text-gray-600">
-        Seja Bem Vindo!
-        <span className="truncate w-12 mx-auto">{userEmail}</span>
-      </span>
-      <DropdownMenuTrigger
-        ref={ref}
-        className="relative p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors active:scale-95"
-      >
-        <User2 className="w-5 h-5 text-gray-700 " />
-      </DropdownMenuTrigger>
+    <div className="hidden lg:flex">
+      <DropdownMenu>
+        <span className="hidden lg:flex lg:flex-col lg:text-center text-sm text-gray-600 mr-10 -ml-15">
+          Seja Bem Vindo!
+          <span className="truncate w-12 mx-auto">{userEmail}</span>
+        </span>
+        <DropdownMenuTrigger
+          ref={ref}
+          className={cn(
+            "relative p-2 rounded-lg  cursor-pointer transition-colors active:scale-95",
+            className
+          )}
+        >
+          <User2 className="w-5 h-5 text-gray-700 " />
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        style={{ minWidth: `${size}px` }}
-        className={cn("bg-white border border-slate-200 hover:cursor-pointer")}
-      >
-        {options.map((opt, idx) => (
-          <DropdownMenuItem
-            key={idx}
-            className="hover:bg-slate-100 hover:cursor-pointer"
-            onSelect={() => onSelect?.(opt)}
-          >
-            {opt.text}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <DropdownMenuContent
+          side="right"
+          style={{ minWidth: `${size}px` }}
+          className={cn("bg-white my-1 border-2 border-black  grid gap-2")}
+        >
+          {options.map((opt, idx) => (
+            <DropdownMenuItem
+              key={idx}
+              className="hover:bg-black hover:text-white hover:disabled:cursor-none hover:cursor-pointer border border-black flex justify-center"
+              onSelect={() => onSelect?.(opt)}
+              disabled={opt?.disabled}
+            >
+              {opt.text}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };

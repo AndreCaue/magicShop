@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { motion, easeInOut } from "framer-motion";
-import { Sparkles, Award } from "lucide-react";
+import { Sparkles, Award, HatGlasses, Star } from "lucide-react";
 import { BrandSection } from "./Teste";
+import { GiPokerHand } from "react-icons/gi";
+import { cn } from "@/lib/utils";
 
 const MagicBrandDisplay = () => {
   const [selectedBrand, setSelectedBrand] = useState("bicycle");
@@ -27,30 +29,33 @@ const MagicBrandDisplay = () => {
     {
       id: "bicycle",
       name: "Bicycle",
-      icon: "🎴",
-      color: "from-blue-600 to-blue-800",
-      accentColor: "blue",
+      icon: <span className="text-red-500">♥</span>,
+      color: "from-red-600 to-red-800 cursor-pointer",
+      nameStyle: "cursor-pointer",
+      accentColor: "text-black",
     },
     {
       id: "theory11",
-      name: "Theory11",
-      icon: "👑",
-      color: "from-purple-600 to-purple-800",
-      accentColor: "purple",
+      name: "Gimmick",
+      icon: <HatGlasses className="text-white" />,
+      color: "from-black/50 to-black/80 cursor-pointer",
+      nameStyle: "cursor-pointer",
+      accentColor: "text-red-500",
     },
     {
       id: "ellusionist",
-      name: "Ellusionist",
-      icon: "🎩",
-      color: "from-red-600 to-red-800",
-      accentColor: "red",
+      name: "Coleção",
+      icon: <Star className="fill-black" />,
+      color: " from-red-600 to-red-800 cursor-pointer",
+      nameStyle: "cursor-pointer",
+      accentColor: "text-black",
     },
     {
       id: "madison",
-      name: "Madison",
-      icon: "💎",
-      color: "from-emerald-600 to-emerald-800",
-      accentColor: "emerald",
+      name: "Cardistry",
+      icon: <GiPokerHand />,
+      color: "from-black/50 to-black/80",
+      accentColor: "",
     },
   ];
 
@@ -104,13 +109,11 @@ const MagicBrandDisplay = () => {
             <Sparkles className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
           </motion.div>
           <h1 className="text-6xl md:text-7xl font-bold text-white mb-4 tracking-tight">
-            <span className="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 bg-clip-text text-transparent">
-              Coleção Mágica
+            <span className="bg-gradient-to-br from-amber-50 via-slate-400 to-gray-900 bg-clip-text text-transparent">
+              Playing Cards
             </span>
           </h1>
-          <p className="text-gray-300 text-xl">
-            Escolha a marca e descubra o baralho perfeito
-          </p>
+          <p className="text-gray-300 text-xl">Cada baralho uma experiência.</p>
         </motion.div>
 
         {/* Brand Selector */}
@@ -124,23 +127,32 @@ const MagicBrandDisplay = () => {
             <motion.button
               key={brand.id}
               onClick={() => setSelectedBrand(brand.id)}
-              className={`relative px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
+              className={cn(
+                "relative px-8 py-5 rounded-2xl font-bold text-lg transition-all",
                 selectedBrand === brand.id
                   ? "text-white shadow-2xl"
                   : "bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 backdrop-blur-sm"
-              }`}
+              )}
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
             >
               {selectedBrand === brand.id && (
                 <motion.div
                   layoutId="brandBackground"
-                  className={`absolute inset-0 bg-gradient-to-r ${brand.color} rounded-2xl`}
+                  className={cn(
+                    "absolute inset-0 bg-gradient-to-r rounded-2xl",
+                    brand.color
+                  )}
                   initial={false}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
-              <span className="relative z-10 flex items-center gap-2">
+              <span
+                className={cn(
+                  "relative z-10 flex items-center gap-2",
+                  brand.nameStyle
+                )}
+              >
                 <span className="text-3xl">{brand.icon}</span>
                 {brand.name}
               </span>
@@ -151,12 +163,15 @@ const MagicBrandDisplay = () => {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 200 }}
                 >
-                  <div className="text-4xl rotate-180">♠</div>
+                  <div className={cn("text-2xl rotate-180", brand.accentColor)}>
+                    ♠
+                  </div>
                 </motion.div>
               )}
             </motion.button>
           ))}
         </motion.div>
+        {/**Produto conteudo map ?  */}
         <BrandSection brand="Theory11" products={sampleTheory11} />
 
         <motion.div

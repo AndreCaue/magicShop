@@ -75,9 +75,7 @@ export const Topbar = () => {
           <LogoTopbar className="w-auto h-8" />
           <AnimatedSymbols hide={isMobile} />
         </button>
-
         <AnimatedSymbols hide={!isMobile} />
-
         <div
           //Search input v2 (+/-) desktop
           className="hidden lg:flex "
@@ -93,13 +91,14 @@ export const Topbar = () => {
             </form>
           </Form>
         </div>
-
         <div className="flex items-center gap-2 lg:gap-4">
           <UserTopbar
             userEmail={user?.email ?? ""}
-            label=""
-            // fazer logout, tirar label, onClick
-            options={[{ text: "logout", value: 1 }]}
+            label="hidden lg:flex"
+            options={[
+              { text: "Logout", value: 1 },
+              { text: "Configuração", value: 2, disabled: true },
+            ]}
           />
 
           <button
@@ -110,14 +109,6 @@ export const Topbar = () => {
             <ShoppingCartIcon className="w-5 h-5 text-gray-700 " />
             <CartBadge count={totalItems} />
           </button>
-
-          {/* <button
-            onClick={handleCartClick}
-            className="relative p-2 hidden lg:flex -mr-5 rounded-lg hover:bg-gray-100 transition-colors active:scale-95 cursor-pointer"
-          > */}
-          {/* <User2 className="w-5 h-5 text-gray-700" /> */}
-          {/* </button> */}
-
           <SidebarTrigger
             //active for premium
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
