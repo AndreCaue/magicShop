@@ -64,7 +64,7 @@ export const CategoryTab = ({
           )}
           <span
             className={cn(
-              "relative z-10 flex items-center gap-2",
+              "relative flex z-10 items-center gap-2",
               brand.nameStyle
             )}
           >

@@ -24,6 +24,8 @@ export interface IProduct {
 export const MainBaralhos = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
 
+  console.log(products); // build
+
   useEffect(() => {
     (async () => {
       const res = await getListOfProducts();
