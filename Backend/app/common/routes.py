@@ -5,15 +5,15 @@ from sqlalchemy.orm import Session
 from .models import DropdownItem, ShippingPreset
 from .schemas import ShippingPresetDropdown, ShippingPresetResponse
 from app.auth.dependencies import get_db
-from app.store.branch.models import Brand
+from app.store.categories.models import Category
 from app.auth.dependencies import require_master_full_access
 
 router = APIRouter(prefix="/dropdown", tags=["Dropdown/Helpers"])
 
-@router.get("/branch", response_model=List[DropdownItem])
-async def get_brands_dropdown(db: Session = Depends(get_db), _: User = Depends(require_master_full_access)):
-    brands = db.query(Brand.id, Brand.name).order_by(Brand.name.asc()).all()
-    return [{"id": b.id, "descricao": b.name} for b in brands]
+@router.get("/category", response_model=List[DropdownItem])
+async def get_category_dropdown(db: Session = Depends(get_db), _: User = Depends(require_master_full_access)):
+    category = db.query(Category.id, Category.name).order_by(Category.name.asc()).all()
+    return [{"id": c.id, "descricao": c.name} for c in category]
 
 @router.get("/shipping-presets", response_model=List[ShippingPresetDropdown])
 def get_shipping_presets_dropdown(

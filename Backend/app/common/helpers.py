@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from .models import ShippingPreset
 from .schemas import ShippingPresetResponse, ShippingPresetCreate, ShippingPresetUpdate
 from app.auth.dependencies import get_db
-from app.store.branch.models import Brand
 from app.auth.dependencies import require_master_full_access
 from app.schemas import UserOut
 from app.generics.schemas import SuccessMessage

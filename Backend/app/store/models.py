@@ -17,6 +17,8 @@ class Product(Base):
     width_cm = Column(Integer, nullable=False, default=15)
     length_cm = Column(Integer, nullable=False, default=20)
 
+    discount = Column(Float, nullable=True, default=None)
+
     image_urls = Column(JSON, nullable=True)
-    brand_id = Column(Integer, ForeignKey("brands.id"), nullable=False)
-    brand = relationship("Brand", back_populates="products")
+    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
+    category = relationship("Category", back_populates="products")

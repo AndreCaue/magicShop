@@ -6,7 +6,7 @@ from . import models
 from .database import engine
 from .auth import routes as auth_routes
 from .store import routes as products_router
-from .store.branch import routes as branchs_router
+from .store.categories import routes as categories_router
 from .store.cart import routes as cart_router
 from .common.routes import router as dropdown_router
 from .common.helpers import router as helpers_router
@@ -31,6 +31,7 @@ async def custom_swagger_ui_html():
         swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
         swagger_ui_parameters={"persistAuthorization": True, "tryItOutEnabled": True}
     )
+
 
 
 @app.middleware("http")
@@ -68,7 +69,7 @@ app.add_middleware(
 
 app.include_router(auth_routes.router)
 app.include_router(products_router.router)
-app.include_router(branchs_router.router)
+app.include_router(categories_router.router)
 app.include_router(cart_router.router)
 app.include_router(dropdown_router)
 app.include_router(helpers_router)

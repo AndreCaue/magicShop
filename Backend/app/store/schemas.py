@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import List, Optional
-from .branch.schemas import BrandResponse
+from .categories.schemas import CategoryResponse
 
 class ProductBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
@@ -8,7 +8,7 @@ class ProductBase(BaseModel):
     price: float = Field(..., ge=0.01, description="Preço em reais")
     stock: int = Field(..., ge=0)
     image_urls: Optional[List[str]] = None
-    brand_id: int = Field(..., gt=0)
+    category_id: int = Field(..., gt=0)
 
     weight_grams: int = Field(
         ..., gt=0, le=30_000, description="Peso em gramas (máx 30kg)"
@@ -16,6 +16,7 @@ class ProductBase(BaseModel):
     height_cm: float = Field(..., ge=1, le=105, description="Altura em cm")
     width_cm: float = Field(..., ge=1, le=105, description="Largura em cm")
     length_cm: float = Field(..., ge=1, le=105, description="Comprimento em cm")
+    discount: float = Field(..., ge=0.01, description="Desconto propocional ao frete.")
 
     @field_validator("height_cm", "width_cm", "length_cm")
     @classmethod
@@ -43,7 +44,7 @@ class ProductCreate(ProductBase):
 
 class ProductResponse(ProductBase):
     id: int
-    brand: BrandResponse
+    category: CategoryResponse
 
     model_config = ConfigDict(
         from_attributes=True,

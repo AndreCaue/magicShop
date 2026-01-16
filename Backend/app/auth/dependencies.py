@@ -135,11 +135,11 @@ def require_user(user: UserOut = Depends(get_current_user)) -> UserOut:
 
 
 def get_token_from_cookie(request: Request):
-    token = request.cookies.get("access_token")
+    token = request.cookies.get("refresh_token")
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token ausente"
+            detail="Token ausente asd"
         )
     return token
 
