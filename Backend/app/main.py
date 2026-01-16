@@ -17,8 +17,8 @@ from .core.routes import router as test_router
 
 from .core.config import settings
 
-if settings.ENVIRONMENT == "development":
-    models.Base.metadata.create_all(bind=engine)
+# if settings.ENVIRONMENT == "development":
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(docs_url="/docs", title=f"{settings.APP_NAME}")
 
