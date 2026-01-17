@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, Boolean, String
+from sqlalchemy import Column, Integer, Boolean, String, Float
 from app.database import Base 
 
 class DropdownItem(BaseModel):
@@ -13,6 +13,7 @@ class ShippingPreset(Base):
     name = Column(String(50), nullable=False, unique=True, index=True)
     weight_grams = Column(Integer, nullable=False)
     height_cm = Column(Integer, nullable=False)
+    discount = Column(Float, nullable=True)
     width_cm = Column(Integer, nullable=False)
     length_cm = Column(Integer, nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)

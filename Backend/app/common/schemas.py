@@ -10,6 +10,7 @@ class ShippingPresetResponse(BaseModel):
     id: int
     name: str
     weight_grams: float
+    discount: float
     height_cm: float
     width_cm: float
     length_cm: float
@@ -18,6 +19,7 @@ class ShippingPresetResponse(BaseModel):
 class ShippingPresetCreate(BaseModel):
     name: str
     weight_grams: int
+    discount: float
     height_cm: float
     width_cm: float
     length_cm: float
@@ -30,6 +32,7 @@ class ShippingPresetUpdate(BaseModel):
     weight_grams: Optional[int] = None
     height_cm: Optional[float] = None
     width_cm: Optional[float] = None
+    discount: Optional[float] = None
     length_cm: Optional[float] = None
     is_active: Optional[bool] = None
 
