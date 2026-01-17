@@ -23,19 +23,11 @@ const glowMotion = {
   hover: { opacity: 0.35, scale: 1.3, transition: { duration: 1.1 } },
 };
 
-type TProduct = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-};
-
 type TBrandSectionProps = {
-  brand: string;
-  products: TProduct[];
+  products: IProduct[];
 };
 
-export const ProductSection = ({ brand, products }: TBrandSectionProps) => {
+export const ProductSection = ({ products }: TBrandSectionProps) => {
   return (
     <section className="py-24 md:py-32">
       <motion.h2
@@ -45,11 +37,11 @@ export const ProductSection = ({ brand, products }: TBrandSectionProps) => {
         transition={{ duration: 1.4 }}
         className="text-3xl md:text-4xl font-light tracking-widest text-white/90 text-center mb-16 md:mb-24"
       >
-        {brand}
+        {products[0]?.category?.name}
       </motion.h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-20 max-w-6xl mx-auto px-6">
-        {products.map((product) => (
+        {products?.map((product) => (
           <motion.div
             key={product.id}
             className="group relative perspective-[1400px]"
@@ -68,11 +60,11 @@ export const ProductSection = ({ brand, products }: TBrandSectionProps) => {
             >
               <div className="aspect-[3/4] relative overflow-hidden bg-black/40">
                 <motion.img
-                  src={product.image}
+                  src={product.image_urls[0]}
                   alt={product.name}
                   className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700"
                   whileHover={{ scale: 1.08 }}
-                  transition={{ duration: 1.4, ease: "easeOut" }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 />
               </div>
 

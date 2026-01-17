@@ -91,18 +91,23 @@ export const LoginDesktop = () => {
             />
 
             <ScatterBtn
-              text="Entrar na Ilusão"
-              className="cursor-pointer hover:bg-black"
+              text="Entre na Ilusão"
+              className="cursor-pointer hover:scale-105"
               isSubmitting={isSubmitting}
             />
 
             <div className="flex flex-col mt-2 gap-8 text-center">
               <SmokeLink
                 goTo={"/forgot_password"}
+                className="text-white"
                 textLabel="Esqueceu sua senha ?"
               />
 
-              <SmokeLink goTo={"/register"} textLabel="Registrar-se" />
+              <SmokeLink
+                goTo={"/register"}
+                textLabel="Registrar-se"
+                className="text-white"
+              />
             </div>
           </form>
         </Form>

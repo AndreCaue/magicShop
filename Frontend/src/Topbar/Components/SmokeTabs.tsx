@@ -29,13 +29,11 @@ const tabContent: Record<string, React.ReactNode> = {
       {subTab.map((tab) => (
         <SmokeLink
           textLabel={tab.label}
+          background="light"
           goTo={`loja/${tab.link}`}
           key={tab.label}
         />
       ))}
-      {/* <SmokeLink textLabel="Acessórios" goTo="/acessorios" />
-      <SmokeLink textLabel="Trukes" goTo="/trukes" />
-      <SmokeLink textLabel="Marcas" goTo="/marcas" /> */}
     </div>
   ),
   conteudo: (
@@ -43,6 +41,7 @@ const tabContent: Record<string, React.ReactNode> = {
       {subTabConteudo.map((tab) => (
         <SmokeLink
           textLabel={tab.label}
+          background="light"
           goTo={`conteudo/${tab.link}`}
           key={tab.label}
         />
@@ -52,7 +51,11 @@ const tabContent: Record<string, React.ReactNode> = {
   jogos: (
     <div className="flex justify-between px-10 underline w-full">
       {subTabJogos.map((tab) => (
-        <SmokeLink textLabel={tab.label} goTo={`/${tab.link}`} />
+        <SmokeLink
+          textLabel={tab.label}
+          background="light"
+          goTo={`/${tab.link}`}
+        />
       ))}
     </div>
   ),
@@ -78,7 +81,7 @@ export const SmokeTabs = ({
           />
         ))}
       </nav>
-      <nav className="hidden lg:flex bg-slate-200/40">
+      <nav className="hidden lg:flex bg-slate-200/40s">
         {tabContent[activeTab]}
       </nav>
     </>

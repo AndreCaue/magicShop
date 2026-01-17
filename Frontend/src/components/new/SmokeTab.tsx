@@ -50,7 +50,7 @@ export const SmokeButton = ({
         className={cn(
           "text-white text-center px-4 py-2 rounded-lg transition-colors relative overflow-hidden hover:cursor-pointer",
           isActive && "bg-white/20",
-          className
+          className,
         )}
       >
         {isActive && (
@@ -70,7 +70,7 @@ export const SmokeButton = ({
       onClick={onClick}
       className={cn(
         "relative flex self-center px-4 py-1 rounded-lg min-w-[80px] justify-center hover:cursor-pointer",
-        className
+        className,
       )}
     >
       <motion.span

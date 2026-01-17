@@ -1,7 +1,7 @@
-import { Bicycle } from "@/Pages/Shop/Branch/Bicycle";
+import { Bicycle } from "@/Pages/Shop/Categoria/Bicycle";
 import { Route, Routes } from "react-router-dom";
 
-export const Branch = () => {
+export const Categoria = () => {
   return (
     <Routes>
       <Route element={<Bicycle />} path="BICYCLE" />

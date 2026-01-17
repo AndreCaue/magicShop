@@ -26,12 +26,14 @@ type TSmokeLink = {
   goTo: string;
   isMobile?: boolean;
   className?: string;
+  background?: "dark" | "light";
 };
 
 export const SmokeLink = ({
   goTo,
   textLabel,
   isMobile,
+  background = "dark",
   className,
 }: TSmokeLink) => {
   const controls = useAnimation();
@@ -50,7 +52,13 @@ export const SmokeLink = ({
           ease: [0.4, 0, 0.2, 1],
         }}
       >
-        <Link to={goTo} className="text-white text-center block">
+        <Link
+          to={goTo}
+          className={cn(
+            "text-center block",
+            background === "dark" ? "text-white" : "text-black"
+          )}
+        >
           {textLabel}
         </Link>
       </motion.div>
@@ -64,7 +72,13 @@ export const SmokeLink = ({
       onMouseLeave={() => controls.start("initial")}
     >
       <motion.div variants={smokeVariants} initial="initial" animate={controls}>
-        <Link to={goTo} className={"text-black text-center flex"}>
+        <Link
+          to={goTo}
+          className={cn(
+            "text-center flex",
+            background === "dark" ? "text-white" : "text-black"
+          )}
+        >
           {textLabel}
         </Link>
       </motion.div>

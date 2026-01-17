@@ -1,26 +1,27 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import type { TBrandsTab } from "../../types";
 import { HatGlasses, Star } from "lucide-react";
 import { GiPokerHand } from "react-icons/gi";
+import { useMemo } from "react";
+import categoryStyles from "../../helper";
 
 type TCategoryTab = {
-  setSelectedBrand: React.Dispatch<React.SetStateAction<string>>;
-  selectedBrand: string;
-  brands: TBrandsTab[];
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
+  selectedCategory: string;
+  category: ICategory[];
 };
 
 export const CategoryTab = ({
-  selectedBrand,
-  brands,
-  setSelectedBrand,
+  selectedCategory,
+  setSelectedCategory,
+  category,
 }: TCategoryTab) => {
-  const brandIcon: Record<string, React.JSX.Element> = {
+  const tabIcon: Record<string, React.JSX.Element> = {
     heart: (
       <span
         className={cn(
           "text-red-500",
-          selectedBrand === "bicycle" && "text-white"
+          selectedCategory === "bicycle" && "text-white",
         )}
       >
         ♥
@@ -31,32 +32,51 @@ export const CategoryTab = ({
     pokerHand: <GiPokerHand />,
   };
 
+  const tabs = useMemo(() => {
+    return category.map((cat) => {
+      const style = categoryStyles[cat.name] || {
+        icon: "default",
+        color: "from-gray-600 to-gray-800",
+        nameStyle: "",
+        selectorColor: "text-white",
+      };
+
+      return {
+        ...cat,
+        icon: style.icon,
+        color: style.color,
+        nameStyle: style.nameStyle,
+        selectorColor: style.selectorColor,
+      };
+    });
+  }, [category]);
+
   return (
     <motion.div
-      className="flex justify-center gap-4 mb-16 flex-wrap"
+      className="flex justify-center gap-4 mb-16 flex-wrap md:px-20"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, delay: 0.2 }}
     >
-      {brands.map((brand) => (
+      {tabs?.map((tab) => (
         <motion.button
-          key={brand.id}
-          onClick={() => setSelectedBrand(brand.id)}
+          key={tab.id}
+          onClick={() => setSelectedCategory(tab.name)}
           className={cn(
             "relative px-8 py-5 rounded-2xl font-bold text-lg transition-all",
-            selectedBrand === brand.id
+            selectedCategory === tab.name
               ? "text-white shadow-2xl"
-              : "bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 backdrop-blur-sm"
+              : "bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 backdrop-blur-sm",
           )}
           whileHover={{ scale: 1.05, y: -5 }}
           whileTap={{ scale: 0.95 }}
         >
-          {selectedBrand === brand.id && (
+          {selectedCategory === tab.name && (
             <motion.div
-              layoutId="brandBackground"
+              layoutId="tabBackground"
               className={cn(
                 "absolute inset-0 bg-gradient-to-r rounded-2xl",
-                brand.color
+                tab.color,
               )}
               initial={false}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -65,20 +85,20 @@ export const CategoryTab = ({
           <span
             className={cn(
               "relative flex z-10 items-center gap-2",
-              brand.nameStyle
+              tab.nameStyle,
             )}
           >
-            <span className="text-3xl">{brandIcon[brand.icon]}</span>
-            {brand.name}
+            <span className="text-3xl">{tabIcon[tab.icon]}</span>
+            {tab.name}
           </span>
-          {selectedBrand === brand.id && (
+          {selectedCategory === tab.name && (
             <motion.div
               className="absolute -top-8 left-1/2 -translate-x-1/2"
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ type: "spring", stiffness: 200 }}
             >
-              <div className={cn("text-2xl rotate-180", brand.selectorColor)}>
+              <div className={cn("text-2xl rotate-180", tab.selectorColor)}>
                 ♠
               </div>
             </motion.div>

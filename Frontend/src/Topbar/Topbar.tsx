@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { UserTopbar } from "./Components/User/UserTopbar";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   search: z.string(),
@@ -49,7 +50,7 @@ export const Topbar = () => {
 
   const totalItems = useMemo(
     () => cart?.items?.length ?? 0,
-    [cart?.items?.length]
+    [cart?.items?.length],
   );
 
   const handleLogoClick = () => {
@@ -111,7 +112,10 @@ export const Topbar = () => {
           </button>
           <SidebarTrigger
             //active for premium
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
+            className={cn(
+              "p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden",
+              user?.isMaster && "lg:flex", // premium
+            )}
           />
         </div>
       </div>

@@ -10,7 +10,6 @@ import Autoplay from "embla-carousel-autoplay";
 import MovingTitle from "@/components/new/StyledMovingTitle";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import type { IProduct } from "../MainBaralhos";
 
 export type TLojaCarousel = {
   data: IProduct[];
@@ -31,7 +30,7 @@ export const EachCarousel = ({
       stopOnInteraction: false,
       stopOnMouseEnter: true,
       jump: false,
-    })
+    }),
   );
 
   const currentPath = window.location;

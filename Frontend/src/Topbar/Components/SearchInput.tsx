@@ -27,7 +27,7 @@ type SearchInputProps = {
 };
 
 const SearchInput = ({
-  placeholder = "Buscar...",
+  placeholder = "Em desenvolvimento (bloqueado)...",
   onSearch,
   onResultSelect,
   searchResults = [],

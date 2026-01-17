@@ -5,7 +5,7 @@ import { InputForm } from "@/components/new/InputForm";
 import { Form } from "@/components/ui/form";
 import { createProductCards } from "@/Repositories/shop/cadaster";
 import {
-  getBranchDropdown,
+  getCategoryDropdown,
   getShippingPresets,
 } from "@/Repositories/shop/dropdown";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +26,8 @@ const formSchema = z.object({
   width_cm: z.number(),
   length_cm: z.number(),
   models: z.number(),
-  brand_id: z.number(),
+  category_id: z.number(),
+  discount: z.number(),
   images_urls: z.array(
     z.object({
       name: z.string().min(1, "Nome do arquivo é obrigatório"),
@@ -35,13 +36,13 @@ const formSchema = z.object({
         .instanceof(File, { error: "Deve ser um arquivo válido" })
         .refine(
           (file) => file.size <= 5 * 1024 * 1024,
-          "Arquivo muito grande (máx. 5MB)"
+          "Arquivo muito grande (máx. 5MB)",
         )
         .refine(
           (file) => file.type.startsWith("image/"),
-          "Apenas arquivos de imagem são permitidos"
+          "Apenas arquivos de imagem são permitidos",
         ),
-    })
+    }),
   ),
 });
 
@@ -63,8 +64,8 @@ export const BaralhoForm = () => {
     formState: { isSubmitting },
   } = form;
 
-  const getDropdownBranch = async () => {
-    const branchs = await getBranchDropdown();
+  const getDropdownCategory = async () => {
+    const branchs = await getCategoryDropdown();
     if (!branchs) return;
 
     setBranchs(formatedToDrop(branchs));
@@ -79,7 +80,7 @@ export const BaralhoForm = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    getDropdownBranch();
+    getDropdownCategory();
     getDropdownShip();
     setIsLoading(false);
   }, []);
@@ -92,6 +93,7 @@ export const BaralhoForm = () => {
         length_cm: undefined,
         weight_grams: undefined,
         width_cm: undefined,
+        discount: undefined,
       });
       return;
     }
@@ -101,12 +103,10 @@ export const BaralhoForm = () => {
     setValue("length_cm", res.length_cm);
     setValue("weight_grams", res.weight_grams);
     setValue("width_cm", res.width_cm);
-    console.log(res, "teste de resultado");
+    setValue("discount", res?.discount ?? 0);
   };
 
   const onSubmit = async (values: TForm) => {
-    console.log(values, "teste");
-
     const res = await createProductCards({
       ...values,
       price: Number(values.price),
@@ -122,10 +122,11 @@ export const BaralhoForm = () => {
     <div className="">
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-4 ">
             <UploadImage
               name="images_urls"
               control={control}
+              maxFiles={5}
               className="mb-5"
               isSkeletonLoading={isLoading}
               disabled={isSubmitting}
@@ -150,13 +151,13 @@ export const BaralhoForm = () => {
               required
               isSkeletonLoading={isLoading}
             />
-            <div className="flex gap-4 mt-1">
+            <div className="grid lg:flex gap-4 mt-1">
               <InputForm
                 control={control}
                 label="Quantidade"
                 name="stock"
                 background="dark"
-                className="w-1/2"
+                className="lg:w-1/2"
                 disabled={isSubmitting}
                 required
                 isSkeletonLoading={isLoading}
@@ -165,7 +166,7 @@ export const BaralhoForm = () => {
                 control={control}
                 label="Preço"
                 name="price"
-                className="w-1/2"
+                className="lg:w-1/2"
                 background="dark"
                 disabled={isSubmitting}
                 required
@@ -173,14 +174,14 @@ export const BaralhoForm = () => {
               />
             </div>
 
-            <div className="flex w-full gap-4 mt-1">
+            <div className="lg:flex w-full gap-4 mt-1">
               <DropdownForm
                 control={control}
-                label="Marca"
+                label="Categoria"
                 required
                 disabled={isSubmitting}
                 className="w-full placeholder-white"
-                name="brand_id"
+                name="category_id"
                 options={branchs}
                 isSkeletonLoading={isLoading}
               />
@@ -197,7 +198,7 @@ export const BaralhoForm = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
               <InputForm
                 control={control}
                 label="Peso em Gramas"
@@ -207,6 +208,7 @@ export const BaralhoForm = () => {
                 required
                 isSkeletonLoading={isLoading}
               />
+
               <InputForm
                 control={control}
                 label="Altura (cm)"
@@ -216,6 +218,7 @@ export const BaralhoForm = () => {
                 // disabled
                 isSkeletonLoading={isLoading}
               />
+
               <InputForm
                 control={control}
                 label="Largura (cm)"
@@ -225,11 +228,22 @@ export const BaralhoForm = () => {
                 // disabled
                 isSkeletonLoading={isLoading}
               />
+
               <InputForm
                 control={control}
                 label="Comprimento"
                 background="dark"
                 name="length_cm"
+                required
+                // disabled
+                isSkeletonLoading={isLoading}
+              />
+
+              <InputForm
+                control={control}
+                label="Deseja aplicar desconto?"
+                background="dark"
+                name="discount"
                 required
                 // disabled
                 isSkeletonLoading={isLoading}

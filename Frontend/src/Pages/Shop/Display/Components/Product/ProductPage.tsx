@@ -1,11 +1,9 @@
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import { ProductSection } from "./ProductSection";
-import type { TBrandsTab } from "../../types";
-import { productsByBrand } from "../../mocks";
 
 type TProductPage = {
-  selectedBrand: string;
-  brands: TBrandsTab[];
+  selectedCategory: string;
+  data: IProduct[];
 };
 
 const pageVariants = {
@@ -18,24 +16,22 @@ const pageTransition = {
   ease: easeInOut,
 };
 
-export const ProductPage = ({ selectedBrand, brands }: TProductPage) => {
-  const currentProduct =
-    productsByBrand[selectedBrand as keyof typeof productsByBrand];
+export const ProductPage = ({ selectedCategory, data }: TProductPage) => {
+  const currentProduct = data.filter(
+    (prod) => prod.category.name === selectedCategory,
+  );
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="sync">
       <motion.div
-        key={selectedBrand}
+        key={selectedCategory}
         variants={pageVariants}
         initial="initial"
         animate="animate"
         exit="exit"
         transition={pageTransition}
       >
-        <ProductSection
-          brand={brands.find((b) => b.id === selectedBrand)?.name || "Unknown"}
-          products={currentProduct}
-        />
+        <ProductSection products={currentProduct} />
       </motion.div>
     </AnimatePresence>
   );

@@ -6,11 +6,12 @@ type TProductCardParams = {
   price: number;
   stock: number;
   images_urls: UploadedFile[];
-  brand_id: number;
+  category_id: number;
   weight_grams: number;
   height_cm: number;
   width_cm: number;
   length_cm: number;
+  discount: number;
 };
 interface UploadedFile {
   name: string;
@@ -25,11 +26,12 @@ export const createProductCards = async (data: TProductCardParams) => {
   formData.append("description", data.description);
   formData.append("price", String(data.price));
   formData.append("stock", String(data.stock));
-  formData.append("brand_id", String(data.brand_id));
+  formData.append("category_id", String(data.category_id));
   formData.append("weight_grams", String(data.weight_grams));
   formData.append("height_cm", String(data.height_cm));
   formData.append("width_cm", String(data.width_cm));
   formData.append("length_cm", String(data.length_cm));
+  formData.append("discount", String(data.discount));
 
   data.images_urls.forEach((imgObj) => {
     if (imgObj.file instanceof File) {
@@ -44,15 +46,15 @@ export const createProductCards = async (data: TProductCardParams) => {
   return response.data;
 };
 
-type TCreateBranch = {
+type TCreateCategory = {
   name: string;
   description?: string;
   website?: string;
   logo_url?: string;
 };
 
-export const createBranch = async (data: TCreateBranch) => {
-  const response = api.post("/brands/register", { ...data });
+export const createCategory = async (data: TCreateCategory) => {
+  const response = api.post("/category/register", { ...data });
 
   return response;
 };
@@ -64,6 +66,7 @@ type TCreatePreset = {
   width_cm: number;
   length_cm: number;
   is_active?: boolean;
+  discount?: number;
 };
 
 export const createPresets = async (data: TCreatePreset) => {

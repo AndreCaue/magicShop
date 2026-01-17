@@ -17,6 +17,7 @@ interface IGetShippingPresetsResponse {
   name: string;
   weight_grams: number;
   width_cm: number;
+  discount?: number;
 }
 
 export const getShippingPresetsById = async (id?: number) => {

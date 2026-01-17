@@ -52,7 +52,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await api.post("/auth/logout");
+      const res = await api.post("/auth/logout");
+      if (!res) return;
       toast.success("Logout realizado com sucesso.");
     } catch (error) {
       console.error("Erro ao chamar logout backend:", error);
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       document.cookie =
         "access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
       document.cookie =
-        "refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
+        "refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure"; // verificar se é para limpar
 
       navigate("/login");
     }

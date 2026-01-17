@@ -83,8 +83,8 @@ export const LoginMobile = () => {
           />
 
           <ScatterBtn
-            text="Entrar na Ilusão"
-            className="cursor-pointer hover:bg-black"
+            text="Entre na Ilusão"
+            className="cursor-pointer"
             isSubmitting={isSubmitting}
           />
 

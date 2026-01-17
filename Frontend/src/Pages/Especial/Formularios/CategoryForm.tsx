@@ -1,7 +1,7 @@
 import { NewButton } from "@/components/new/NewButton";
 import { InputForm } from "@/components/new/InputForm";
 import { Form } from "@/components/ui/form";
-import { createBranch } from "@/Repositories/shop/cadaster";
+import { createCategory } from "@/Repositories/shop/cadaster";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,16 +16,16 @@ const formSchema = z.object({
 
 type TForm = z.infer<typeof formSchema>;
 
-export const MarcasForm = () => {
+export const CategoriaForm = () => {
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (values: TForm) => {
-    const res = await createBranch(values);
+    const res = await createCategory(values);
 
     if (!res) return;
-    toast.success("Marca cadastrada.");
+    toast.success("Categoria cadastrada.");
   };
 
   const {
@@ -38,12 +38,13 @@ export const MarcasForm = () => {
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-5 w-full px-10 place-self-center">
-            <h1 className="text-4xl my-20 text-center">Cadastrar Marcas</h1>
+            <h1 className="text-4xl my-20 text-center">Cadastrar Categorias</h1>
             <InputForm
               control={control}
-              label="Nome da Marca"
+              label="Nome da Caterogia"
               name="name"
               required
+              background="dark"
               className="w-full"
               disabled={isSubmitting}
             />
@@ -51,17 +52,19 @@ export const MarcasForm = () => {
               control={control}
               label="Descrição"
               name="description"
+              background="dark"
               disabled={isSubmitting}
             />
             <InputForm
               control={control}
               label="URL"
+              background="dark"
               name="website"
               disabled={isSubmitting}
             />
 
             <NewButton
-              label="Cadastrar Marca"
+              label="Cadastrar Categoria"
               className="flex"
               disabled={isSubmitting}
             />

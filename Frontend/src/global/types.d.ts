@@ -1,4 +1,4 @@
-interface IBrand {
+interface ICategory {
   name: string;
   description: string;
   website: string;
@@ -12,9 +12,10 @@ interface IProduct {
   price: number;
   stock: number;
   image_urls: string[];
-  brand_id: number;
+  category_id: number;
   id: number;
-  brand: Brand;
+  discount: number;
+  category: ICategory;
 }
 
 interface IResMessage {

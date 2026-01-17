@@ -1,7 +1,7 @@
 import api from "@/axiosInstance";
 
-export const getBranchDropdown = async () => {
-  const response = await api.get("/dropdown/branch");
+export const getCategoryDropdown = async () => {
+  const response = await api.get("/dropdown/category");
   return response.data;
 };
 
