@@ -33,4 +33,27 @@ const categoryStyles: Record<
   },
 };
 
-export default categoryStyles;
+const cardMotion = {
+  rest: {
+    y: 20,
+    opacity: 0.4,
+    scale: 0.94,
+    rotateX: 8,
+    transition: { duration: 0.9, ease: "easeOut" },
+  },
+  hover: {
+    y: -16,
+    opacity: 1,
+    scale: 1.04,
+    rotateX: 0,
+    rotateY: 4,
+    transition: { type: "spring", stiffness: 280, damping: 22 },
+  },
+} as const;
+
+const glowMotion = {
+  rest: { opacity: 0 },
+  hover: { opacity: 0.35, scale: 1.3, transition: { duration: 1.1 } },
+};
+
+export { categoryStyles, cardMotion, glowMotion };

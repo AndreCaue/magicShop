@@ -17,34 +17,49 @@ export const useCart = () => {
     isFetching,
   } = useQuery<Cart | null>({
     queryKey: ["cart"],
-    queryFn: getCart,
-    staleTime: 30_000, // 30 segundos
+    queryFn: async () => {
+      console.log("🔄 Executando getCart...");
+      const result = await getCart();
+      console.log("✅ getCart resultado:", result);
+      return result;
+    },
+    staleTime: 30_000,
     refetchOnWindowFocus: true,
   });
 
-  const invalidateCart = () => {
-    queryClient.invalidateQueries({ queryKey: ["cart"] });
+  const invalidateCart = async () => {
+    console.log("🔃 Invalidando cart...");
+    await queryClient.invalidateQueries({ queryKey: ["cart"] });
+    console.log("✅ Cart invalidado");
   };
 
   const addMutation = useMutation({
     mutationFn: addToCart,
-    onSuccess: invalidateCart,
+    onSuccess: (response) => {
+      queryClient.setQueryData(["cart"], response.cart);
+    },
   });
 
   const updateQuantityMutation = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: number; quantity: number }) =>
       updateCartItemQuantity({ product_id: itemId, quantity }),
-    onSuccess: invalidateCart,
+    onSuccess: async () => {
+      await invalidateCart();
+    },
   });
 
   const removeMutation = useMutation({
     mutationFn: removeFromCart,
-    onSuccess: invalidateCart,
+    onSuccess: async () => {
+      await invalidateCart();
+    },
   });
 
   const clearMutation = useMutation({
     mutationFn: clearCart,
-    onSuccess: invalidateCart,
+    onSuccess: async () => {
+      await invalidateCart();
+    },
   });
 
   const addToCartAction = (item: Parameters<typeof addToCart>[0]) => {
@@ -53,7 +68,7 @@ export const useCart = () => {
 
   const updateQuantity = (itemId: number, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCartAction(itemId);
+      removeMutation.mutate(itemId);
     } else {
       updateQuantityMutation.mutate({ itemId, quantity });
     }
@@ -63,11 +78,15 @@ export const useCart = () => {
     removeMutation.mutate(itemId);
   };
 
+  const clearCartAction = () => {
+    clearMutation.mutate();
+  };
+
   const items = cart?.items ?? [];
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = items.reduce(
     (acc, item) => acc + item.unit_price * item.quantity,
-    0
+    0,
   );
 
   const isMutating =
@@ -81,14 +100,12 @@ export const useCart = () => {
     items,
     totalItems,
     subtotal: subtotal.toFixed(2),
-
     isLoading,
     isFetching: isFetching && !isLoading,
     isMutating,
-
     addToCart: addToCartAction,
     updateQuantity,
     removeFromCartAction,
-    clearCart,
+    clearCart: clearCartAction, // ✅ Corrigido
   };
 };

@@ -23,43 +23,45 @@ const subTabConteudo = [
 ];
 const subTabJogos = [{ label: "Jogos", link: "jogos" }];
 
-const tabContent: Record<string, React.ReactNode> = {
-  loja: (
-    <div className="flex justify-between px-10 underline w-full">
-      {subTab.map((tab) => (
-        <SmokeLink
-          textLabel={tab.label}
-          background="light"
-          goTo={`loja/${tab.link}`}
-          key={tab.label}
-        />
-      ))}
-    </div>
-  ),
-  conteudo: (
-    <div className="flex justify-between px-10 underline w-full">
-      {subTabConteudo.map((tab) => (
-        <SmokeLink
-          textLabel={tab.label}
-          background="light"
-          goTo={`conteudo/${tab.link}`}
-          key={tab.label}
-        />
-      ))}
-    </div>
-  ),
-  jogos: (
-    <div className="flex justify-between px-10 underline w-full">
-      {subTabJogos.map((tab) => (
-        <SmokeLink
-          textLabel={tab.label}
-          background="light"
-          goTo={`/${tab.link}`}
-        />
-      ))}
-    </div>
-  ),
-};
+// function handleRedirect() {}
+
+// const tabContent: Record<string, React.ReactNode> = {
+//   loja: (
+//     <div className="flex justify-between px-10 underline w-full">
+//       {subTab.map((tab) => (
+//         <SmokeLink
+//           textLabel={tab.label}
+//           background="light"
+//           goTo={`loja/${tab.link}`}
+//           key={tab.label}
+//         />
+//       ))}
+//     </div>
+//   ),
+//   conteudo: (
+//     <div className="flex justify-between px-10 underline w-full">
+//       {subTabConteudo.map((tab) => (
+//         <SmokeLink
+//           textLabel={tab.label}
+//           background="light"
+//           goTo={`conteudo/${tab.link}`}
+//           key={tab.label}
+//         />
+//       ))}
+//     </div>
+//   ),
+//   jogos: (
+//     <div className="flex justify-between px-10 underline w-full">
+//       {subTabJogos.map((tab) => (
+//         <SmokeLink
+//           textLabel={tab.label}
+//           background="light"
+//           goTo={`/${tab.link}`}
+//         />
+//       ))}
+//     </div>
+//   ),
+// };
 
 export const SmokeTabs = ({
   tabs,
@@ -68,6 +70,51 @@ export const SmokeTabs = ({
   className,
   isMobile = false,
 }: TSmokeTabs) => {
+  function onClickCloseSubtab() {
+    onTabChange("");
+  }
+
+  const tabContent: Record<string, React.ReactNode> = {
+    loja: (
+      <div className="flex justify-between px-10 underline w-full">
+        {subTab.map((tab) => (
+          <SmokeLink
+            textLabel={tab.label}
+            background="light"
+            goTo={`loja/${tab.link}`}
+            onClick={onClickCloseSubtab}
+            key={tab.label}
+          />
+        ))}
+      </div>
+    ),
+    conteudo: (
+      <div className="flex justify-between px-10 underline w-full">
+        {subTabConteudo.map((tab) => (
+          <SmokeLink
+            textLabel={tab.label}
+            background="light"
+            onClick={onClickCloseSubtab}
+            goTo={`conteudo/${tab.link}`}
+            key={tab.label}
+          />
+        ))}
+      </div>
+    ),
+    jogos: (
+      <div className="flex justify-between px-10 underline w-full">
+        {subTabJogos.map((tab) => (
+          <SmokeLink
+            textLabel={tab.label}
+            background="light"
+            onClick={onClickCloseSubtab}
+            goTo={`/${tab.link}`}
+          />
+        ))}
+      </div>
+    ),
+  };
+
   return (
     <>
       <nav className={cn("hidden lg:flex lg:justify-around", className)}>

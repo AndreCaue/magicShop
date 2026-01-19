@@ -7,12 +7,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Images } from "./Components/Images";
-import { addToCart } from "@/Repositories/shop/cart";
+import { useCart } from "@/Hooks/useCart";
 
 export const IndividualProduct = () => {
   const [product, setProduct] = useState<IProduct>({} as IProduct);
   const [quantity, setQuantity] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -31,7 +32,8 @@ export const IndividualProduct = () => {
     const res = await addToCart({ product_id: product.id, quantity });
     setIsLoading(false);
 
-    if (res?.message) toast.success(res.message);
+    console.log(res, "teste");
+    // if (res) toast.success(res.message);
   };
 
   const handleBuyNow = () => {

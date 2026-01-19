@@ -11,7 +11,7 @@ type TPostItemCart = {
 };
 
 export const addToCart = async (props: TPostItemCart) => {
-  const response = await api.post<IResMessage>("/cart/add", { ...props });
+  const response = await api.post<any>("/cart/add", { ...props });
 
   return response.data;
 };

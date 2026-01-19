@@ -1,6 +1,6 @@
 import { Home } from "@/Pages/Home/Home";
 
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Shop } from "./Shop";
 import { PrivateRoute } from "@/Security/ProtectedRoute";
 import { ForgotPassword } from "@/Pages/Login/subPages/ForgotPassword/Forgot";
@@ -55,7 +55,7 @@ export const AppRoutes = () => {
         <Route path="/master" element={<EspecialRoutes />} />
       </Route>
 
-      <Route path="*" element={<Navigate to={"/login"} replace />} />
+      {/* <Route path="*" element={<Navigate to={"/login"} replace />} /> */}
     </Routes>
   );
 };

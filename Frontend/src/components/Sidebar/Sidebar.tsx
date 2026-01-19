@@ -90,7 +90,7 @@ export function AppSidebar() {
       id: 2,
       title: "Conteúdo",
       url: "/conteudo",
-      icon: MonitorPlay, //cambiar
+      icon: MonitorPlay,
       subItem: [
         { id: 20, title: "Vídeos", url: "/conteudo/videos" },
         { id: 21, title: "E-Books", url: "/conteudo/books" },
@@ -117,7 +117,7 @@ export function AppSidebar() {
 
   const masterItems: TItem[] = [
     {
-      id: 1,
+      id: 99,
       title: "Cadastros",
       url: "/",
       icon: Database,
@@ -138,7 +138,7 @@ export function AppSidebar() {
     icon: User2,
     subItem: [
       {
-        id: 12,
+        id: 91,
         title: "Logout",
         url: "/login",
       },
@@ -169,10 +169,10 @@ export function AppSidebar() {
                       </CollapsibleTrigger>
                     </SidebarGroupLabel>
                     {item.subItem && item.subItem.length > 0
-                      ? item.subItem.map((sub) => (
+                      ? item.subItem.map((sub, i) => (
                           <CollapsibleContent
                             className="flex pl-6 py-1"
-                            key={index}
+                            key={i}
                           >
                             <SidebarMenuButton
                               onClick={() => handleClickNavigate(sub.url)}

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { HatGlasses, Star } from "lucide-react";
 import { GiPokerHand } from "react-icons/gi";
 import { useMemo } from "react";
-import categoryStyles from "../../helper";
+import { categoryStyles } from "../../helper";
 
 type TCategoryTab = {
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;

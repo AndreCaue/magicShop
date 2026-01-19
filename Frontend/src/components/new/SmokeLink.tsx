@@ -25,6 +25,7 @@ type TSmokeLink = {
   textLabel: string;
   goTo: string;
   isMobile?: boolean;
+  onClick?: () => void;
   className?: string;
   background?: "dark" | "light";
 };
@@ -35,6 +36,7 @@ export const SmokeLink = ({
   isMobile,
   background = "dark",
   className,
+  onClick,
 }: TSmokeLink) => {
   const controls = useAnimation();
 
@@ -71,7 +73,7 @@ export const SmokeLink = ({
       onMouseEnter={() => controls.start("hover")}
       onMouseLeave={() => controls.start("initial")}
     >
-      <motion.div variants={smokeVariants} initial="initial" animate={controls}>
+      <motion.div variants={smokeVariants} initial="initial" animate={controls} onClick={onClick}>
         <Link
           to={goTo}
           className={cn(
