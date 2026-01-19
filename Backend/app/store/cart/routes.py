@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy.orm import Session, joinedload
 from typing import List
+from .service import get_cart_with_items
 
 from app.auth.dependencies import get_db, require_user
 from app.store.models import  Product
@@ -89,8 +90,13 @@ def add_to_cart(
         db.add(cart_item)
 
     db.commit()
- 
-    return AddToCartResponse(message="Item adicionado ao carrinho com sucesso.")
+
+    updated_cart = get_cart_with_items(db, user.id)
+    
+    return AddToCartResponse(
+        message="Item adicionado ao carrinho com sucesso.",
+        cart=updated_cart
+    )
 
 
 
