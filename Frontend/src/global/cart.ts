@@ -6,6 +6,7 @@ export type CartItem = {
   product_name: string;
   quantity: number;
   total_price: number;
+  discount: number;
 
   /** Dimensões e pesos */
   weight: number;
@@ -60,8 +61,9 @@ export type Cart = {
   /** Itens no carrinho */
   items: CartItem[];
 
+  totalDiscount: number;
   /** Cupom aplicado (ou null) */
-  coupon: CartCoupon | null;
+  // coupon: CartCoupon | null;
 
   /** Frete já calculado (pode ser null até o cliente informar CEP) */
   shipping: CartShipping | null;
@@ -83,5 +85,5 @@ export type Cart = {
   updatedAt: string;
 
   /** Token para checkout guest (se não tiver login) */
-  guestToken?: string;
+  // guestToken?: string;
 };

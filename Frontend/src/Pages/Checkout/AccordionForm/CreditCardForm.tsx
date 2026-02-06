@@ -1,6 +1,7 @@
 import { InputForm } from "@/components/new/InputForm";
 import type { UseFormReturn } from "react-hook-form";
 import { type TForm } from "../types";
+import { InputCardForm } from "@/components/new/InputCardForm";
 
 type Props = {
   form: UseFormReturn<TForm>;
@@ -12,18 +13,11 @@ export default function CreditCardForm({ form }: Props) {
   return (
     <div className="mt-6 space-y-5 bg-gray-50 p-6 rounded-xl border border-gray-200">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputForm
+        <InputCardForm
           name="numero_cartao"
           control={control}
           label="Número do Cartão"
-          placeholder="1234 5678 9012 3456"
-          maxLength={19}
-          // adicionar maskito?
-          // mask="9999 9999 9999 9999"
-          // onChange={(e) => {
-          //   const value = e.target.value.replace(/\D/g, "");
-          //   setValue("numero_cartao", value);
-          // }}
+          placeholder="1234 5678 9012 3457"
         />
 
         <InputForm
@@ -41,8 +35,6 @@ export default function CreditCardForm({ form }: Props) {
           label="Validade"
           placeholder="MM/AA"
           maxLength={5}
-          // maskito
-          // mask="99/99"
         />
 
         <InputForm

@@ -1,20 +1,14 @@
 import { PageContainer } from "../Home/Components/PageContainer";
 import { AccordionForm } from "./AccordionForm";
+import { Summary } from "./Summary";
 
 export const Checkout = () => {
   return (
     <PageContainer>
-      <div className="border border-red-500 lg:grid lg:grid-cols-3  ">
-        <div
-          id="mainCheckout"
-          className="border border-blue-500 col-span-2 flex justify-center"
-        >
-          <AccordionForm />
-        </div>
+      <div className="lg:grid lg:grid-cols-3 mt-5 lg:h-full bg-gradient-to-br from-slate-900 via-gray-800 to-gray-700 ">
+        <AccordionForm />
 
-        <div id="total" className="border border-green-500">
-          Seção de pagamento (resumo pedido)
-        </div>
+        <Summary />
       </div>
     </PageContainer>
   );

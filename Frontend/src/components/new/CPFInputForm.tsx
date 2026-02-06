@@ -14,45 +14,60 @@ import type {
 } from "react-hook-form";
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { useMaskito } from "@maskito/react";
+import type { MaskitoOptions } from "@maskito/core";
 
-type TInputForm = {
+type TCpfInputForm = {
   required?: boolean;
   label?: string;
-  restrictInput?: RegExp;
   onChangeValue?: (value: string) => void;
   isSkeletonLoading?: boolean;
   placeholder?: string;
   iconPlaceholder?: React.ReactElement;
-  maxLength?: number;
   background?: "light" | "dark";
   onBlur?: () => void;
-  formatValue?: (value: string) => string;
   className?: string;
   disabled?: boolean;
-  type?: string;
 };
 
-const InputForm = <
+const cpfMask: MaskitoOptions = {
+  mask: [
+    /\d/,
+    /\d/,
+    /\d/,
+    ".",
+    /\d/,
+    /\d/,
+    /\d/,
+    ".",
+    /\d/,
+    /\d/,
+    /\d/,
+    "-",
+    /\d/,
+    /\d/,
+  ],
+};
+
+const CPFInputForm = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   className,
-  label,
+  label = "CPF",
   control,
   name,
   required,
-  type = "text",
   iconPlaceholder,
   onChangeValue,
-  placeholder = "Digite ...",
-  restrictInput,
+  placeholder = "000.000.000-00",
   onBlur,
-  maxLength,
   isSkeletonLoading,
-  formatValue,
   background = "light",
   disabled,
-}: TInputForm & UseControllerProps<TFieldValues, TName>) => {
+}: TCpfInputForm & UseControllerProps<TFieldValues, TName>) => {
+  const maskedInputRef = useMaskito({ options: cpfMask });
+
   return (
     <FormField
       control={control}
@@ -82,24 +97,15 @@ const InputForm = <
               <FormControl>
                 <Input
                   {...field}
+                  ref={maskedInputRef}
                   placeholder={placeholder}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    if (restrictInput)
-                      event.target.value = event.target.value.replace(
-                        restrictInput,
-                        "",
-                      );
-
-                    if (formatValue) {
-                      formatValue(event.target.value);
-                    }
                     field.onChange(event);
                     onChangeValue?.(event.target.value);
                   }}
                   onBlur={onBlur}
                   background={background}
-                  maxLength={maxLength}
-                  type={type}
+                  type="text"
                   icon={iconPlaceholder}
                   disabled={disabled}
                 />
@@ -113,6 +119,6 @@ const InputForm = <
   );
 };
 
-InputForm.displayName = "InputForm";
+CPFInputForm.displayName = "CPFInputForm";
 
-export { InputForm };
+export { CPFInputForm };

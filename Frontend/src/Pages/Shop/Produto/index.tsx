@@ -112,11 +112,14 @@ export const IndividualProduct = () => {
             <div className="space-y-3 pt-6 border-t text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
                 <Truck className="w-5 h-5" />
-                <span>Frete grátis acima de R$ XXX (em breve)</span>
+                <span className="flex gap-2">
+                  Frete grátis acima de<p className="text-green-500">R$100</p>{" "}
+                  {/* criar logica para tornar gratuito */}
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <CreditCard className="w-5 h-5" />
-                <span>Parcele sem juros</span>
+                <span>Parcele sem juros </span>
               </div>
             </div>
           </div>

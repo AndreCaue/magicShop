@@ -1,6 +1,7 @@
 import { SmokeLink } from "@/components/new/SmokeLink";
 import { SmokeButton } from "@/components/new/SmokeTab";
 import { cn } from "@/lib/utils";
+import { SmokeSubTab, SmokeSubTabConteudo, SmokeSubTabJogos } from "../utils";
 
 type TSmokeTabs = {
   tabs: { id: string; label: string }[];
@@ -9,59 +10,6 @@ type TSmokeTabs = {
   className?: string;
   isMobile?: boolean;
 };
-
-const subTab = [
-  { label: "Baralhos", link: "baralhos" },
-  { label: "Acessórios", link: "acessorios" },
-  { label: "Trukes", link: "trukes" },
-  { label: "Marcas", link: "marcas" },
-];
-
-const subTabConteudo = [
-  { label: "Vídeos", link: "videos" },
-  { label: "E-Books", link: "books" },
-];
-const subTabJogos = [{ label: "Jogos", link: "jogos" }];
-
-// function handleRedirect() {}
-
-// const tabContent: Record<string, React.ReactNode> = {
-//   loja: (
-//     <div className="flex justify-between px-10 underline w-full">
-//       {subTab.map((tab) => (
-//         <SmokeLink
-//           textLabel={tab.label}
-//           background="light"
-//           goTo={`loja/${tab.link}`}
-//           key={tab.label}
-//         />
-//       ))}
-//     </div>
-//   ),
-//   conteudo: (
-//     <div className="flex justify-between px-10 underline w-full">
-//       {subTabConteudo.map((tab) => (
-//         <SmokeLink
-//           textLabel={tab.label}
-//           background="light"
-//           goTo={`conteudo/${tab.link}`}
-//           key={tab.label}
-//         />
-//       ))}
-//     </div>
-//   ),
-//   jogos: (
-//     <div className="flex justify-between px-10 underline w-full">
-//       {subTabJogos.map((tab) => (
-//         <SmokeLink
-//           textLabel={tab.label}
-//           background="light"
-//           goTo={`/${tab.link}`}
-//         />
-//       ))}
-//     </div>
-//   ),
-// };
 
 export const SmokeTabs = ({
   tabs,
@@ -77,7 +25,7 @@ export const SmokeTabs = ({
   const tabContent: Record<string, React.ReactNode> = {
     loja: (
       <div className="flex justify-between px-10 underline w-full">
-        {subTab.map((tab) => (
+        {SmokeSubTab.map((tab) => (
           <SmokeLink
             textLabel={tab.label}
             background="light"
@@ -90,7 +38,7 @@ export const SmokeTabs = ({
     ),
     conteudo: (
       <div className="flex justify-between px-10 underline w-full">
-        {subTabConteudo.map((tab) => (
+        {SmokeSubTabConteudo.map((tab) => (
           <SmokeLink
             textLabel={tab.label}
             background="light"
@@ -103,7 +51,7 @@ export const SmokeTabs = ({
     ),
     jogos: (
       <div className="flex justify-between px-10 underline w-full">
-        {subTabJogos.map((tab) => (
+        {SmokeSubTabJogos.map((tab) => (
           <SmokeLink
             textLabel={tab.label}
             background="light"

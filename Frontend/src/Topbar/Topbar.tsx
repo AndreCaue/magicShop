@@ -18,6 +18,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { UserTopbar } from "./Components/User/UserTopbar";
 import { cn } from "@/lib/utils";
+import { topbarTab } from "./utils";
+import type { TValue } from "@/components/new/DropdownButton";
 
 const formSchema = z.object({
   search: z.string(),
@@ -30,7 +32,7 @@ export const Topbar = () => {
   const [activeTab, setActiveTab] = useState("");
   const navigate = useNavigate();
   const { cart } = useCart();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),
@@ -42,36 +44,25 @@ export const Topbar = () => {
     formState: { isSubmitting },
   } = form;
 
-  const tabs = [
-    { id: "loja", label: "Loja" },
-    { id: "conteudo", label: "Conteúdo" },
-    { id: "jogos", label: "Jogos" },
-  ];
-
   const totalItems = useMemo(
     () => cart?.items?.length ?? 0,
     [cart?.items?.length],
   );
 
-  const handleLogoClick = () => {
-    navigate("/");
+  const handleLogout = (value: TValue) => {
+    switch (value.text) {
+      case "Logout":
+        logout();
+    }
   };
-
-  const handleCartClick = () => {
-    navigate("/carrinho");
-  };
-
-  // const handleUserClick = () => {};
 
   const onSubmit = () => {};
-
-  console.log("re re re renderiza?", totalItems);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
       <div className="flex items-center justify-between h-16 px-4 lg:px-2 max-w-[1600px] mx-auto">
         <button
-          onClick={handleLogoClick}
+          onClick={() => navigate("/")}
           className="flex items-center gap-3 group transition-transform hover:scale-[1.02] active:scale-[0.98]"
           aria-label="Ir para página inicial"
         >
@@ -97,6 +88,7 @@ export const Topbar = () => {
         <div className="flex items-center gap-2 lg:gap-4">
           <UserTopbar
             userEmail={user?.email ?? ""}
+            onSelect={handleLogout}
             label="hidden lg:flex"
             options={[
               { text: "Logout", value: 1 },
@@ -105,7 +97,7 @@ export const Topbar = () => {
           />
 
           <button
-            onClick={handleCartClick}
+            onClick={() => navigate("/carrinho")}
             className="relative p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors active:scale-95"
             aria-label={`Carrinho de compras com ${totalItems} ${totalItems === 1 ? "item" : "itens"}`}
           >
@@ -113,16 +105,19 @@ export const Topbar = () => {
             <CartBadge count={totalItems} />
           </button>
           <SidebarTrigger
-            //active for premium
             className={cn(
               "p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden",
-              user?.isMaster && "lg:flex", // premium
+              user?.isMaster && "lg:flex",
             )}
           />
         </div>
       </div>
 
-      <SmokeTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      <SmokeTabs
+        tabs={topbarTab}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
       {/*Search input v1 Descontrolado */}
       {isMobile && <SearchInput background="light" disabled />}

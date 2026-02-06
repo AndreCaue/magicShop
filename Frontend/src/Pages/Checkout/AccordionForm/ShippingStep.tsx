@@ -11,30 +11,37 @@ import { type TStep, type TForm } from "../types";
 import type { UseFormReturn } from "react-hook-form";
 import { useShippingStore } from "@/stores/useShippingStore";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useCart } from "@/Hooks/useCart";
+import { ShippingPrice } from "../Components/ShippingPrice";
 
 type Props = {
-  goToNextStep: (current: TStep, next: TStep) => Promise<void>;
+  navigateToSteps: (
+    current: TStep,
+    next: TStep,
+    previous?: boolean,
+  ) => Promise<void>;
   canOpenStep: (step: TStep) => boolean;
   form: UseFormReturn<TForm>;
 };
 
 export default function ShippingStep({
-  goToNextStep,
+  navigateToSteps,
   canOpenStep,
   form,
 }: Props) {
   const {
     shippingOptions,
-    isFreeShipping,
     isCalculatingShipping,
     setSelectedShipping,
+    selectedShipping,
     shippingError,
   } = useShippingStore();
+  const { discount } = useCart();
 
   const { watch, setValue } = form;
 
   const isStepValid = () => {
-    if (isFreeShipping) return true;
     return (
       !isCalculatingShipping &&
       shippingOptions.length > 0 &&
@@ -43,7 +50,25 @@ export default function ShippingStep({
   };
 
   const handleNext = async () => {
-    await goToNextStep("entrega", "pagamento");
+    await navigateToSteps("entrega", "pagamento");
+  };
+
+  const handlePrevious = async () => {
+    await navigateToSteps("entrega", "endereco", true);
+  };
+
+  useEffect(() => {
+    if (selectedShipping?.id) {
+      setValue("frete_opcao", Number(selectedShipping.id));
+    }
+  }, [selectedShipping, setValue]);
+
+  const calculateFreeShipping = (eachOption: number) => {
+    if (Number(discount ?? 0) >= (eachOption ?? 0)) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -59,16 +84,7 @@ export default function ShippingStep({
       </AccordionTrigger>
 
       <AccordionContent className="flex flex-col gap-6 px-5 pb-8">
-        {isFreeShipping ? (
-          <div className="p-6 bg-green-50 border border-green-300 rounded-lg text-center">
-            <p className="text-2xl font-bold text-green-800">
-              Frete Grátis! 🎉
-            </p>
-            <p className="text-green-700 mt-2">
-              Sua compra acima de R$250 ganhou entrega gratuita
-            </p>
-          </div>
-        ) : isCalculatingShipping ? (
+        {isCalculatingShipping ? (
           <div className="text-center py-8">
             <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600" />
             <p className="mt-4 text-gray-600">
@@ -77,9 +93,9 @@ export default function ShippingStep({
           </div>
         ) : shippingOptions.length > 0 ? (
           <RadioGroup
-            value={watch("frete_opcao") ?? ""}
+            value={watch("frete_opcao")?.toString() ?? ""}
             onValueChange={(value) => {
-              setValue("frete_opcao", value, { shouldValidate: true });
+              setValue("frete_opcao", Number(value), { shouldValidate: true });
 
               const selected = shippingOptions.find((opt) => opt.id === value);
               if (selected) {
@@ -89,7 +105,7 @@ export default function ShippingStep({
             className="space-y-2 py-3 border-t border-b"
           >
             {shippingOptions.map((option) => {
-              const isSelected = watch("frete_opcao") === option.id;
+              const isSelected = watch("frete_opcao") === Number(option.id);
 
               return (
                 <motion.label
@@ -131,11 +147,11 @@ export default function ShippingStep({
                     </div>
                   </div>
 
-                  <span className="font-semibold text-sm">
-                    {option.preco === 0
-                      ? "Grátis"
-                      : `R$ ${option.preco.toFixed(2).replace(".", ",")}`}
-                  </span>
+                  <ShippingPrice
+                    discount={discount}
+                    isFreeShipping={calculateFreeShipping(option.preco)}
+                    price={option.preco}
+                  />
                 </motion.label>
               );
             })}
@@ -149,15 +165,21 @@ export default function ShippingStep({
           </div>
         )}
 
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-between mt-5">
           <NewButton
-            label="Ir para Pagamento"
+            label="Voltar"
+            icon={<CircleArrowRight className="rotate-180" />}
+            onClick={handlePrevious}
+            className={cn("w-1/3", "bg-red-400 text-white hover:bg-red-500")}
+          />
+          <NewButton
+            label="Prosseguir"
             icon={<CircleArrowRight />}
             onClick={handleNext}
-            disabled={!isStepValid()}
+            typeB="button"
             className={cn(
-              "w-full md:w-1/3",
-              isStepValid() && "bg-green-400 text-white hover:bg-green-500"
+              "w-1/3",
+              isStepValid() && "bg-green-400 text-white hover:bg-green-500",
             )}
           />
         </div>

@@ -18,9 +18,7 @@ export const useCart = () => {
   } = useQuery<Cart | null>({
     queryKey: ["cart"],
     queryFn: async () => {
-      console.log("🔄 Executando getCart...");
       const result = await getCart();
-      console.log("✅ getCart resultado:", result);
       return result;
     },
     staleTime: 30_000,
@@ -28,9 +26,7 @@ export const useCart = () => {
   });
 
   const invalidateCart = async () => {
-    console.log("🔃 Invalidando cart...");
     await queryClient.invalidateQueries({ queryKey: ["cart"] });
-    console.log("✅ Cart invalidado");
   };
 
   const addMutation = useMutation({
@@ -88,6 +84,7 @@ export const useCart = () => {
     (acc, item) => acc + item.unit_price * item.quantity,
     0,
   );
+  const discount = (items && items[0]?.discount * items[0]?.quantity) || null;
 
   const isMutating =
     addMutation.isPending ||
@@ -101,11 +98,12 @@ export const useCart = () => {
     totalItems,
     subtotal: subtotal.toFixed(2),
     isLoading,
+    discount: discount?.toFixed(2),
     isFetching: isFetching && !isLoading,
     isMutating,
     addToCart: addToCartAction,
     updateQuantity,
     removeFromCartAction,
-    clearCart: clearCartAction, // ✅ Corrigido
+    clearCart: clearCartAction,
   };
 };

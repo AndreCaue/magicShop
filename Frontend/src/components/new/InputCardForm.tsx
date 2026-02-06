@@ -14,25 +14,34 @@ import type {
 } from "react-hook-form";
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { useMaskito } from "@maskito/react";
 
-type TInputForm = {
+type TInputCardForm = {
   required?: boolean;
   label?: string;
-  restrictInput?: RegExp;
   onChangeValue?: (value: string) => void;
   isSkeletonLoading?: boolean;
   placeholder?: string;
   iconPlaceholder?: React.ReactElement;
-  maxLength?: number;
   background?: "light" | "dark";
   onBlur?: () => void;
-  formatValue?: (value: string) => string;
   className?: string;
   disabled?: boolean;
-  type?: string;
 };
 
-const InputForm = <
+const cardMaskOptions = {
+  mask: [
+    ...Array(4).fill(/\d/),
+    " ",
+    ...Array(4).fill(/\d/),
+    " ",
+    ...Array(4).fill(/\d/),
+    " ",
+    ...Array(4).fill(/\d/),
+  ],
+};
+
+const InputCardForm = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
@@ -41,18 +50,16 @@ const InputForm = <
   control,
   name,
   required,
-  type = "text",
   iconPlaceholder,
   onChangeValue,
-  placeholder = "Digite ...",
-  restrictInput,
-  onBlur,
-  maxLength,
+  placeholder = "0000 0000 0000 0000",
   isSkeletonLoading,
-  formatValue,
+  onBlur,
   background = "light",
   disabled,
-}: TInputForm & UseControllerProps<TFieldValues, TName>) => {
+}: TInputCardForm & UseControllerProps<TFieldValues, TName>) => {
+  const maskedInputRef = useMaskito({ options: cardMaskOptions });
+
   return (
     <FormField
       control={control}
@@ -82,26 +89,20 @@ const InputForm = <
               <FormControl>
                 <Input
                   {...field}
+                  ref={maskedInputRef}
                   placeholder={placeholder}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    if (restrictInput)
-                      event.target.value = event.target.value.replace(
-                        restrictInput,
-                        "",
-                      );
-
-                    if (formatValue) {
-                      formatValue(event.target.value);
-                    }
                     field.onChange(event);
-                    onChangeValue?.(event.target.value);
+                    const unmaskedValue = event.target.value.replace(/\s/g, "");
+                    onChangeValue?.(unmaskedValue);
                   }}
-                  onBlur={onBlur}
                   background={background}
-                  maxLength={maxLength}
-                  type={type}
+                  onBlur={onBlur}
+                  maxLength={19} // 16 dígitos + 3 espaços
+                  type="text"
                   icon={iconPlaceholder}
                   disabled={disabled}
+                  inputMode="numeric"
                 />
               </FormControl>
               <FormMessage />
@@ -113,6 +114,6 @@ const InputForm = <
   );
 };
 
-InputForm.displayName = "InputForm";
+InputCardForm.displayName = "InputCardForm";
 
-export { InputForm };
+export { InputCardForm };

@@ -9,6 +9,7 @@ type TNewButton = {
   className?: string;
   isSkeletonLoading?: boolean;
   disabled?: boolean;
+  typeB?: "button" | "submit" | "reset" | undefined;
   icon?: ReactNode;
 };
 
@@ -18,6 +19,7 @@ export const NewButton = ({
   className,
   isSkeletonLoading,
   icon,
+  typeB,
   disabled,
   ...props
 }: TNewButton) => {
@@ -32,10 +34,11 @@ export const NewButton = ({
           onClick={onClick}
           className={cn(
             "w-full h-full bg-white hover:bg-slate-100 text-black hover:cursor-pointer border border-slate-200 text-base font-normal lg:hover:scale-105",
-            className
+            className,
           )}
           {...props}
           disabled={disabled}
+          type={typeB}
         >
           {icon}
           {label}

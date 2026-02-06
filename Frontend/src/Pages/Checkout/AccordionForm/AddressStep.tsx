@@ -20,13 +20,17 @@ import { useCart } from "@/Hooks/useCart";
 import { getShippingPrice } from "@/Repositories/shipping/calculate";
 
 type Props = {
-  goToNextStep: (current: TStep, next: TStep) => Promise<void>;
+  navigateToSteps: (
+    current: TStep,
+    next: TStep,
+    previous?: boolean,
+  ) => Promise<void>;
   canOpenStep: (step: TStep) => boolean;
   form: UseFormReturn<TForm>;
 };
 
 export default function AddressStep({
-  goToNextStep,
+  navigateToSteps,
   canOpenStep,
   form,
 }: Props) {
@@ -59,7 +63,11 @@ export default function AddressStep({
   };
 
   const handleNext = async () => {
-    await goToNextStep("endereco", "entrega");
+    await navigateToSteps("endereco", "entrega");
+  };
+
+  const handlePrevious = async () => {
+    await navigateToSteps("endereco", "cliente", true);
   };
 
   const handleCepChange = async (cep: string) => {
@@ -106,7 +114,7 @@ export default function AddressStep({
       } else {
         setShippingOptions(options);
         const cheapest = options.reduce((prev, curr) =>
-          curr.preco < prev.preco ? curr : prev
+          curr.preco < prev.preco ? curr : prev,
         );
         setSelectedShipping(cheapest);
       }
@@ -201,17 +209,28 @@ export default function AddressStep({
           />
         </div>
 
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-between mt-5">
+          <NewButton
+            label="Voltar"
+            icon={<CircleArrowRight className="rotate-180" />}
+            onClick={() => handlePrevious()}
+            disabled={isFetchingCep}
+            typeB="button"
+            className={cn(
+              "w-1/3 ",
+              !isFetchingCep && "bg-red-400 text-white hover:bg-red-500",
+            )}
+          />
           <NewButton
             label="Prosseguir"
             icon={<CircleArrowRight />}
-            onClick={handleNext}
+            onClick={() => handleNext()}
             disabled={!isStepValid() || isFetchingCep}
             className={cn(
-              "w-full md:w-1/3",
-              isStepValid() &&
+              "w-1/3",
+              isStepValid() && // botão com problema, Realizar submit, preencher campo, submit.
                 !isFetchingCep &&
-                "bg-green-400 text-white hover:bg-green-500"
+                "bg-green-400 text-white hover:bg-green-500",
             )}
           />
         </div>

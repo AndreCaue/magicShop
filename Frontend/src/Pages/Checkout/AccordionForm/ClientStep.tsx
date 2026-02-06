@@ -10,27 +10,37 @@ import { InputForm } from "@/components/new/InputForm";
 import { CelularInputForm } from "@/components/new/CelularInputForm";
 import { type TStep, type TForm } from "../types";
 import type { UseFormReturn } from "react-hook-form";
+import { CPFInputForm } from "@/components/new/CPFInputForm";
 
 type Props = {
-  goToNextStep: (current: TStep, next: TStep) => Promise<void>;
+  navigateToSteps: (current: TStep, next: TStep) => Promise<void>;
   canOpenStep: (step: TStep) => boolean;
   form: UseFormReturn<TForm>;
 };
 
-export default function ClientStep({ goToNextStep, canOpenStep, form }: Props) {
-  const {
-    control,
-    formState: { errors },
-  } = form;
-
-  const isStepValid = () => {
-    const fields = ["nome_cliente", "email"];
-    return fields.every((field) => !errors[field as keyof TForm]);
-  };
+export default function ClientStep({
+  navigateToSteps,
+  canOpenStep,
+  form,
+}: Props) {
+  const { control } = form;
 
   const handleNext = async () => {
-    await goToNextStep("cliente", "endereco");
+    const isValid = await form.trigger([
+      "nome_cliente",
+      "email",
+      "celular",
+      "cpf",
+    ]);
+
+    if (!isValid) return;
+
+    await navigateToSteps("cliente", "endereco");
   };
+
+  const watched = form.watch(["nome_cliente", "email", "celular"]);
+
+  const isStepFilled = watched.every((v) => v && v.toString().trim() !== "");
 
   return (
     <AccordionItem value="cliente">
@@ -53,6 +63,8 @@ export default function ClientStep({ goToNextStep, canOpenStep, form }: Props) {
           required
         />
 
+        <CPFInputForm name="cpf" control={control} required />
+
         <InputForm
           name="email"
           control={control}
@@ -65,7 +77,8 @@ export default function ClientStep({ goToNextStep, canOpenStep, form }: Props) {
         <CelularInputForm
           name="celular"
           control={control}
-          label="Celular (opcional)"
+          label="Celular"
+          required
           placeholder="(11) 99999-9999"
         />
 
@@ -74,10 +87,10 @@ export default function ClientStep({ goToNextStep, canOpenStep, form }: Props) {
             label="Prosseguir"
             icon={<CircleArrowRight />}
             onClick={handleNext}
-            disabled={!isStepValid()}
+            disabled={!isStepFilled}
             className={cn(
               "w-full md:w-1/3",
-              isStepValid() && "bg-green-400 text-white hover:bg-green-500"
+              "bg-green-400 text-white hover:bg-green-500",
             )}
           />
         </div>

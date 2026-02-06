@@ -10,9 +10,11 @@ import { Link } from "react-router-dom";
 import { Loader2, Truck, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { ShippingPrice } from "../Checkout/Components/ShippingPrice";
+import { RadioSuit } from "./Components/CustomRadio";
 
 export default function CartSummary() {
-  const { subtotal, items } = useCart();
+  const { subtotal, items, discount } = useCart();
 
   const {
     shippingOptions,
@@ -21,19 +23,29 @@ export default function CartSummary() {
     setCep,
     setShippingOptions,
     setSelectedShipping,
-    setFreeShipping,
+    // setFreeShipping,
   } = useShippingStore();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const currentIsFreeShipping = Number(subtotal) > 250;
-  useEffect(() => {
-    setFreeShipping(currentIsFreeShipping);
-  }, [currentIsFreeShipping, setFreeShipping]);
+  // const currentIsFreeShipping = Number(subtotal) > 250;
+  // useEffect(() => {
+  //   setFreeShipping(currentIsFreeShipping);
+  // }, [currentIsFreeShipping, setFreeShipping]);  // Free shipping by price -> feature
 
-  const shippingPrice = isFreeShipping ? 0 : selectedShipping?.preco || 0;
-  const total = Number(subtotal) + shippingPrice;
+  // const shippingPrice = isFreeShipping
+  //   ? 0
+  //   : (selectedShipping?.preco || 0) - Number(discount);
+
+  const calculateShippingPrice = () => {
+    if (Number(discount) >= (selectedShipping?.preco || 0)) {
+      return 0;
+    }
+    return (selectedShipping?.preco || 0) - Number(discount);
+  };
+
+  const total = Number(subtotal) + calculateShippingPrice();
 
   const canProceedToCheckout = isFreeShipping || shippingOptions.length > 0;
 
@@ -70,18 +82,26 @@ export default function CartSummary() {
       } else {
         setShippingOptions(options);
         const cheapest = options.reduce((prev, curr) =>
-          curr.preco < prev.preco ? curr : prev
+          curr.preco < prev.preco ? curr : prev,
         );
         setSelectedShipping(cheapest);
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.error("Erro ao calcular frete:", err);
       setError("Erro ao calcular frete. Tente novamente.");
       setShippingOptions([]);
       setSelectedShipping(null);
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateFreeShipping = () => {
+    if (Number(discount ?? 0) >= (selectedShipping?.preco ?? 0)) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -94,7 +114,7 @@ export default function CartSummary() {
           <span className="font-medium">R$ {subtotal.replace(".", ",")}</span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 ">
           <div className="flex justify-between items-center">
             <span className="flex items-center gap-2">
               <Truck className="w-4 h-4" />
@@ -109,9 +129,11 @@ export default function CartSummary() {
                 Calculando...
               </span>
             ) : shippingOptions.length > 0 ? (
-              <span className="font-medium">
-                R$ {selectedShipping?.preco.toFixed(2).replace(".", ",")}
-              </span>
+              <ShippingPrice
+                price={selectedShipping?.preco}
+                isFreeShipping={calculateFreeShipping()}
+                discount={discount}
+              />
             ) : (
               <span className="text-green-500 font-medium cursor-pointer hover:underline">
                 CALCULAR
@@ -151,58 +173,7 @@ export default function CartSummary() {
               {shippingOptions.map((option) => {
                 const isSelected = selectedShipping?.id === option.id;
 
-                return (
-                  <motion.label
-                    key={option.id}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedShipping(option)}
-                    className="flex items-center justify-between cursor-pointer py-2 hover:bg-gray-50 rounded-lg px-2 -mx-2 select-none"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                          isSelected ? "border-indigo-600" : "border-gray-300"
-                        }`}
-                      >
-                        {isSelected && (
-                          <motion.span
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.2 }}
-                            className="text-indigo-600 text-xs"
-                          >
-                            ♠
-                          </motion.span>
-                        )}
-                      </div>
-
-                      <div>
-                        <p className="font-medium text-sm">
-                          {option.nome} - {option.empresa}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Entrega em até {option.prazo_dias} dias úteis
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="font-semibold text-sm">
-                      R$ {option.preco.toFixed(2).replace(".", ",")}
-                    </span>
-
-                    <input
-                      type="radio"
-                      name="shipping"
-                      checked={isSelected}
-                      onChange={() => {}}
-                      className="hidden"
-                    />
-                  </motion.label>
-                );
+                return <RadioSuit isSelected={isSelected} opt={option} />;
               })}
             </div>
           )}
@@ -223,7 +194,7 @@ export default function CartSummary() {
             "w-full mt-6 py-4 rounded-lg font-medium text-center block transition",
             canProceedToCheckout
               ? "bg-indigo-600 text-white hover:bg-indigo-700"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed",
           )}
           onClick={(e) => !canProceedToCheckout && e.preventDefault()}
         >

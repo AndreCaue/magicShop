@@ -37,7 +37,10 @@
     "input-otp": "^1.4.2",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.552.0",
+    "middleware": "^1.0.0",
     "next-themes": "^0.4.6",
+    "payment-token-efi": "^3.2.1",
+    "persist": "^0.2.7",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-dropzone": "^14.3.8",
@@ -53,7 +56,7 @@
     "use-debounce": "^10.1.0",
     "vaul": "^1.1.2",
     "zod": "^4.1.11",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

@@ -20,7 +20,7 @@ export const AccordionForm = () => {
 
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),
-    mode: "onBlur",
+    mode: "onChange", //onBlur
     defaultValues: {
       celular: "",
       complemento: "",
@@ -47,52 +47,60 @@ export const AccordionForm = () => {
     }
   }, [cepFromStore, setValue]);
 
-  const goToNextStep = async (current: TStep, next: TStep) => {
+  const navigateToSteps = async (
+    current: TStep,
+    next: TStep,
+    previous?: boolean,
+  ) => {
+    if (previous) {
+      setActiveStep(next);
+      return;
+    }
+
     const fields = STEP_FIELDS[current];
     const isValid = await form.trigger(fields);
-    if (isValid) {
-      setCompletedSteps((prev) => [...prev, current]);
-      setActiveStep(next);
-    }
+
+    if (!isValid) return;
+
+    setCompletedSteps((prev) =>
+      prev.includes(current) ? prev : [...prev, current],
+    );
+    setActiveStep(next);
   };
 
   const canOpenStep = (step: TStep) =>
     step === activeStep || completedSteps.includes(step);
   //parei aqui em webhook do backend.
-  //preciso fazer deploy.
   // migrar banco.
 
   return (
     <Accordion
       type="single"
       collapsible
-      className="w-full bg-white"
+      className="w-full bg-white pb-20 col-span-2"
       value={activeStep}
     >
       <Form {...form}>
         <form>
           <ClientStep
-            goToNextStep={goToNextStep}
+            navigateToSteps={navigateToSteps}
             canOpenStep={canOpenStep}
             form={form}
           />
           <AddressStep
-            goToNextStep={goToNextStep}
+            navigateToSteps={navigateToSteps}
             canOpenStep={canOpenStep}
             form={form}
           />
           <ShippingStep
-            goToNextStep={goToNextStep}
+            navigateToSteps={navigateToSteps}
             canOpenStep={canOpenStep}
             form={form}
           />
           <PaymentStep
+            navigateToSteps={navigateToSteps}
             canOpenStep={canOpenStep}
             form={form}
-            onSubmit={form.handleSubmit((data) => {
-              console.log("Finalizar:", data);
-              // Integração de pagamento aqui
-            })}
           />
         </form>
       </Form>

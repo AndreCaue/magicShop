@@ -8,17 +8,20 @@ import type { TForm } from "./types";
 
 export const fetchAddressByCep = async (
   cep: string,
-  setValue: UseFormSetValue<TForm>
+  setValue: UseFormSetValue<TForm>,
 ) => {
   if (cep.length < 8) return;
 
   const response = await getViaCep(cep);
+
+  console.log(response, "teste cep");
 
   if (response) {
     setValue("endereco", response.logradouro || "");
     setValue("bairro", response.bairro || "");
     setValue("cidade", response.localidade || "");
     setValue("estado", response.estado ?? getEstadoPorUF(response.uf));
+    setValue("uf", response.uf);
     setValue("complemento", response.complemento || "");
   }
 };
@@ -48,7 +51,7 @@ export const UseCalculateShipping = () => {
       setShippingOptions(options);
       const cheapest = options.reduce(
         (prev: { preco: number }, curr: { preco: number }) =>
-          curr.preco < prev.preco ? curr : prev
+          curr.preco < prev.preco ? curr : prev,
       );
       setSelectedShipping(cheapest);
       setValue("frete_opcao", cheapest.id, { shouldValidate: true });
@@ -56,4 +59,29 @@ export const UseCalculateShipping = () => {
       console.error(err);
     }
   };
+};
+
+export const detectCardBrand = (cardNumber: string): string => {
+  /*
+    Visa:     4111 1111 1111 1111
+Mastercard: 5555555555554444
+Amex:     378282246310005
+Elo:      6362970000457013 (ou 506699)
+Hipercard: 6062825624254001
+Validade: 12/30 (ou qualquer futura)
+CVV: 123 (ou 1234 para Amex)
+     */
+  const cleaned = cardNumber.replace(/\D/g, "");
+
+  if (!cleaned || cleaned.length < 6) return "";
+
+  const bin = cleaned.slice(0, 6);
+
+  if (/^4/.test(bin)) return "visa";
+  if (/^5[1-5]/.test(bin)) return "mastercard";
+  if (/^3[47]/.test(bin)) return "amex";
+  if (/^(50[67]|50[89]|509|6277|63[67]|650|651)/.test(bin)) return "elo"; // simplificado
+  if (/^(606282|3841)/.test(bin)) return "hipercard"; // simplificado
+
+  return ""; // ou lance erro / peça ao usuário
 };
