@@ -25,6 +25,7 @@ class CartItem(Base):
     quantity = Column(Integer, default=1)
     unit_price = Column(Float, nullable=False)
     total_price = Column(Float, nullable=False)
+    discount = Column(Float, nullable=True)
 
     cart = relationship("Cart", back_populates="items")
     product = relationship("Product")

@@ -16,6 +16,8 @@ router = APIRouter(prefix="/cart", tags=["Cart"])
 def calculate_cart_total(cart: Cart):
     return sum(item.total_price for item in cart.items)
 
+def calculate_discount_item(cart: Cart):
+    return sum(item.discount for item in cart.items)
 
 @router.get("/", response_model=CartResponse)
 def get_cart(
@@ -28,6 +30,8 @@ def get_cart(
         return {"id": 0, "user_id": user.id, "status": "active", "items": [], "total": 0}
     
     total = calculate_cart_total(cart)
+    total_discount = calculate_discount_item(cart)
+
     return CartResponse(
         id=cart.id,
         user_id=user.id,
@@ -41,6 +45,7 @@ def get_cart(
                 total_price=item.total_price,
                 product_name=item.product.name,
                 product_image_urls=item.product.image_urls or [],
+                discount=total_discount,
                 height=item.product.height_cm,
                 width=item.product.width_cm,
                 length=item.product.length_cm,
@@ -78,6 +83,8 @@ def add_to_cart(
     if cart_item:
         cart_item.quantity += quantity
         cart_item.total_price = cart_item.quantity * cart_item.unit_price
+        cart_item.discount = product.discount * cart_item.quantity
+
 
     else:
         cart_item = CartItem(
@@ -85,7 +92,8 @@ def add_to_cart(
             product_id=product.id,
             quantity=quantity,
             unit_price=product.price,
-            total_price=product.price * quantity
+            total_price=product.price * quantity,
+            discount=product.discount * quantity
         )
         db.add(cart_item)
 

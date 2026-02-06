@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
-from .schemas import PixRequest, CardOneStepRequest
+from .schemas import PixRequest, CardOneStepRequest, InstallmentsRequest
 from .service import EfiService
 import os
 
@@ -7,6 +7,7 @@ router = APIRouter(prefix="/payment", tags=["payment"])
 
 sandbox = os.getenv("EFI_SANDBOX", "true").lower() == "true"
 service = EfiService(sandbox=sandbox)
+
 
 @router.post("/pix")
 def create_pix(request: PixRequest):
@@ -21,14 +22,25 @@ def create_pix(request: PixRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro Efí Pix: {str(e)}")
 
+
 @router.post("/card/one-step")
 async def create_card_payment(request: CardOneStepRequest):
     try:
-        result = await service.create_card_one_step(request)
+        result = service.create_card_one_step(request)
         return {"success": True, "data": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro Efí Cartão: {str(e)}")
-    
+        raise HTTPException(
+            status_code=500, detail=f"Erro Efí Cartão: {str(e)}")
+
+
+@router.post("/card/installments")
+def get_installments(request: InstallmentsRequest):
+    try:
+        result = service.get_card_installments(request)
+        return {"success": True, "installments": result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.post('/webhook/pix')
 async def webhook_pix(request: Request):
