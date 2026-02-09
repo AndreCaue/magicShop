@@ -14,6 +14,7 @@ from app.melhorenvio.frete.routes import router as menvio_frete_router
 from .address.routes import router as address_router
 from .payment.routes import router as payment_router
 from .core.routes import router as test_router
+from .payment.webhook.routes import router as webhook_router
 
 from .core.config import settings
 
@@ -22,6 +23,7 @@ if settings.ENVIRONMENT == "development":
 
 app = FastAPI(docs_url="/docs", title=f"{settings.APP_NAME}")
 
+
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
@@ -29,16 +31,16 @@ async def custom_swagger_ui_html():
         title=app.title + " - Swagger UI",
         swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
         swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
-        swagger_ui_parameters={"persistAuthorization": True, "tryItOutEnabled": True}
+        swagger_ui_parameters={
+            "persistAuthorization": True, "tryItOutEnabled": True}
     )
-
 
 
 @app.middleware("http")
 async def sanitize_logs(request: Request, call_next):
-    
+
     try:
-    
+
         body = await request.body()
         text = body.decode("utf-8")
 
@@ -53,7 +55,7 @@ async def sanitize_logs(request: Request, call_next):
     response = await call_next(request)
     return response
 
- 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -73,10 +75,12 @@ app.include_router(categories_router.router)
 app.include_router(cart_router.router)
 app.include_router(dropdown_router)
 app.include_router(helpers_router)
-app.include_router(menvio_frete_router) 
+app.include_router(menvio_frete_router)
 app.include_router(address_router)
 app.include_router(payment_router)
 app.include_router(test_router)
+app.include_router(webhook_router)
+
 
 @app.get("/")
 def home():

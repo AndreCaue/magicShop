@@ -50,3 +50,22 @@ MASTER_PASSWORD=change_me_in_production
 ✅ **Commite o `.env.example` como template**
 
 Dessa forma o script é útil para a equipe e seguro! 🔐
+
+# 📋 Webhook Efipay - Documentação
+
+## URL do Webhook
+
+- **Sandbox**: https://pseudoregal-mysticly-gilbert.ngrok-free.dev/webhook/efipay
+- **Produção**: https://api.seudominio.com/webhook/efipay
+
+## Eventos Recebidos
+
+- `paid` - Pagamento aprovado
+- `unpaid` - Pagamento não aprovado
+- `waiting` - Aguardando pagamento
+- `canceled` - Pagamento cancelado
+- `refunded` - Pagamento reembolsado
+
+## Testes
+
+Execute: `python -m app.payment.webhook.test_webhook`

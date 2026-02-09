@@ -3,17 +3,26 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
 
+
 class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    status = Column(String, default="pending")  
+
+    status = Column(String, default="pending")
+
+    efipay_charge_id = Column(String, index=True, nullable=True)
+    payment_status = Column(String, default="aguardando_pagamento")
+
+    paid_at = Column(DateTime, nullable=True)
+
     total = Column(Float, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
-    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+    items = relationship("OrderItem", back_populates="order",
+                         cascade="all, delete-orphan")
 
 
 class OrderItem(Base):

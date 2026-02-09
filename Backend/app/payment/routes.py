@@ -1,7 +1,11 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from .schemas import PixRequest, CardOneStepRequest, InstallmentsRequest
+from sqlalchemy.orm import Session
 from .service import EfiService
+from app.models import User
 import os
+# from app.auth.dependencies import get_db, require_master_full_access
+from app.auth.dependencies import get_db, get_current_user
 
 router = APIRouter(prefix="/payment", tags=["payment"])
 
@@ -24,9 +28,9 @@ def create_pix(request: PixRequest):
 
 
 @router.post("/card/one-step")
-async def create_card_payment(request: CardOneStepRequest):
+async def create_card_payment(request: CardOneStepRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
-        result = service.create_card_one_step(request)
+        result = service.create_card_one_step(request, db, current_user.id)
         return {"success": True, "data": result}
     except Exception as e:
         raise HTTPException(
