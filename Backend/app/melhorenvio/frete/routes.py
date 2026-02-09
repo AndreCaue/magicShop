@@ -9,7 +9,8 @@ router = APIRouter(prefix="/frete", tags=["Frete - Melhor Envio"])
 
 
 class CotarFreteRequest(BaseModel):
-    cep_destino: str = Field(..., example="01001000", description="CEP apenas números")
+    cep_destino: str = Field(..., example="01001000",
+                             description="CEP apenas números")
     peso_gramas: float = Field(..., gt=0, example=500)
     largura_cm: float = Field(..., gt=0, example=16)
     altura_cm: float = Field(..., gt=0, example=6)
@@ -22,7 +23,8 @@ class CotarFreteRequest(BaseModel):
     def validar_cep(cls, v: str | None) -> str | None:
         if v is not None:
             if len(v) != 8 or not v.isdigit():
-                raise ValueError("CEP deve conter exatamente 8 dígitos numéricos")
+                raise ValueError(
+                    "CEP deve conter exatamente 8 dígitos numéricos")
             return v
         return v
 
@@ -56,6 +58,10 @@ async def cotar_frete_route(payload: CotarFreteRequest):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(
-        status_code=500,
-        detail=f"Erro interno: {repr(e)}",
-    )
+            status_code=500,
+            detail=f"Erro interno: {repr(e)}",
+        )
+
+    # DESENVOLVER - FAZER - PAREI AQUI
+
+    # Criar rota de gerar etiqueta, + verificar fluxo.
