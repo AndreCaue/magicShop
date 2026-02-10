@@ -80,6 +80,8 @@ export default function PaymentStep({
     return true;
   };
 
+  console.log(tokenError, "token error");
+
   const generateToken = async () => {
     if (selectedMethod !== "cartao") return null; // pode pagar
 
@@ -264,9 +266,7 @@ export default function PaymentStep({
             label={getButtonLabel()}
             icon={<CircleArrowRight />}
             onClick={onSubmit}
-            disabled={
-              !isStepValid() || isSubmitting || isTokenizing || !tokenError
-            }
+            disabled={!isStepValid() || isSubmitting || isTokenizing}
             typeB="button"
             className={cn(
               "w-full py-7 text-lg",
