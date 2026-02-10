@@ -1,9 +1,5 @@
 import api from "../../axiosInstance";
 
-type T = {
-  params: any;
-};
-
 export const paymentCard = async (params: any) => {
   const response = await api.post("/payment/card/one-step", { ...params });
 
