@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from .service import EfiService
 from app.models import User
 import os
-# from app.auth.dependencies import get_db, require_master_full_access
 from app.auth.dependencies import get_db, get_current_user
 
 router = APIRouter(prefix="/payment", tags=["payment"])

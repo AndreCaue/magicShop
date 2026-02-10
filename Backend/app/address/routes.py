@@ -12,6 +12,7 @@ router = APIRouter(
 
 cep_cache: Dict[str, Dict[str, Any]] = {}
 
+
 @router.get(
     "/{cep}",
     summary="Busca endereço por CEP",
@@ -30,13 +31,14 @@ async def buscar_cep(
     cep_clean = re.sub(r"\D", "", cep)
 
     if len(cep_clean) != 8:
-        raise HTTPException(status_code=400, detail="CEP deve conter exatamente 8 dígitos numéricos")
+        raise HTTPException(
+            status_code=400, detail="CEP deve conter exatamente 8 dígitos numéricos")
 
     if cep_clean in cep_cache:
         return cep_cache[cep_clean]
 
     viacep_url = f"https://viacep.com.br/ws/{cep_clean}/json/"
-    
+
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(viacep_url, timeout=8.0)
@@ -63,7 +65,7 @@ async def buscar_cep(
 
     except (httpx.RequestError, httpx.HTTPStatusError, ValueError, Exception) as e:
         brasilapi_url = f"https://brasilapi.com.br/api/cep/v2/{cep_clean}"
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(brasilapi_url, timeout=5.0)

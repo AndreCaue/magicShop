@@ -2,11 +2,6 @@ from pydantic import BaseModel, field_validator, Field
 from typing import List, Optional
 
 
-# class Item(BaseModel): antigo
-#     name: str
-#     quantity: int = Field(..., gt=0)
-#     unit_price: int = Field(..., gt=0)
-
 class Item(BaseModel):
     product_id: int
     quantity: int = Field(..., gt=0)

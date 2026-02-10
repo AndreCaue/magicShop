@@ -42,13 +42,15 @@ def generate_verification_code():
 
 @router.post("/register", response_model=schemas.UserOut)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
+    existing_user = db.query(models.User).filter(
+        models.User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email já cadastrado")
 
     hashed_pw = hash_password(user.password)
 
-    new_user = models.User(email=user.email, password=hashed_pw, scopes=["basic"])
+    new_user = models.User(
+        email=user.email, password=hashed_pw, scopes=["basic"])
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -64,7 +66,8 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
         send_verification_email(user.email, code)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao enviar e-mail: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Erro ao enviar e-mail: {str(e)}")
 
     return schemas.UserOut.model_validate(new_user)
 
@@ -82,10 +85,12 @@ def verify_email(
 
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user or not user.verification_code or not user.salt:
-        raise HTTPException(status_code=400, detail="Usuário inválido ou sem código de verificação")
+        raise HTTPException(
+            status_code=400, detail="Usuário inválido ou sem código de verificação")
 
     salt = binascii.unhexlify(user.salt)
-    hash_code = hashlib.pbkdf2_hmac("sha256", data.code.encode(), salt, 100_000)
+    hash_code = hashlib.pbkdf2_hmac(
+        "sha256", data.code.encode(), salt, 100_000)
     hash_code_hex = binascii.hexlify(hash_code).decode()
 
     if hash_code_hex != user.verification_code:
@@ -117,27 +122,28 @@ async def forgot_password(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    user = db.query(models.User).filter(models.User.email == request.email.lower()).first()
-    
+    user = db.query(models.User).filter(
+        models.User.email == request.email.lower()).first()
+
     if not user:
         return {"message": "Se o e-mail estiver cadastrado, enviaremos um link de recuperação."}
-
 
     reset_token = create_reset_password_token(user_id=user.id)
 
     if settings.ENVIRONMENT == 'production':
-     reset_link = f"https://doceilusao.store/reset_password?token={reset_token}"
+        reset_link = f"https://doceilusao.store/reset_password?token={reset_token}"
     else:
-     reset_link = f"http://localhost:5173/reset_password?token={reset_token}"
+        reset_link = f"http://localhost:5173/reset_password?token={reset_token}"
 
     background_tasks.add_task(
         send_reset_password_email,
         to_email=user.email,
-        username=user.email,  # to do
+        username=user.email,
         reset_link=reset_link,
     )
 
     return {"message": "Se o e-mail estiver cadastrado, enviaremos um link de recuperação."}
+
 
 @router.post("/reset-password")
 def reset_password(
@@ -150,7 +156,7 @@ def reset_password(
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    hashed_password = hash_password(request.new_password) 
+    hashed_password = hash_password(request.new_password)
 
     user.password = hashed_password
     user.updated_at = datetime.now(timezone.utc)
@@ -159,13 +165,15 @@ def reset_password(
 
     return {"message": "Senha redefinida com sucesso!"}
 
+
 @router.post("/token", response_model=schemas.Token)
 def login(
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    db_user = db.query(models.User).filter(models.User.email == form_data.username).first()
+    db_user = db.query(models.User).filter(
+        models.User.email == form_data.username).first()
     if not db_user or not verify_password(form_data.password, db_user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -188,7 +196,7 @@ def login(
         data={"sub": db_user.email},
         expires_delta=timedelta(days=7),
         token_type="refresh",
-        include_jti=True 
+        include_jti=True
     )
 
     try:
@@ -201,7 +209,8 @@ def login(
             detail="Erro ao gerar refresh token"
         )
 
-    save_refresh_token(db=db, user_id=db_user.id, jti=jti, expires_at=expires_at)
+    save_refresh_token(db=db, user_id=db_user.id,
+                       jti=jti, expires_at=expires_at)
 
     response.set_cookie(
         key="refresh_token",
@@ -232,7 +241,7 @@ def basic_area(current_user: models.User = Security(get_current_user, scopes=["b
 
 
 @router.get("/premium-area")
-def premium_area(current_user: models.User = Security(get_current_user, scopes=["premium"])): 
+def premium_area(current_user: models.User = Security(get_current_user, scopes=["premium"])):
     return {"message": f"Acesso premium concedido para {current_user.email}"}
 
 
@@ -241,7 +250,8 @@ def upgrade_user_to_premium(
     current_user: models.User = Security(get_current_user, scopes=["basic"]),
     db: Session = Depends(get_db)
 ):
-    db_user = db.query(models.User).filter(models.User.id == current_user.id).first()
+    db_user = db.query(models.User).filter(
+        models.User.id == current_user.id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
@@ -251,6 +261,7 @@ def upgrade_user_to_premium(
         db.refresh(db_user)
 
     return {"message": f"Usuário {db_user.email} agora é premium!", "scopes": db_user.scopes}
+
 
 @router.post("/refresh", response_model=schemas.Token)
 def refresh_token(
@@ -274,10 +285,12 @@ def refresh_token(
         if not jti or not email:
             raise HTTPException(status_code=401, detail="Token inválido")
     except ValueError:
-        raise HTTPException(status_code=401, detail="Refresh token inválido ou expirado")
+        raise HTTPException(
+            status_code=401, detail="Refresh token inválido ou expirado")
 
     if not is_refresh_token_valid(db, jti):
-        raise HTTPException(status_code=401, detail="Refresh token revogado ou expirado")
+        raise HTTPException(
+            status_code=401, detail="Refresh token revogado ou expirado")
 
     revoke_refresh_token(db, jti)
 
@@ -285,7 +298,8 @@ def refresh_token(
     if not db_user:
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-    scopes = db_user.scopes if isinstance(db_user.scopes, list) else db_user.scopes.split(",") if db_user.scopes else []
+    scopes = db_user.scopes if isinstance(
+        db_user.scopes, list) else db_user.scopes.split(",") if db_user.scopes else []
     new_access_token = create_access_token(
         data={
             "sub": db_user.email,
@@ -305,21 +319,22 @@ def refresh_token(
 
     new_payload = decode_token(new_refresh_token)
     new_jti = new_payload["jti"]
-    new_expires_at = datetime.fromtimestamp(new_payload["exp"], tz=timezone.utc)
+    new_expires_at = datetime.fromtimestamp(
+        new_payload["exp"], tz=timezone.utc)
     save_refresh_token(db, db_user.id, new_jti, new_expires_at)
 
     _prod = settings.ENVIRONMENT == 'production'
 
     response.set_cookie(
-    key="refresh_token",
-    value=new_refresh_token,
-    httponly=True,
-    secure=_prod,
-    samesite="lax", #none
-    domain='.doceilusao.store' if _prod else None, # Desabilitar para dev, não envia kookie
-    path="/",
-    max_age=60 * 60 * 24 * 30,
-)
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        secure=_prod,
+        samesite="lax",
+        domain='.doceilusao.store' if _prod else None,
+        path="/",
+        max_age=60 * 60 * 24 * 30,
+    )
 
     token_response = {
         "access_token": new_access_token,
@@ -345,16 +360,15 @@ def logout(
         RefreshToken.revoked == False
     ).update({RefreshToken.revoked: True})
     db.commit()
-    
 
     response.delete_cookie(
         key="access_token",
         path="/",
         httponly=True,
         secure=True,
-        samesite="strict"         # ou "strict" se não precisar cross-site "lax" cross
+        samesite="strict"
     )
-    
+
     response.delete_cookie(
         key="refresh_token",
         path="/",
@@ -364,6 +378,7 @@ def logout(
     )
 
     return {"message": "Logout global realizado com sucesso"}
+
 
 @router.get("/me")
 def read_users_me(current_user: models.User = Depends(get_current_user)):

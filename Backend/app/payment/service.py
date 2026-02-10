@@ -107,13 +107,12 @@ class EfiService:
 
         shipping_total_cents = data.shipping.value if data.shipping else 0
 
-        order_total_cents = items_total_cents + shipping_total_cents  # verificar
+        order_total_cents = items_total_cents + shipping_total_cents
         order.total = order_total_cents / 100
 
         body = {
             "items": items_list,
             "metadata": {
-                # dev , ajustar para uma variavel para mudar entre prod e dev
                 "notification_url": f"{WEBHOOK_URL}/webhook/efipay",
                 "custom_id": f"order_{order.id}",
             },
