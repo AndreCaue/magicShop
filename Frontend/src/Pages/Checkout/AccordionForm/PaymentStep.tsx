@@ -134,6 +134,7 @@ export default function PaymentStep({
     } catch (err: any) {
       const msg = err.error_description || "Falha na tokenização do cartão";
       setTokenError(msg);
+      console.log(msg, "é aqui o erro");
       setError("numero_cartao", { message: msg });
       return null;
     } finally {
