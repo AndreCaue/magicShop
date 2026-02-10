@@ -13,7 +13,8 @@ import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
 import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/RecoveryPassword";
 import { Register } from "@/Pages/Login/subPages/Register/Register";
-import { MainJogo } from "@/Pages/Jogos/Main";
+import { MainGames } from "@/Pages/Games/main";
+import { Games } from "./Games";
 
 export const AppRoutes = () => {
   return (
@@ -46,7 +47,7 @@ export const AppRoutes = () => {
 
           {/* Jogos Rota de proteção+++ */}
           {/* <Route path="/teste" element={<TesteDef />} /> */}
-          <Route path="/jogos" element={<MainJogo />} />
+          <Route path="/jogos/*" element={<Games />} />
           {/* Jogos */}
         </Route>
       </Route>
