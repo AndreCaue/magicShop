@@ -162,16 +162,15 @@ export default function PaymentStep({
 
       const payload = {
         items: items.map((item) => ({
-          name: item.product_name || "Produto",
+          product_id: item.id,
           quantity: item.quantity || 1,
-          unit_price: Math.round(item.unit_price * 100), // centavos / Adicionar valor do frete com desconto. + logica de frete gratis futuramente.
-        })), // parei aqui
+          // unit_price: Math.round(item.unit_price * 100),
+        })),
         shipping:
           shippingCost > 0
             ? {
                 name: selectedShipping?.nome || "Frete",
                 value: shippingCost,
-                //payee_code: 'CODE',
               }
             : null,
         payment_token: token,

@@ -69,7 +69,7 @@ export default function ClientStep({
           name="email"
           control={control}
           label="Email"
-          placeholder="seuemail@exemplo.com"
+          placeholder="seuemail@exemplos.com"
           type="email"
           required
         />
