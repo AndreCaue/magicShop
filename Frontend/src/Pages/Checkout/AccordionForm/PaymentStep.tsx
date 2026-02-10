@@ -193,6 +193,7 @@ export default function PaymentStep({
 
       try {
         const res = await paymentCard(payload);
+        console.log(res, "res");
       } catch (err) {
         setTokenError("Não foi possível processar o pagamento.");
         return;
@@ -263,7 +264,9 @@ export default function PaymentStep({
             label={getButtonLabel()}
             icon={<CircleArrowRight />}
             onClick={onSubmit}
-            disabled={!isStepValid() || isSubmitting || isTokenizing}
+            disabled={
+              !isStepValid() || isSubmitting || isTokenizing || !tokenError
+            }
             typeB="button"
             className={cn(
               "w-full py-7 text-lg",

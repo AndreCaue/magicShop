@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/Hooks/useCart";
 import {
@@ -8,7 +8,6 @@ import {
 import { getShippingPrice } from "@/Repositories/shipping/calculate";
 import { Link } from "react-router-dom";
 import { Loader2, Truck, AlertCircle } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ShippingPrice } from "../Checkout/Components/ShippingPrice";
 import { RadioSuit } from "./Components/CustomRadio";
