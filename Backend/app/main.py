@@ -18,10 +18,10 @@ from .payment.webhook.routes import router as webhook_router
 
 from .core.config import settings
 
-# if settings.ENVIRONMENT == "development":
-models.Base.metadata.create_all(bind=engine)
+if settings.ENVIRONMENT == "development":
+    models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(docs_url="/docs", title=f"{settings.APP_NAME}")
+app = FastAPI(docs_url="/docs", title=f"{settings.APP_NAME}".  redirect_slashes=False)
 
 
 @app.get("/docs", include_in_schema=False)
