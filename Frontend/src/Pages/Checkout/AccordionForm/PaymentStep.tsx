@@ -81,7 +81,7 @@ export default function PaymentStep({
     return true;
   };
 
-  console.log(tokenError, "token error");
+  console.log(tokenError, "$erro do token");
 
   const generateToken = async () => {
     if (selectedMethod !== "cartao") return null; // pode pagar
@@ -107,7 +107,9 @@ export default function PaymentStep({
       return null;
     }
 
-    console.log(getValues("cpf"), "raw cpf");
+    const holderDocument = getValues("cpf")
+      .replaceAll(".", "")
+      .replace("-", "");
 
     try {
       const tokenData = await EfiPay.CreditCard.setEnvironment(ENV) // aki tmb
@@ -121,7 +123,7 @@ export default function PaymentStep({
           holderName: getValues("nome_titular") || "",
           reuse: false,
           brand: brand,
-          holderDocument: getValues("cpf"), // verificar se
+          holderDocument: holderDocument, // verificar se
         })
         .getPaymentToken();
 
