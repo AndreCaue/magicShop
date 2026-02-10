@@ -18,6 +18,7 @@ import EfiPay from "payment-token-efi";
 import { detectCardBrand } from "../utils";
 
 const ACCOUNT_EFI_ID = import.meta.env.VITE_EFI_ACCOUNTID;
+const ENV = import.meta.env.VITE_ENVIRONMENT;
 
 type Props = {
   canOpenStep: (step: TStep) => boolean;
@@ -106,8 +107,10 @@ export default function PaymentStep({
       return null;
     }
 
+    console.log(getValues("cpf"), "raw cpf");
+
     try {
-      const tokenData = await EfiPay.CreditCard.setEnvironment("sandbox")
+      const tokenData = await EfiPay.CreditCard.setEnvironment("sandbox") // aki tmb
         .setAccount(ACCOUNT_EFI_ID)
         .setCardNumber(cardNumber)
         .setCreditCardData({
@@ -118,7 +121,7 @@ export default function PaymentStep({
           holderName: getValues("nome_titular") || "",
           reuse: false,
           brand: brand,
-          holderDocument: "82566214000", // verificar se
+          holderDocument: getValues("cpf"), // verificar se
         })
         .getPaymentToken();
 
