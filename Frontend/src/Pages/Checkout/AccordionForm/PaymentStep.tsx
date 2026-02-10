@@ -82,7 +82,6 @@ export default function PaymentStep({
   };
 
   console.log(tokenError, "$erro do token");
-  console.log(ENV, "em prod");
 
   const generateToken = async () => {
     if (selectedMethod !== "cartao") return null; // pode pagar
