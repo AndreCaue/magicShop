@@ -4,13 +4,14 @@ from typing import List
 import httpx
 import os
 
-from app.auth.dependencies import get_db 
+from app.auth.dependencies import get_db
 from app.store.models import Product
-from app.store.schemas import  ProductResponse
+from app.store.schemas import ProductResponse
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
+
 
 async def upload_to_imgbb(image: UploadFile, api_key: str = IMGBB_API_KEY):
     if not api_key:
@@ -44,12 +45,14 @@ async def upload_to_imgbb(image: UploadFile, api_key: str = IMGBB_API_KEY):
                 detail=f"Erro inesperado ao fazer upload: {str(e)}"
             )
 
-@router.get("/", response_model=List[ProductResponse])
+
+@router.get("", response_model=List[ProductResponse])
 async def list_products(
     db: Session = Depends(get_db),
 ):
     products = db.query(Product).options(joinedload(Product.category)).all()
     return products
+
 
 @router.post("/register", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 async def create_product(
@@ -67,7 +70,8 @@ async def create_product(
     db: Session = Depends(get_db),
 ):
     if height_cm + width_cm + length_cm > 200:
-        raise HTTPException(status_code=400, detail="Soma das dimensões excede 200cm (limite Correios)")
+        raise HTTPException(
+            status_code=400, detail="Soma das dimensões excede 200cm (limite Correios)")
 
     image_urls = []
     if images:
@@ -96,13 +100,13 @@ async def create_product(
     return ProductResponse.model_validate(new_product, from_attributes=True)
 
 
-
 @router.get("/{product_id}", response_model=ProductResponse)
 async def get_product_by_id(
     product_id: int,
     db: Session = Depends(get_db),
 ):
-    product = db.query(Product).options(joinedload(Product.category)).filter(Product.id == product_id).first()
+    product = db.query(Product).options(joinedload(
+        Product.category)).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Produto não encontrado.")
     return product
