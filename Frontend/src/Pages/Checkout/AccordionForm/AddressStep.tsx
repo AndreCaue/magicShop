@@ -228,7 +228,7 @@ export default function AddressStep({
             disabled={!isStepValid() || isFetchingCep}
             className={cn(
               "w-1/3",
-              isStepValid() && // botão com problema, Realizar submit, preencher campo, submit.
+              isStepValid() &&
                 !isFetchingCep &&
                 "bg-green-400 text-white hover:bg-green-500",
             )}

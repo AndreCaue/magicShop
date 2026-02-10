@@ -98,7 +98,7 @@ const InputCardForm = <
                   }}
                   background={background}
                   onBlur={onBlur}
-                  maxLength={19} // 16 dígitos + 3 espaços
+                  maxLength={19}
                   type="text"
                   icon={iconPlaceholder}
                   disabled={disabled}

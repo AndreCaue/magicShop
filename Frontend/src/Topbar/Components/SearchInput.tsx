@@ -1,7 +1,7 @@
 import { Search, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useCallback, useEffect } from "react";
-import { useDebounce } from "use-debounce"; // você pode precisar criar este hook
+import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 
 type SearchResult = {
@@ -60,7 +60,7 @@ const SearchInput = ({
       setQuery("");
       setIsFocused(false);
     },
-    [onResultSelect]
+    [onResultSelect],
   );
 
   const showResultsPanel =
@@ -75,7 +75,7 @@ const SearchInput = ({
         <Search
           className={cn(
             "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2",
-            background === "light" ? "text-gray-500" : "text-gray-400"
+            background === "light" ? "text-gray-500" : "text-gray-400",
           )}
         />
 
@@ -101,7 +101,7 @@ const SearchInput = ({
               onClick={handleClear}
               className={cn(
                 "hover:opacity-70 transition-opacity",
-                background === "light" ? "text-gray-500" : "text-gray-400"
+                background === "light" ? "text-gray-500" : "text-gray-400",
               )}
             >
               <X className="h-4 w-4" />
@@ -116,7 +116,7 @@ const SearchInput = ({
             "absolute top-full left-0 right-0 mt-2 rounded-md border shadow-lg z-50 max-h-96 overflow-y-auto",
             background === "light"
               ? "bg-white border-gray-200"
-              : "bg-gray-800 border-gray-700"
+              : "bg-gray-800 border-gray-700",
           )}
         >
           {searchResults.length > 0 ? (
@@ -130,7 +130,7 @@ const SearchInput = ({
                     "w-full px-4 py-3 text-left transition-colors",
                     background === "light"
                       ? "hover:bg-gray-100"
-                      : "hover:bg-gray-700"
+                      : "hover:bg-gray-700",
                   )}
                 >
                   <div className="flex flex-col gap-1">
@@ -140,7 +140,7 @@ const SearchInput = ({
                           "font-medium text-sm",
                           background === "light"
                             ? "text-gray-900"
-                            : "text-white"
+                            : "text-white",
                         )}
                       >
                         {result.title}
@@ -151,7 +151,7 @@ const SearchInput = ({
                             "text-xs px-2 py-1 rounded",
                             background === "light"
                               ? "bg-gray-100 text-gray-600"
-                              : "bg-gray-700 text-gray-300"
+                              : "bg-gray-700 text-gray-300",
                           )}
                         >
                           {result.category}
@@ -164,7 +164,7 @@ const SearchInput = ({
                           "text-xs line-clamp-1",
                           background === "light"
                             ? "text-gray-500"
-                            : "text-gray-400"
+                            : "text-gray-400",
                         )}
                       >
                         {result.description}
@@ -179,7 +179,7 @@ const SearchInput = ({
               <p
                 className={cn(
                   "text-sm",
-                  background === "light" ? "text-gray-500" : "text-gray-400"
+                  background === "light" ? "text-gray-500" : "text-gray-400",
                 )}
               >
                 {emptyMessage}

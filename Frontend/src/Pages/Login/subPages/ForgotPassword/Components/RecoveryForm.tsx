@@ -16,7 +16,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { recoveryPassword } from "@/Repositories/auth";
 import { toast } from "sonner";
-// import { useSearchParams } from "react-router-dom";
 
 const formSchema = z
   .object({

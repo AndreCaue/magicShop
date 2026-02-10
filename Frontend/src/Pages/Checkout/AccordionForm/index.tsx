@@ -20,7 +20,7 @@ export const AccordionForm = () => {
 
   const form = useForm<TForm>({
     resolver: zodResolver(formSchema),
-    mode: "onChange", //onBlur
+    mode: "onChange",
     defaultValues: {
       celular: "",
       complemento: "",
@@ -70,8 +70,6 @@ export const AccordionForm = () => {
 
   const canOpenStep = (step: TStep) =>
     step === activeStep || completedSteps.includes(step);
-  //parei aqui em webhook do backend.
-  // migrar banco.
 
   return (
     <Accordion

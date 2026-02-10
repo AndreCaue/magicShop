@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AccordionItem,
   AccordionTrigger,
@@ -72,7 +73,6 @@ export default function PaymentStep({
         parcelas: watch("parcelas"),
       };
 
-      // Todos os campos devem estar preenchidos e sem erros
       return Object.entries(requiredFields).every(([key, value]) => {
         return value?.toString().trim() !== "" && !errors[key as keyof TForm];
       });
@@ -81,11 +81,9 @@ export default function PaymentStep({
     return true;
   };
 
-  console.log(tokenError, "$erro do token");
+  console.log("$erro$", tokenError);
 
   const generateToken = async () => {
-    if (selectedMethod !== "cartao") return null; // pode pagar
-
     setIsTokenizing(true);
     setTokenError(null);
 
@@ -112,7 +110,7 @@ export default function PaymentStep({
       .replace("-", "");
 
     try {
-      const tokenData = await EfiPay.CreditCard.setEnvironment(ENV) // aki tmb
+      const tokenData = await EfiPay.CreditCard.setEnvironment(ENV)
         .setAccount(ACCOUNT_EFI_ID)
         .setCardNumber(cardNumber)
         .setCreditCardData({
@@ -123,7 +121,7 @@ export default function PaymentStep({
           holderName: getValues("nome_titular") || "",
           reuse: false,
           brand: brand,
-          holderDocument: holderDocument, // verificar se
+          holderDocument: holderDocument,
         })
         .getPaymentToken();
 
@@ -139,7 +137,6 @@ export default function PaymentStep({
     } catch (err: any) {
       const msg = err.error_description || "Falha na tokenização do cartão";
       setTokenError(msg);
-      console.log(msg, "é aqui o erro");
       setError("numero_cartao", { message: msg });
       return null;
     } finally {
@@ -155,7 +152,7 @@ export default function PaymentStep({
 
     const shippingWithDiscount =
       Number(selectedShipping.preco) - Number(discount);
-    return Math.round(shippingWithDiscount * 100); // centavos
+    return Math.round(shippingWithDiscount * 100);
   };
 
   const onSubmit = async () => {
@@ -172,7 +169,6 @@ export default function PaymentStep({
         items: items.map((item) => ({
           product_id: item.id,
           quantity: item.quantity || 1,
-          // unit_price: Math.round(item.unit_price * 100),
         })),
         shipping:
           shippingCost > 0
@@ -200,19 +196,17 @@ export default function PaymentStep({
       };
 
       try {
-        const res = await paymentCard(payload);
-        console.log(res, "res");
-      } catch (err) {
+        await paymentCard(payload);
+      } catch (err: any) {
+        const msg = err.error_description || "Falha na tokenização do cartão";
+        setTokenError(msg);
         setTokenError("Não foi possível processar o pagamento.");
         return;
       }
 
-      // Opcional: force revalidação
       await form.trigger();
       if (!form.formState.isValid) return;
     }
-
-    // ... continue com fetch /api/checkout/finalizar
   };
 
   const getTotal = () => {

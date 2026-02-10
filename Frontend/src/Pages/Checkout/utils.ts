@@ -62,15 +62,6 @@ export const UseCalculateShipping = () => {
 };
 
 export const detectCardBrand = (cardNumber: string): string => {
-  /*
-    Visa:     4111 1111 1111 1111
-Mastercard: 5555555555554444
-Amex:     378282246310005
-Elo:      6362970000457013 (ou 506699)
-Hipercard: 6062825624254001
-Validade: 12/30 (ou qualquer futura)
-CVV: 123 (ou 1234 para Amex)
-     */
   const cleaned = cardNumber.replace(/\D/g, "");
 
   if (!cleaned || cleaned.length < 6) return "";
@@ -80,8 +71,8 @@ CVV: 123 (ou 1234 para Amex)
   if (/^4/.test(bin)) return "visa";
   if (/^5[1-5]/.test(bin)) return "mastercard";
   if (/^3[47]/.test(bin)) return "amex";
-  if (/^(50[67]|50[89]|509|6277|63[67]|650|651)/.test(bin)) return "elo"; // simplificado
-  if (/^(606282|3841)/.test(bin)) return "hipercard"; // simplificado
+  if (/^(50[67]|50[89]|509|6277|63[67]|650|651)/.test(bin)) return "elo";
+  if (/^(606282|3841)/.test(bin)) return "hipercard";
 
-  return ""; // ou lance erro / peça ao usuário
+  return "";
 };

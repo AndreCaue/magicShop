@@ -22,20 +22,10 @@ export default function CartSummary() {
     setCep,
     setShippingOptions,
     setSelectedShipping,
-    // setFreeShipping,
   } = useShippingStore();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // const currentIsFreeShipping = Number(subtotal) > 250;
-  // useEffect(() => {
-  //   setFreeShipping(currentIsFreeShipping);
-  // }, [currentIsFreeShipping, setFreeShipping]);  // Free shipping by price -> feature
-
-  // const shippingPrice = isFreeShipping
-  //   ? 0
-  //   : (selectedShipping?.preco || 0) - Number(discount);
 
   const calculateShippingPrice = () => {
     if (Number(discount) >= (selectedShipping?.preco || 0)) {

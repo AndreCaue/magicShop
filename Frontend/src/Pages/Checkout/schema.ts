@@ -47,7 +47,7 @@ export const formSchema = z
     frete_opcao: z.number().min(1, "Selecione uma opção de entrega"),
 
     pagamento: z
-      .enum(["pix", "cartao"]) //  "boleto"
+      .enum(["pix", "cartao"])
       .optional()
       .refine((val) => val !== undefined, {
         message: "Selecione uma forma de pagamento",

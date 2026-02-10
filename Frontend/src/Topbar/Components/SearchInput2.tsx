@@ -21,9 +21,9 @@ import { Input } from "@/components/ui/input";
 type SearchInputProps = {
   label?: string;
   placeholder?: string;
-  onSearch?: (value: string) => void; // obrigatório agora
+  onSearch?: (value: string) => void;
   debounceMs?: number;
-  minChars?: number; // evita busca com 1 letra
+  minChars?: number;
   background?: "light" | "dark";
   className?: string;
   disabled?: boolean;
@@ -85,7 +85,7 @@ const SearchInput2 = <
                       "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2",
                       background === "dark"
                         ? "text-gray-400"
-                        : "text-muted-foreground"
+                        : "text-muted-foreground",
                     )}
                   />
                   <Input

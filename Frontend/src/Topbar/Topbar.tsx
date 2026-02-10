@@ -1,4 +1,3 @@
-// import { type TValue } from "@/components/new/DropdownButton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ShoppingCartIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";

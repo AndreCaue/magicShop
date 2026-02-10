@@ -38,13 +38,6 @@ export const Summary = () => {
   const { selectedShipping } = useShippingStore();
   const [isFreeShipping, setIsFreeShipping] = useState(false);
 
-  // const formatCurrency = (value: number) => {
-  //   return value.toLocaleString("pt-BR", {
-  //     style: "currency",
-  //     currency: "BRL",
-  //   });
-  // };
-
   const getTotal = () => {
     const frete = (selectedShipping?.preco || 0) - Number(discount);
 

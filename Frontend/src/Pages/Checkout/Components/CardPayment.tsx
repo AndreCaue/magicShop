@@ -56,7 +56,7 @@ export const CardPayment = ({
               name="numero_cartao"
               control={control}
               label="Número do Cartão"
-              placeholder="1234 5678 9012 34562"
+              placeholder="1234 5678 9012 3456"
               disabled={isLoading}
               onBlur={handleGetParcelas}
               onChangeValue={(e) => !e && setInstallments([])}

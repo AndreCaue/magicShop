@@ -29,11 +29,8 @@ export const IndividualProduct = () => {
     if (quantity < 1) return toast.error("Selecione a quantidade");
 
     setIsLoading(true);
-    const res = await addToCart({ product_id: product.id, quantity });
+    await addToCart({ product_id: product.id, quantity });
     setIsLoading(false);
-
-    console.log(res, "teste");
-    // if (res) toast.success(res.message);
   };
 
   const handleBuyNow = () => {
@@ -114,7 +111,6 @@ export const IndividualProduct = () => {
                 <Truck className="w-5 h-5" />
                 <span className="flex gap-2">
                   Frete grátis acima de<p className="text-green-500">R$100</p>{" "}
-                  {/* criar logica para tornar gratuito */}
                 </span>
               </div>
               <div className="flex items-center gap-3">
