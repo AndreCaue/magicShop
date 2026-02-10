@@ -110,7 +110,7 @@ export default function PaymentStep({
     console.log(getValues("cpf"), "raw cpf");
 
     try {
-      const tokenData = await EfiPay.CreditCard.setEnvironment("sandbox") // aki tmb
+      const tokenData = await EfiPay.CreditCard.setEnvironment(ENV) // aki tmb
         .setAccount(ACCOUNT_EFI_ID)
         .setCardNumber(cardNumber)
         .setCreditCardData({
