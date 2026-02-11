@@ -13,7 +13,6 @@ import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
 import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/RecoveryPassword";
 import { Register } from "@/Pages/Login/subPages/Register/Register";
-import { MainGames } from "@/Pages/Games/main";
 import { Games } from "./Games";
 
 export const AppRoutes = () => {
