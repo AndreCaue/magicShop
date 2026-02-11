@@ -31,5 +31,3 @@ export const OClock = () => {
     </>
   );
 };
-
-// export default HiddenItIs;

@@ -1,10 +1,5 @@
-// import { useState, useCallback, useEffect, useRef } from "react";
-// import { useNavigate } from "react-router-dom";
 import Maze from "./Maze";
 
-// const ROWS = 10;
-// const COLS = 15;
-// const CELL_SIZE = 35;
 const START_ROW = 1;
 const START_COL = 3;
 const END_ROW = 1;

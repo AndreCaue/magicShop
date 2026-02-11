@@ -6,7 +6,6 @@ const START_COL = 0;
 const END_ROW = 7;
 const END_COL = 8;
 
-// Caminho jogável (formato da imagem)
 const PATH = [
   [1, 0],
   [2, 0],
@@ -103,7 +102,7 @@ export const TheOtherHalf = () => {
         PATH={PATH}
         START_COL={START_COL}
         START_ROW={START_ROW}
-        goTo="o-clock" // temporario
+        goTo="o-clock"
       />
     </>
   );

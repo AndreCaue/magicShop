@@ -1,28 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CELL_SIZE = 35;
-
-// 🟡 Ponto inicial (amarelo da imagem)
-// const START_ROW = 5;
-// const START_COL = 1;
-
-// 🏁 Final do trajeto principal
-// const END_ROW = 8; // mudar
-// const END_COL = 14;
-
-// Caminho jogável (formato da imagem)
-// const LETTER_POSITIONS = [[0, 5]];
-
-// const MAZE = (() => {
-//   const m = Array.from({ length: ROWS }, () => Array(COLS).fill(1));
-//   LETTER_POSITIONS.forEach(([r, c]) => {
-//     if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
-//       m[r][c] = 0;
-//     }
-//   });
-//   return m;
-// })();
 
 type TMaze = {
   PATH: number[][];
@@ -46,11 +27,11 @@ function Maze({
   ROWS = 10,
 }: TMaze) {
   const navigate = useNavigate();
-  const canvasRef = useRef(null);
-  const containerRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [player, setPlayer] = useState({ row: START_ROW, col: START_COL });
-  const [lastPos, setLastPos] = useState(null);
+  const [lastPos, setLastPos] = useState<any>(null);
   const [visited, setVisited] = useState(() => {
     const v = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
     v[START_ROW][START_COL] = true;
@@ -71,6 +52,7 @@ function Maze({
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
     ctx.fillStyle = "#0f0f0f";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -134,12 +116,12 @@ function Maze({
   }, [player, visited, completed]);
 
   const handleKeyDown = useCallback(
-    (e) => {
+    (e: any) => {
       if (completed) return;
 
       e.preventDefault();
 
-      const dirMap = {
+      const dirMap: any = {
         ArrowUp: [-1, 0],
         ArrowDown: [1, 0],
         ArrowLeft: [0, -1],
@@ -169,7 +151,7 @@ function Maze({
     [player, completed, lastPos],
   );
 
-  const handleReset = useCallback((e) => {
+  const handleReset = useCallback((e: any) => {
     if (e.key.toLowerCase() === "r") {
       setPlayer({ row: START_ROW, col: START_COL });
       setLastPos(null);
