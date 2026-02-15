@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
 from .client import EfiClient
-from .schemas import PixRequest, CardOneStepRequest, InstallmentsRequest
+from .schemas import CardOneStepRequest, InstallmentsRequest, PixRequest
+from .models import PixCharge
 from app.store.orders.models import Order, OrderItem
 from app.store.models import Product
 from datetime import datetime, timezone
 from app.core.config import settings
+from pycpfcnpj import cpfcnpj
 
 SANDBOX = settings.EFI_SANDBOX
 
@@ -19,31 +21,119 @@ class EfiService:
         self.sandbox = sandbox
         self.client = EfiClient(sandbox=sandbox).efi
 
-    def create_pix_charge(self, data: PixRequest) -> dict:
-        valor_formatado = data.valor_original
+    def create_pix_charge(self, data: PixRequest, db: Session, order_id: int = None) -> dict:
+        """
+        Create pix charge and save db
+        """
+
+        # valor_formatado = data.valor_original
 
         body = {
             "calendario": {"expiracao": data.expiracao},
-            "valor": {"original": valor_formatado},
+            "valor": {"original": data.valor_original},
             "chave": data.chave,
         }
 
         if data.solicitacao_pagador:
             body["solicitacaoPagador"] = data.solicitacao_pagador
 
-        devedor = {}
-        if data.devedor_cpf:
-            devedor["cpf"] = data.devedor_cpf
-        if data.devedor_nome:
-            devedor["nome"] = data.devedor_nome
+        if self.sandbox:
+            devedor = {
+                "cpf": data.devedor_cpf or "12345678909",
+                "nome": data.devedor_nome or "Teste Homologacao"
+            }
+        else:
+            if not data.devedor_cpf or not data.devedor_nome:
+                raise ValueError("CPF e Nome são obrigatórios em produção")
 
-        if not devedor.get("cpf") or not devedor.get("nome"):
-            devedor = {"cpf": "12345678909",
-                       "nome": "Teste Homologacao"}  # precisa mudar
+            if not cpfcnpj.validate(data.devedor_cpf):
+                raise ValueError("CPF inválido")
+
+            devedor = {
+                "cpf": data.devedor_cpf,
+                "nome": data.devedor_nome
+            }
 
         body["devedor"] = devedor
 
-        return self.client.pix_create_immediate_charge(body=body)
+        result = self.client.pix_create_immediate_charge(body=body)
+
+        pix_charge = PixCharge(
+            txid=result["txid"],
+            location=result["loc"]["location"],
+            pix_copia_e_cola=result.get("pixCopiaECola"),
+            imagem_qrcode=result.get("imagemQrcode"),
+            devedor_cpf=devedor.get("cpf"),
+            devedor_nome=devedor.get("nome"),
+            valor_original=data.valor_original,
+            status="ATIVA",
+            order_id=order_id
+        )
+
+        db.add(pix_charge)
+        db.commit()
+        db.refresh(pix_charge)
+
+        return {
+            "txid": result["txid"],
+            "location": result["loc"]["location"],
+            "pix_copia_e_cola": result.get("pixCopiaECola"),
+            "imagem_qrcode": result.get("imagemQrcode"),
+            "charge_id": pix_charge.id
+        }
+
+    def process_pix_webhook(self, webhook_data: dict, db: Session) -> dict:
+        """process web hook pix"""
+
+        if webhook_data.get("evento") == "teste_webhook":
+            print("Evento de teste recibido - ignorando")
+            return {"processed": 0}
+
+        pix_events = webhook_data.get("pix", [])
+        processed_count = 0
+
+        for event in pix_events:
+            txid = event.get("txid")
+            # end_to_end_id = event.get("endToEndId")
+
+            # Search charge in the db.
+
+            pix_charge = db.query(PixCharge).filter(
+                PixCharge.txid == txid
+            ).first()
+
+            if not pix_charge:
+                print(f"Cobrança Pix não encontrada: {txid}")
+                continue
+
+            # Search details of charge
+
+            charges_details = self.client.pix_detail_charge(
+                params={"txid": txid})
+
+            status = charges_details.get("status")
+            pix_list = charges_details.get("pix", [])
+
+            # Update Charge
+
+            pix_charge.status = status
+            pix_charge.updated_at = datetime.now(timezone.utc)
+
+            if status == "CONCLUIDA" and pix_list:
+                pix_charge.paid_at = datetime.now(timezone.utc)
+                pix_charge.end_to_end_id = pix_list[0].get("endToEndId")
+                # Updated relationship charge.
+
+                if pix_charge.order:
+                    pix_charge.order.payment_status = "pago"
+                    pix_charge.order.status = "confirmed"
+                    pix_charge.order.updated_at = datetime.now(timezone.utc)
+
+            db.commit()
+            print(f"✅ Cobrança {txid}: → {status}")
+            processed_count += 1
+
+        return {"processed": processed_count}
 
     def create_card_one_step(self, data: CardOneStepRequest, db: Session, user_id: int) -> dict:
 
@@ -228,4 +318,11 @@ class EfiService:
 
     def configure_webhook(self, chave_pix: str, webhook_url: str) -> dict:
         body = {"webhookUrl": webhook_url}
-        return self.client.pix_config_webhook(chave=chave_pix, body=body)
+        params = {"chave": chave_pix}
+
+        print(f"self {self.sandbox}")
+
+        headers = {}
+        if self.sandbox:
+            headers["x-skip-mtls-checking"] = "true"
+        return self.client.pix_config_webhook(params=params, body=body, headers=headers)
