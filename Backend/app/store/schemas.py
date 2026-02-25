@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import List, Optional
 from .categories.schemas import CategoryResponse
 
+
 class ProductBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=2000)
@@ -9,14 +10,17 @@ class ProductBase(BaseModel):
     stock: int = Field(..., ge=0)
     image_urls: Optional[List[str]] = None
     category_id: int = Field(..., gt=0)
+    shipping_preset_id: int = Field(..., gt=0)
 
     weight_grams: int = Field(
         ..., gt=0, le=30_000, description="Peso em gramas (máx 30kg)"
     )
     height_cm: float = Field(..., ge=1, le=105, description="Altura em cm")
     width_cm: float = Field(..., ge=1, le=105, description="Largura em cm")
-    length_cm: float = Field(..., ge=1, le=105, description="Comprimento em cm")
-    discount: float = Field(..., ge=0.01, description="Desconto propocional ao frete.")
+    length_cm: float = Field(..., ge=1, le=105,
+                             description="Comprimento em cm")
+    discount: float = Field(..., ge=0.01,
+                            description="Desconto propocional ao frete.")
 
     @field_validator("height_cm", "width_cm", "length_cm")
     @classmethod
@@ -28,12 +32,13 @@ class ProductBase(BaseModel):
 
         if info.field_name in ("height_cm", "width_cm", "length_cm") and h and w and l:
             if h + w + l > 200:
-                raise ValueError("A soma altura + largura + comprimento não pode exceder 200cm (limite Correios)")
+                raise ValueError(
+                    "A soma altura + largura + comprimento não pode exceder 200cm (limite Correios)")
         return v
 
     model_config = ConfigDict(
-        from_attributes=True,     
-        populate_by_name=True,   
+        from_attributes=True,
+        populate_by_name=True,
         extra="forbid",
     )
 

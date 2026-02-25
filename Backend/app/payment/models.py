@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -8,6 +9,13 @@ class PixCharge(Base):
     __tablename__ = "pix_charges"
 
     id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(
+        String(36),
+        default=lambda: str(uuid.uuid4()),
+        unique=True,
+        nullable=False,
+        index=True
+    )
     txid = Column(String, unique=True, index=True, nullable=False)
     location = Column(String)
     pix_copia_e_cola = Column(String)

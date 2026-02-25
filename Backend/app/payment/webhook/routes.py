@@ -38,7 +38,8 @@ async def efipay_webhook(request: Request, db: Session = Depends(get_db)):
         return {"received": True, "warning": "Sem charge_id"}
 
     order = db.query(Order).filter(
-        Order.efipay_charge_id == charge_id
+        # talvez colocar pix_id ou criar condição;.
+        Order.efipay_charge_card_id == charge_id
     ).first()
 
     if not order:

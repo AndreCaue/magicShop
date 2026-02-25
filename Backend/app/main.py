@@ -15,14 +15,27 @@ from .address.routes import router as address_router
 from .payment.routes import router as payment_router
 from .core.routes import router as test_router
 from .payment.webhook.routes import router as webhook_router
+from .store.orders.routes import router as orders_router
+from app.tasks.scheduler import start_scheduler, scheduler
+from contextlib import asynccontextmanager
 
 from .core.config import settings
 
 if settings.ENVIRONMENT == "development":
     models.Base.metadata.create_all(bind=engine)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    start_scheduler()
+    yield
+
+    scheduler.shutdown()
+
+
 app = FastAPI(docs_url="/docs",
-              title=f"{settings.APP_NAME}",  redirect_slashes=False)
+              title=f"{settings.APP_NAME}",  redirect_slashes=False, lifespan=lifespan)
 
 
 @app.get("/docs", include_in_schema=False)
@@ -81,6 +94,7 @@ app.include_router(address_router)
 app.include_router(payment_router)
 app.include_router(test_router)
 app.include_router(webhook_router)
+app.include_router(orders_router)
 
 
 @app.get("/")

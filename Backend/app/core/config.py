@@ -26,7 +26,9 @@ class Settings(BaseSettings):
     EFI_CERTIFICATE_PATH: str
     EFI_SANDBOX: bool = True
 
+    CEP_KEY: str
     PIX_KEY: str
+    STORE_NAME: str
     NGROK_URL: str
     WEBHOOK_URL: str
 

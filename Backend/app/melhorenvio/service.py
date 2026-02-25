@@ -2,6 +2,10 @@ from typing import List, Dict, Any
 
 from .client import melhor_envio_client
 from .schemas import CotacaoFreteResponse
+from app.core.config import settings
+
+CEP_KEY = settings.CEP_KEY
+
 
 async def cotar_frete(
     cep_destino: str,
@@ -9,13 +13,14 @@ async def cotar_frete(
     largura_cm: float,
     altura_cm: float,
     comprimento_cm: float,
+    usar_seguro: int = 0,
     valor_declarado: float = 0.0,
     cep_origem: str | None = None,
 ) -> List[CotacaoFreteResponse]:
 
     cep_destino = cep_destino.replace("-", "").strip()
-    cep_origem = (cep_origem or "01001000").replace("-", "").strip() 
-
+    cep_origem = (cep_origem or CEP_KEY).replace("-", "").strip()
+ # precisa fazer, parei aqui, fazer integração para gerar etiqueta e proximos passos.
     payload = {
         "from": {
             "postal_code": cep_origem
@@ -30,18 +35,17 @@ async def cotar_frete(
             "weight": round(peso_gramas / 1000, 5)
         },
         "options": {
-            "insurance_value": float(valor_declarado),
+            "insurance_value": float(valor_declarado) if usar_seguro else 0,
             "receipt": False,
             "own_hand": False,
             "reverse": False,
             "non_commercial": False,
-            "platform": "Minha Loja",                       
-            "invoice": {                                      
+            "platform": "Doce Ilusão",
+            "invoice": {
                 "value": float(valor_declarado)
             }
         }
     }
-
 
     try:
         raw_response = await melhor_envio_client.post(

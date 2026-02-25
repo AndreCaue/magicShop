@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import Optional
 
 # class BrandBase(BaseModel):
+
+
 class CategoryBase(BaseModel):
     name: str
     description: Optional[str] = None

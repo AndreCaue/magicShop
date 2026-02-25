@@ -7,6 +7,7 @@ from app.store.models import Product
 from datetime import datetime, timezone
 from app.core.config import settings
 from pycpfcnpj import cpfcnpj
+from uuid import UUID
 
 SANDBOX = settings.EFI_SANDBOX
 
@@ -15,98 +16,174 @@ if SANDBOX:
 else:
     WEBHOOK_URL = settings.WEBHOOK_URL
 
+PIX_KEY = settings.PIX_KEY
+STORE_NAME = settings.STORE_NAME
+
 
 class EfiService:
     def __init__(self, sandbox: bool = True):
         self.sandbox = sandbox
         self.client = EfiClient(sandbox=sandbox).efi
 
-    def create_pix_charge(self, data: PixRequest, db: Session, order_id: int = None) -> dict:
+    def get_pix_charge_details(self, txid: str) -> dict:
+        """
+        Consulta os detalhes atuais da cobrança PIX na Efí pelo txid.
+        Levanta exceção em caso de erro.
+        """
+        try:
+            response = self.client.pix_detail_charge(params={"txid": txid})
+            if not isinstance(response, dict) or "status" not in response:
+                raise ValueError("Resposta inválida ao consultar cobrança PIX")
+            return response
+        except Exception as e:
+            raise ValueError(
+                f"Erro ao consultar cobrança PIX (txid={txid}): {str(e)}")
+
+    def create_pix_charge(self, db: Session, order, valor_original: str, expiracao: int) -> dict:
         """
         Create pix charge and save db
         """
+        existing = db.query(PixCharge).filter(
+            PixCharge.order_id == order.id,
+            PixCharge.status == "ATIVA"
+        ).first()
 
-        # valor_formatado = data.valor_original
+        if existing:
+            try:
+                details = self.get_pix_charge_details(existing.txid)
+                current_status = details.get("status")
+
+                if current_status == "ATIVA":
+
+                    return {
+                        "txid": existing.txid,
+                        "location": existing.location,
+                        "pix_copia_e_cola": existing.pix_copia_e_cola,
+                        "imagem_qrcode": existing.imagem_qrcode,
+                        "charge_id": existing.id
+                    }
+
+                existing.status = current_status
+                existing.updated_at = datetime.now(timezone.utc)
+
+                if current_status in ("CONCLUIDA", "PAGA"):
+                    existing.paid_at = datetime.now(timezone.utc)
+                    order.payment.status = "pago"
+                    order.status = "confirmed"
+                elif current_status == 'EXPIRADA':
+                    order.payment_status = "expirado"
+
+                db.commit()
+                db.refresh(existing)
+
+                return {
+                    "txid": existing.txid,
+                    "location": existing.location,
+                    "pix_copia_e_cola": existing.pix_copia_e_cola,
+                    "imagem_qrcode": existing.imagem_qrcode,
+                    "charge_id": existing.id,
+                    "message": f"Cobrança já existia, status atual: {current_status}"
+                }
+
+            except ValueError as ve:
+                return {
+                    "txid": existing.txid,
+                    "location": existing.location,
+                    "pix_copia_e_cola": existing.pix_copia_e_cola,
+                    "imagem_qrcode": existing.imagem_qrcode,
+                    "charge_id": existing.id,
+                    "warning": f"Não foi possível consultar status atual: {str(ve)}"
+                }
+        solicitacao = f"{settings.STORE_NAME} - Pedido #{order.uuid}"
 
         body = {
-            "calendario": {"expiracao": data.expiracao},
-            "valor": {"original": data.valor_original},
-            "chave": data.chave,
-        }
+            "calendario": {"expiracao": expiracao},
+            "valor": {"original": valor_original},
+            "chave": PIX_KEY,
+            "solicitacaoPagador": solicitacao,
+            "devedor": {
+                "cpf": order.shipping.recipient_document,
+                "nome": order.shipping.recipient_name,
+            }
 
-        if data.solicitacao_pagador:
-            body["solicitacaoPagador"] = data.solicitacao_pagador
+        }
 
         if self.sandbox:
             devedor = {
-                "cpf": data.devedor_cpf or "12345678909",
-                "nome": data.devedor_nome or "Teste Homologacao"
+                "cpf": order.shipping.recipient_document or "12345678909",
+                "nome": order.shipping.recipient_name or "Teste Homologacao"
             }
         else:
-            if not data.devedor_cpf or not data.devedor_nome:
+            if not order.shipping.recipient_document or not order.shipping.recipient_name:
                 raise ValueError("CPF e Nome são obrigatórios em produção")
 
-            if not cpfcnpj.validate(data.devedor_cpf):
+            if not cpfcnpj.validate(order.shipping.recipient_document):
                 raise ValueError("CPF inválido")
 
             devedor = {
-                "cpf": data.devedor_cpf,
-                "nome": data.devedor_nome
+                "cpf": order.shipping.recipient_document,
+                "nome": order.shipping.recipient_name
             }
 
         body["devedor"] = devedor
 
-        result = self.client.pix_create_immediate_charge(body=body)
+        try:
+            result = self.client.pix_create_immediate_charge(body=body)
 
-        pix_charge = PixCharge(
-            txid=result["txid"],
-            location=result["loc"]["location"],
-            pix_copia_e_cola=result.get("pixCopiaECola"),
-            imagem_qrcode=result.get("imagemQrcode"),
-            devedor_cpf=devedor.get("cpf"),
-            devedor_nome=devedor.get("nome"),
-            valor_original=data.valor_original,
-            status="ATIVA",
-            order_id=order_id
-        )
+            location = result.get("loc", {}).get("location")
 
-        db.add(pix_charge)
-        db.commit()
-        db.refresh(pix_charge)
+            pix_charge = PixCharge(
+                txid=result["txid"],
+                location=location,
+                pix_copia_e_cola=result.get("pixCopiaECola"),
+                imagem_qrcode=result.get("imagemQrcode"),
+                devedor_cpf=devedor.get("cpf"),
+                devedor_nome=devedor.get("nome"),
+                valor_original=valor_original,
+                status="ATIVA",
+                order_id=order.id
+            )
 
-        return {
-            "txid": result["txid"],
-            "location": result["loc"]["location"],
-            "pix_copia_e_cola": result.get("pixCopiaECola"),
-            "imagem_qrcode": result.get("imagemQrcode"),
-            "charge_id": pix_charge.id
-        }
+            db.add(pix_charge)
+            db.commit()
+            db.refresh(pix_charge)
+
+            return {
+                "txid": result["txid"],
+                "location": result["loc"]["location"],
+                "pix_copia_e_cola": result.get("pixCopiaECola"),
+                "imagem_qrcode": result.get("imagemQrcode"),
+                "charge_id": pix_charge.id
+            }
+
+        except Exception as e:
+            db.rollback()
+            raise ValueError(f"Erro ao criar cobrança Pix: {str(e)}")
 
     def process_pix_webhook(self, webhook_data: dict, db: Session) -> dict:
         """process web hook pix"""
 
-        if webhook_data.get("evento") == "teste_webhook":
-            print("Evento de teste recibido - ignorando")
+        pix_events = webhook_data.get("pix", [])
+        if not pix_events:
             return {"processed": 0}
 
-        pix_events = webhook_data.get("pix", [])
         processed_count = 0
 
         for event in pix_events:
             txid = event.get("txid")
-            # end_to_end_id = event.get("endToEndId")
 
-            # Search charge in the db.
+            if not txid:
+                continue
 
             pix_charge = db.query(PixCharge).filter(
                 PixCharge.txid == txid
             ).first()
 
             if not pix_charge:
-                print(f"Cobrança Pix não encontrada: {txid}")
                 continue
 
-            # Search details of charge
+            if pix_charge.status == "CONCLUIDA":
+                continue
 
             charges_details = self.client.pix_detail_charge(
                 params={"txid": txid})
@@ -114,163 +191,169 @@ class EfiService:
             status = charges_details.get("status")
             pix_list = charges_details.get("pix", [])
 
-            # Update Charge
-
             pix_charge.status = status
             pix_charge.updated_at = datetime.now(timezone.utc)
+
+            if status == "EXPIRADA" and pix_charge.order:
+                pix_charge.order.payment_status = "expirado"
 
             if status == "CONCLUIDA" and pix_list:
                 pix_charge.paid_at = datetime.now(timezone.utc)
                 pix_charge.end_to_end_id = pix_list[0].get("endToEndId")
-                # Updated relationship charge.
 
                 if pix_charge.order:
                     pix_charge.order.payment_status = "pago"
                     pix_charge.order.status = "confirmed"
                     pix_charge.order.updated_at = datetime.now(timezone.utc)
 
+            elif status == "EXPIRADA":
+                if pix_charge:
+                    pix_charge.order.payment_status = "expirado"
+                    pix_charge.order.updated_at = datetime.now(timezone.utc)
+
+            elif status == "REMOVIDA_PELO_USUARIO_RECEBEDOR":
+                if pix_charge.order:
+                    pix_charge.order.payment_status = "cancelado"
+                    pix_charge.order.updated_at = datetime.now(timezone.utc)
+
             db.commit()
-            print(f"✅ Cobrança {txid}: → {status}")
             processed_count += 1
 
         return {"processed": processed_count}
 
-    def create_card_one_step(self, data: CardOneStepRequest, db: Session, user_id: int) -> dict:
+    def create_card_one_step(self, order_uuid: UUID, payment_token: str, installments: int, db: Session, user_id: int, name_on_card: str) -> dict:
+        order = db.query(Order).filter(Order.uuid == str(order_uuid)).first()
 
-        customer_name = data.customer.name.strip()
+        if not order:
+            raise ValueError("Pedido não encontrado")
 
+        if order.user_id != user_id:
+            raise ValueError("Você não tem permissão para este pedido")
+
+        if order.efipay_charge_card_id:
+            raise ValueError(
+                "Este pedido já possui uma cobrança de cartão associada")
+
+        if order.paid_at:
+            raise ValueError(
+                "Esse pedido está em processo de pagamento, seja por via cartão ou pix. Em caso de dúvida entre em contato com o suporte."
+            )
+
+        if order.payment_status in ("pago", "approved", "capturado", "autorizado", "paid"):
+            raise ValueError(
+                f"Pedido já processado com sucesso (status: {order.payment_status})"
+            )
+
+        shipping = order.shipping
+        if not shipping:
+            raise ValueError("Dados de entrega não encontrados no pedido")
+
+        customer_name = shipping.recipient_name.strip()
         if len(customer_name.split()) < 2:
             raise ValueError("O nome do cliente deve conter nome e sobrenome")
 
-        customer_name = ' '.join(customer_name.split())
+        cpf = shipping.recipient_document
+        if not cpf or not cpfcnpj.validate(cpf):
+            raise ValueError("CPF/CNPJ inválido ou ausente.")
 
-        phone_number = ""
-        if data.customer.phone_number:
-            phone_number = ''.join(
-                filter(str.isdigit, data.customer.phone_number))
+        phone = shipping.recipient_phone
+        phone_digits = ''.join(filter(str.isdigit, phone)) if phone else ""
+        if len(phone_digits) not in [10, 11]:
+            raise ValueError("Telefone inválido no pedido")
 
-            if len(phone_number) not in [10, 11]:
-                raise ValueError(
-                    "Telefone deve conter 10 ou 11 dígitos (com DDD)")
-
-        order = Order(
-            user_id=user_id,
-            total=0,
-            status="pending",
-            payment_status="aguardando_pagamento",
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
-        )
-
-        db.add(order)
-        db.flush()
+        order_items = db.query(OrderItem).filter(
+            OrderItem.order_id == order.id).all()
+        if not order_items:
+            raise ValueError("Pedido sem itens")
 
         items_list = []
-        items_total_cents = 0
-
-        for item in data.items:
+        for oi in order_items:
             product = db.query(Product).filter(
-                Product.id == item.product_id).first()
+                Product.id == oi.product_id).first()
 
             if not product:
-                raise ValueError(f"Produto {item.product_id} não encontrado")
-
-            unit_price_cents = int(product.price * 100)
-            total_price_cents = unit_price_cents * item.quantity
-
-            items_total_cents += total_price_cents
+                raise ValueError(f"Produto {oi.product_id} não encontrado")
 
             items_list.append({
                 "name": product.name,
-                "amount": item.quantity,
-                "value": unit_price_cents,
+                "amount": oi.quantity,
+                "value": int(oi.unit_price * 100),
             })
-
-            order_item = OrderItem(
-                order_id=order.id,
-                product_id=product.id,
-                quantity=item.quantity,
-                unit_price=product.price,
-                total_price=product.price * item.quantity
-            )
-            db.add(order_item)
-
-        shipping_total_cents = data.shipping.value if data.shipping else 0
-
-        order_total_cents = items_total_cents + shipping_total_cents
-        order.total = order_total_cents / 100
 
         body = {
             "items": items_list,
             "metadata": {
                 "notification_url": f"{WEBHOOK_URL}/webhook/efipay",
-                "custom_id": f"order_{order.id}",
+                "custom_id": f"order_{order.uuid}",
             },
             "payment": {
                 "credit_card": {
-                    "payment_token": data.payment_token,
-                    "installments": data.installments,
+                    "payment_token": payment_token,
+                    "installments": installments,
                     "customer": {
-                        "name": customer_name,
-                        "email": data.customer.email,
-                        "cpf": data.customer.cpf,
-                        "phone_number": phone_number,
+                        "name": name_on_card or customer_name,
+                        "email": shipping.recipient_email,
+                        "cpf": cpf,
+                        "phone_number": phone_digits,
                     },
                     "billing_address": {
-                        "street": data.billing_address.street,
-                        "number": data.billing_address.number,
-                        "neighborhood": data.billing_address.neighborhood,
-                        "zipcode": data.billing_address.zipcode.replace("-", "").replace(".", ""),
-                        "city": data.billing_address.city,
-                        "state": data.billing_address.state
+                        "street": shipping.street,
+                        "number": shipping.number,
+                        "neighborhood": shipping.neighborhood,
+                        "zipcode": shipping.postal_code,
+                        "city": shipping.city,
+                        "state": shipping.state
                     }
                 }
             }
         }
 
-        if data.shipping and data.shipping.value > 0:
-            shipping_item = {
-                "name": data.shipping.name,
-                "value": data.shipping.value
-            }
-
-            if data.shipping.payee_code:
-                shipping_item["payeeCode"] = data.shipping.payee_code
-
-            body["shippings"] = [shipping_item]
+        if order.shipping_cost > 0:
+            body["shippings"] = [{
+                "name": f"Frete - {order.shipping_carrier} {order.shipping_method}",
+                "value": int(order.shipping_cost * 100)
+                # "payeeCode": "..." se necessário
+            }]
 
         # Chamada ao SDK
-        result = self.client.create_one_step_charge(body=body)
+        try:
+            result = self.client.create_one_step_charge(body=body)
 
-        if not isinstance(result, dict) or result.get("code") != 200:
-            order.payment_status = "erro_gateway"
+            if not isinstance(result, dict) or result.get("code") != 200:
+                order.payment_status = "erro_gateway"
+                order.updated_at = datetime.now(timezone.utc)
+                db.commit()
+                raise ValueError(result.get("error_description",
+                                            "Erro desconhecido na Efí"))
+
+            charge_data = result.get("data", {})
+            charge_id = charge_data.get("charge_id")
+
+            if not charge_id:
+                order.payment_status = "erro_gateway"
+                order.updated_at = datetime.now(timezone.utc)
+                db.commit()
+                raise ValueError("Efí não retornou charge_id")
+
+            order.efipay_charge_card_id = str(charge_id)
             order.updated_at = datetime.now(timezone.utc)
+
             db.commit()
-            raise ValueError(result.get("error_description",
-                             "Erro desconhecido na Efí"))
 
-        charge_data = result.get("data", {})
-        charge_id = charge_data.get("charge_id")
-
-        if not charge_id:
-            order.payment_status = "erro_gateway"
-            order.updated_at = datetime.now(timezone.utc)
-            db.commit()
-            raise ValueError("Efí não retornou charge_id")
-
-        order.efipay_charge_id = str(charge_id)
-        order.updated_at = datetime.now(timezone.utc)
-
-        db.commit()
-
-        return {
-            "order_id": order.id,
-            "charge_id": charge_id,
-            "status": charge_data.get("status"),
-            "installments": charge_data.get("installments"),
-            "total": charge_data.get("total"),
-            "payment": charge_data.get("payment"),
-        }
+            return {
+                "order_uuid": order.uuid,
+                "charge_id": charge_id,
+                "status": charge_data.get("status"),
+                "installments": charge_data.get("installments"),
+                "total": charge_data.get("total"),
+                "payment": charge_data.get("payment"),
+            }
+        except Exception as e:
+            db.rollback()
+            if isinstance(e, ValueError):
+                raise
+            raise ValueError(
+                f"Erro interno no processamento do cartão: {str(e)}")
 
     def get_card_installments(self, data: InstallmentsRequest) -> list[dict]:
         valor_centavos = int(data.total_value * 100)

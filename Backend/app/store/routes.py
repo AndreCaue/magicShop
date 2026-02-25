@@ -4,7 +4,7 @@ from typing import List
 import httpx
 import os
 
-from app.auth.dependencies import get_db
+from app.auth.dependencies import get_db, require_master_full_access
 from app.store.models import Product
 from app.store.schemas import ProductResponse
 
@@ -54,7 +54,9 @@ async def list_products(
     return products
 
 
-@router.post("/register", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=ProductResponse, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(require_master_full_access)]
+             )
 async def create_product(
     name: str = Form(...),
     description: str = Form(None),
@@ -65,6 +67,7 @@ async def create_product(
     width_cm: float = Form(..., ge=1, le=105),
     length_cm: float = Form(..., ge=1, le=105),
     category_id: int = Form(...),
+    preset_id: int = Form(...),
     discount: float = Form(..., ge=0),
     images: List[UploadFile] = File(None),
     db: Session = Depends(get_db),
@@ -90,6 +93,7 @@ async def create_product(
         length_cm=length_cm,
         category_id=category_id,
         discount=discount,
+        shipping_preset_id=preset_id,
         image_urls=image_urls or None
     )
 
