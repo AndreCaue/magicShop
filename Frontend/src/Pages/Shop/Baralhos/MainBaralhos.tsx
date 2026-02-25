@@ -16,7 +16,7 @@ export const MainBaralhos = () => {
     <DisplayContent
       title="Playing Cards"
       subTitle="Cada baralho uma experiência."
-      rawData={products}
+      productData={products}
     />
   );
 };

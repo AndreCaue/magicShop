@@ -9,7 +9,7 @@ import { STEP_FIELDS, type TForm, type TStep } from "../types";
 import ClientStep from "./ClientStep";
 import AddressStep from "./AddressStep";
 import ShippingStep from "./ShippingStep";
-import PaymentStep from "./PaymentStep";
+import OrderReview from "./ReviewStep";
 import { useAuth } from "@/Hooks/useAuth";
 
 export const AccordionForm = () => {
@@ -25,12 +25,7 @@ export const AccordionForm = () => {
       celular: "",
       complemento: "",
       numero_casa: "",
-      pagamento: undefined,
-      numero_cartao: "",
-      nome_titular: "",
-      validade: "",
-      cvv: "",
-      parcelas: "1",
+      revisao: "",
     },
   });
 
@@ -75,7 +70,7 @@ export const AccordionForm = () => {
     <Accordion
       type="single"
       collapsible
-      className="w-full bg-white pb-20 col-span-2"
+      className="w-full bg-gray-300 pb-20 col-span-2 rounded-lg"
       value={activeStep}
     >
       <Form {...form}>
@@ -95,7 +90,7 @@ export const AccordionForm = () => {
             canOpenStep={canOpenStep}
             form={form}
           />
-          <PaymentStep
+          <OrderReview
             navigateToSteps={navigateToSteps}
             canOpenStep={canOpenStep}
             form={form}

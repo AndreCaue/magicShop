@@ -111,6 +111,7 @@ export const BaralhoForm = () => {
       ...values,
       price: Number(values.price),
       stock: Number(values.stock),
+      preset_id: Number(values.models),
     });
 
     if (!res) return;
@@ -204,7 +205,7 @@ export const BaralhoForm = () => {
                 label="Peso em Gramas"
                 name="weight_grams"
                 background="dark"
-                // disabled
+                disabled
                 required
                 isSkeletonLoading={isLoading}
               />
@@ -215,7 +216,7 @@ export const BaralhoForm = () => {
                 name="height_cm"
                 background="dark"
                 required
-                // disabled
+                disabled
                 isSkeletonLoading={isLoading}
               />
 
@@ -225,7 +226,7 @@ export const BaralhoForm = () => {
                 background="dark"
                 name="width_cm"
                 required
-                // disabled
+                disabled
                 isSkeletonLoading={isLoading}
               />
 
@@ -235,7 +236,7 @@ export const BaralhoForm = () => {
                 background="dark"
                 name="length_cm"
                 required
-                // disabled
+                disabled
                 isSkeletonLoading={isLoading}
               />
 
@@ -245,7 +246,7 @@ export const BaralhoForm = () => {
                 background="dark"
                 name="discount"
                 required
-                // disabled
+                disabled
                 isSkeletonLoading={isLoading}
               />
             </div>

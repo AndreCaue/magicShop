@@ -5,7 +5,6 @@ import {
 } from "@/components/ui/accordion";
 import { NewButton } from "@/components/new/NewButton";
 import { CircleArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { InputForm } from "@/components/new/InputForm";
 import { CelularInputForm } from "@/components/new/CelularInputForm";
 import { type TStep, type TForm } from "../types";
@@ -88,10 +87,8 @@ export default function ClientStep({
             icon={<CircleArrowRight />}
             onClick={handleNext}
             disabled={!isStepFilled}
-            className={cn(
-              "w-full md:w-1/3",
-              "bg-green-400 text-white hover:bg-green-500",
-            )}
+            variant={isStepFilled ? "proceed" : "default"}
+            className="w-full md:w-1/3"
           />
         </div>
       </AccordionContent>

@@ -4,9 +4,8 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { NewButton } from "@/components/new/NewButton";
-import { CircleArrowRight, Loader2 } from "lucide-react";
+import { CircleArrowLeft, CircleArrowRight, Loader2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { cn } from "@/lib/utils";
 import { type TStep, type TForm } from "../types";
 import type { UseFormReturn } from "react-hook-form";
 import { useShippingStore } from "@/stores/useShippingStore";
@@ -50,7 +49,7 @@ export default function ShippingStep({
   };
 
   const handleNext = async () => {
-    await navigateToSteps("entrega", "pagamento");
+    await navigateToSteps("entrega", "revisao");
   };
 
   const handlePrevious = async () => {
@@ -168,19 +167,18 @@ export default function ShippingStep({
         <div className="flex justify-between mt-5">
           <NewButton
             label="Voltar"
-            icon={<CircleArrowRight className="rotate-180" />}
+            icon={<CircleArrowLeft />}
             onClick={handlePrevious}
-            className={cn("w-1/3", "bg-red-400 text-white hover:bg-red-500")}
+            variant="reject"
+            className="w-1/3"
           />
           <NewButton
             label="Prosseguir"
             icon={<CircleArrowRight />}
             onClick={handleNext}
             typeB="button"
-            className={cn(
-              "w-1/3",
-              isStepValid() && "bg-green-400 text-white hover:bg-green-500",
-            )}
+            variant={isStepValid() ? "proceed" : "default"}
+            className="w-1/3"
           />
         </div>
       </AccordionContent>

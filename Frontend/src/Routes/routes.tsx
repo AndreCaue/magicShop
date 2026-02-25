@@ -14,6 +14,7 @@ import { Checkout } from "@/Pages/Checkout/Checkout";
 import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/RecoveryPassword";
 import { Register } from "@/Pages/Login/subPages/Register/Register";
 import { Games } from "./Games";
+import { CheckoutPayment } from "@/Pages/Checkout/CheckoutPayment";
 
 export const AppRoutes = () => {
   return (
@@ -22,6 +23,7 @@ export const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot_password" element={<ForgotPassword />} />
       <Route path="/reset_password/:token?" element={<RecoveryPassword />} />
+      {/* <Route path="/terms-and-politics" element={<RecoveryPassword />} /> */}
 
       {/* <Route path="/" element={<Home />} />
       <Route path="/shop/*" element={<Shop />} /> */}
@@ -41,6 +43,7 @@ export const AppRoutes = () => {
           {/*Checkout / Carrinho */}
           <Route path="/carrinho/" element={<CartPage />} />
           <Route path="/checkout/" element={<Checkout />} />
+          <Route path="/checkout/:id" element={<CheckoutPayment />} />
 
           {/*Carrinho */}
 

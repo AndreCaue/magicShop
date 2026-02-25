@@ -7,6 +7,7 @@ type TProductCardParams = {
   stock: number;
   images_urls: UploadedFile[];
   category_id: number;
+  preset_id: number;
   weight_grams: number;
   height_cm: number;
   width_cm: number;
@@ -27,6 +28,7 @@ export const createProductCards = async (data: TProductCardParams) => {
   formData.append("price", String(data.price));
   formData.append("stock", String(data.stock));
   formData.append("category_id", String(data.category_id));
+  formData.append("preset_id", String(data.preset_id));
   formData.append("weight_grams", String(data.weight_grams));
   formData.append("height_cm", String(data.height_cm));
   formData.append("width_cm", String(data.width_cm));

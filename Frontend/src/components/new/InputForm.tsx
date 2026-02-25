@@ -26,7 +26,7 @@ type TInputForm = {
   maxLength?: number;
   background?: "light" | "dark";
   onBlur?: () => void;
-  formatValue?: (value: string) => string;
+  // formatValue?: (value: string) => string;
   className?: string;
   disabled?: boolean;
   type?: string;
@@ -49,7 +49,7 @@ const InputForm = <
   onBlur,
   maxLength,
   isSkeletonLoading,
-  formatValue,
+  // formatValue,
   background = "light",
   disabled,
 }: TInputForm & UseControllerProps<TFieldValues, TName>) => {
@@ -90,9 +90,9 @@ const InputForm = <
                         "",
                       );
 
-                    if (formatValue) {
-                      formatValue(event.target.value);
-                    }
+                    // if (formatValue) {
+                    //   formatValue(event.target.value);
+                    // }
                     field.onChange(event);
                     onChangeValue?.(event.target.value);
                   }}

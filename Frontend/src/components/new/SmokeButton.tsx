@@ -26,6 +26,7 @@ type TSmokeButton = {
   isMobile?: boolean;
   className?: string;
   isActive?: boolean;
+  spanStyle?: string;
 };
 
 export const SmokeButton = ({
@@ -33,11 +34,13 @@ export const SmokeButton = ({
   onClick,
   isMobile,
   className,
+  spanStyle,
   isActive = false,
 }: TSmokeButton) => {
   if (isMobile) {
     return (
       <motion.button
+        type="button"
         onClick={onClick}
         whileTap={{
           scale: 0.96,
@@ -68,6 +71,7 @@ export const SmokeButton = ({
   return (
     <button
       onClick={onClick}
+      type="button"
       className={cn(
         "relative flex self-center px-4 py-1 rounded-lg min-w-[80px] justify-center hover:cursor-pointer",
         className,
@@ -77,7 +81,7 @@ export const SmokeButton = ({
         variants={smokeVariants}
         initial="initial"
         animate={isActive ? "active" : "initial"}
-        className="text-black text-center font-medium"
+        className={cn("text-black text-center font-medium", spanStyle)}
       >
         {textLabel}
       </motion.span>

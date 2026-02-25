@@ -1,7 +1,30 @@
 import api from "@/axiosInstance";
 
+type TGetProductResponse = {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  image_urls: string[];
+  category_id: number;
+  shipping_preset_id: number;
+  weight_grams: number;
+  height_cm: number;
+  width_cm: number;
+  length_cm: number;
+  discount: number;
+  id: number;
+  category: {
+    name: string;
+    description: string;
+    website: string;
+    logo_url: string;
+    id: number;
+  };
+};
+
 export const getListOfProducts = async () => {
-  const response = await api.get("/products");
+  const response = await api.get<TGetProductResponse[]>("/products");
   return response.data;
 };
 
@@ -22,7 +45,7 @@ interface IGetShippingPresetsResponse {
 
 export const getShippingPresetsById = async (id?: number) => {
   const response = await api.get<IGetShippingPresetsResponse>(
-    `/helpers/shipping-presets/${id}`
+    `/helpers/shipping-presets/${id}`,
   );
   return response.data;
 };

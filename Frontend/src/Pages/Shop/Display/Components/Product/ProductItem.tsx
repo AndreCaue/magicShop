@@ -47,7 +47,12 @@ export const ProductItem = ({
             transition={{ duration: 0.4, ease: "easeOut" }}
           />
         </div>
-        {discount && (
+        {Number(discount) > 99 ? (
+          <span className="absolute top-6 -right-3 rotate-45 w-24 h-6 text-center bg-green-500 text-white rouded-t-2xl">
+            FRETE
+            <p className="bg-white text-green-500 rounded-b-2xl">GRÁTIS</p>
+          </span>
+        ) : (
           <span className="absolute top-6 -right-3 rotate-45 w-24 h-6 text-center bg-green-500 text-white rouded-t-2xl">
             Ganhe R${discount}{" "}
             <p className="bg-white text-green-500 rounded-b-2xl">NO FRETE</p>

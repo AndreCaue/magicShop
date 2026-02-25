@@ -5,7 +5,6 @@ import {
 } from "@/components/ui/accordion";
 import { NewButton } from "@/components/new/NewButton";
 import { CircleArrowRight, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { CepInputForm } from "@/components/new/CepInputForm";
 import { InputForm } from "@/components/new/InputForm";
 import { type TStep, type TForm } from "../types";
@@ -216,22 +215,16 @@ export default function AddressStep({
             onClick={() => handlePrevious()}
             disabled={isFetchingCep}
             typeB="button"
-            className={cn(
-              "w-1/3 ",
-              !isFetchingCep && "bg-red-400 text-white hover:bg-red-500",
-            )}
+            variant={!isFetchingCep ? "reject" : "default"}
+            className="w-1/3 "
           />
           <NewButton
             label="Prosseguir"
             icon={<CircleArrowRight />}
             onClick={() => handleNext()}
             disabled={!isStepValid() || isFetchingCep}
-            className={cn(
-              "w-1/3",
-              isStepValid() &&
-                !isFetchingCep &&
-                "bg-green-400 text-white hover:bg-green-500",
-            )}
+            variant={isStepValid() && !isFetchingCep ? "proceed" : "default"}
+            className="w-1/3"
           />
         </div>
       </AccordionContent>

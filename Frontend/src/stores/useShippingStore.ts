@@ -8,6 +8,7 @@ export interface ShippingOption {
   preco: number;
   preco_com_desconto: number;
   prazo_dias: number;
+  empresa_picture?: string;
 }
 
 interface ShippingState {

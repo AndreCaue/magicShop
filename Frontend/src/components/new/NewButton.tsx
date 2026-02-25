@@ -10,7 +10,16 @@ type TNewButton = {
   isSkeletonLoading?: boolean;
   disabled?: boolean;
   typeB?: "button" | "submit" | "reset" | undefined;
+  variant?: "default" | "proceed" | "reject";
   icon?: ReactNode;
+};
+
+const variantStyles = {
+  default: "bg-white hover:bg-slate-100 text-black border border-slate-200",
+  proceed:
+    "bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white border border-green-700",
+  reject:
+    "bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white border border-red-700",
 };
 
 export const NewButton = ({
@@ -21,6 +30,7 @@ export const NewButton = ({
   icon,
   typeB,
   disabled,
+  variant = "default",
   ...props
 }: TNewButton) => {
   return (
@@ -33,7 +43,8 @@ export const NewButton = ({
         <Button
           onClick={onClick}
           className={cn(
-            "w-full h-full bg-white hover:bg-slate-100 text-black hover:cursor-pointer border border-slate-200 text-base font-normal lg:hover:scale-105",
+            "w-full h-full lg:hover:scale-105 font-medium text-base rounded-xl shadow-md transition-all cursor-pointer",
+            variantStyles[variant],
             className,
           )}
           {...props}

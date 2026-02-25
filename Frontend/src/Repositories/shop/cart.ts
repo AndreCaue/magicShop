@@ -11,7 +11,7 @@ type TPostItemCart = {
 };
 
 export const addToCart = async (props: TPostItemCart) => {
-  const response = await api.post<any>("/cart/add", { ...props });
+  const response = await api.post<any>("/cart/add", { ...props }); // falta tipar
 
   return response.data;
 };
@@ -21,6 +21,7 @@ export const updateCartItemQuantity = async ({
   quantity,
 }: TPostItemCart) => {
   const response = await api.put<any>("/cart/update", {
+    // falta tipar
     cart_item_id: product_id,
     quantity,
   });
@@ -39,6 +40,37 @@ export const removeFromCart = async (cartId: number) => {
 };
 
 export const clearCart = async () => {
-  const response = await api.put<any>("/");
+  const response = await api.put<any>("/"); // falta tipar
+  return response.data;
+};
+
+type TCreateOrderResponse = {
+  message: string;
+  redirect: string;
+};
+
+type TCreateOrderParams = {
+  postal_code: string;
+  shipping_option_id: number;
+  usar_seguro?: number;
+
+  recipient_name: string;
+  recipient_document: string;
+  recipient_email: string;
+  recipient_phone: string;
+
+  street: string;
+  number: string;
+  complement: string | undefined;
+  neighborhood: string;
+  city: string;
+  state: string;
+};
+
+export const createOrderCheckout = async (params: TCreateOrderParams) => {
+  const response = await api.post<TCreateOrderResponse>("/cart/checkout", {
+    ...params,
+  });
+
   return response.data;
 };

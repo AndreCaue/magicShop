@@ -49,6 +49,7 @@ type TSelectForm = {
   placeholder?: string;
   ariaLabel?: string;
   searchAriaLabel?: string;
+  hideCommand?: boolean;
   filter?: (value: string, search: string) => number;
 };
 
@@ -86,6 +87,7 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
   inputClass,
   placeholder = "Selecione...",
   ariaLabel,
+  hideCommand = false,
   searchAriaLabel = "Digite para filtrar os itens da lista",
   ...props
 }) => {
@@ -170,7 +172,7 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
               "my-3 flex w-full flex-row items-start justify-between rounded border sm:items-center",
               inputClass,
               (props.disabled || isFetching) &&
-                "cursor-not-allowed bg-slate-200 opacity-50"
+                "cursor-not-allowed bg-slate-50/20 opacity-50",
             )}
           >
             <Popover
@@ -194,13 +196,13 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
                     aria-labelledby={ariaLabel && "button-aria-label"}
                   >
                     {field.value !== null && field.value !== undefined ? (
-                      <span>
+                      <span className="text-white">
                         {options?.find((opt) => opt.value === field.value)
                           ?.text ?? placeholder}
                       </span>
                     ) : (
                       <span
-                        className="text-slate-500"
+                        className="text-slate-500 "
                         aria-hidden={Boolean(ariaLabel)}
                       >
                         {placeholder}
@@ -229,13 +231,15 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
                 data-testid="triggerDropdown"
               >
                 <Command filter={props.filter}>
-                  <CommandInput
-                    placeholder="Pesquisar"
-                    data-testid="searchCommandInputBottom"
-                    autoFocus
-                    aria-label={searchAriaLabel}
-                    role="search"
-                  />
+                  {hideCommand ? null : (
+                    <CommandInput
+                      placeholder="Pesquisar"
+                      data-testid="searchCommandInputBottom"
+                      autoFocus
+                      aria-label={searchAriaLabel}
+                      role="search"
+                    />
+                  )}
 
                   <CommandList className="max-h-[150px] h-sm:max-h-[200px] h-md:max-h-[300px]">
                     <CommandEmpty>Nenhum resultado encontrado</CommandEmpty>
@@ -259,7 +263,7 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
                               "mr-2 h-4 w-4",
                               option.value === field.value
                                 ? "opacity-100"
-                                : "opacity-0"
+                                : "opacity-0",
                             )}
                           />
                           {option.text}

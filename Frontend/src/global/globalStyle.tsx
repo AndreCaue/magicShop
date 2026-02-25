@@ -1,1 +1,1 @@
-export const initialStile = "h-screen w-screen pt-24"; //py-20 Before: pt-20
+export const initialStile = "pt-24 pb-4"; //py-20 Before: pt-20 retirada h-screen

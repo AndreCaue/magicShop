@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DisplayFooter } from "./Components/DisplayFooter";
 import { ProductPage } from "./Components/Product/ProductPage";
 import { DisplayBackground } from "./Components/DisplayBackground";
@@ -9,16 +9,23 @@ import { cn } from "@/lib/utils";
 export interface IDisplayContext {
   title: string;
   subTitle: string;
-  rawData: IProduct[];
+  productData: IProduct[];
 }
 
-const DisplayContent = ({ title, subTitle, rawData }: IDisplayContext) => {
-  const [selectedCategory, setSelectedCategory] = useState("Bicycle");
+const DisplayContent = ({ title, subTitle, productData }: IDisplayContext) => {
+  const [selectedCategory, setSelectedCategory] = useState("");
   const { open } = useSidebar();
 
-  const categoryTab = rawData.map((item) => ({
-    ...item.category,
-  }));
+  const categoryTab = useMemo(() => {
+    const tabs = Array.from(
+      new Map(
+        productData.map((item) => [item.category.id, item.category]),
+      ).values(),
+    );
+    setSelectedCategory(tabs[0]?.name);
+
+    return tabs;
+  }, [productData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 relative overflow-hidden mt-20">
@@ -37,7 +44,7 @@ const DisplayContent = ({ title, subTitle, rawData }: IDisplayContext) => {
           setSelectedCategory={setSelectedCategory}
           category={categoryTab}
         />
-        <ProductPage selectedCategory={selectedCategory} data={rawData} />
+        <ProductPage selectedCategory={selectedCategory} data={productData} />
         <DisplayFooter />
       </div>
     </div>

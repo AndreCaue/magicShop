@@ -1,5 +1,5 @@
 import { SmokeLink } from "@/components/new/SmokeLink";
-import { SmokeButton } from "@/components/new/SmokeTab";
+import { SmokeButton } from "@/components/new/SmokeButton";
 import { cn } from "@/lib/utils";
 import { SmokeSubTab, SmokeSubTabConteudo, SmokeSubTabJogos } from "../utils";
 

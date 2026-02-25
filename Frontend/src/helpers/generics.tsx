@@ -13,7 +13,7 @@ export interface IDropdownOption {
 }
 
 export const formatedToDrop = (
-  arr: ItemWithDescription[]
+  arr: ItemWithDescription[],
 ): IDropdownOption[] => {
   return (
     arr?.map((x) => ({
