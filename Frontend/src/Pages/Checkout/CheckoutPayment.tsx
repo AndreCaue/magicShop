@@ -13,6 +13,7 @@ import {
   type IPixDataResponse,
 } from "@/Repositories/payment/payment";
 import PixLoader from "./Components/PixLoading";
+import Contador from "./Components/Contador";
 
 export type IPaymentMethod = "pix" | "credit";
 
@@ -20,12 +21,10 @@ export const CheckoutPayment = () => {
   const [activeMethod, setActiveMethod] = useState<IPaymentMethod>("credit");
   const { id } = useParams();
   const [isOpen, setOpen] = useState(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [data, setData] = useState<IOrderResponse>();
   const [pixData, setPixData] = useState<IPixDataResponse>();
   const [isPixLoading, setPixLoading] = useState(false);
-
-  console.log(id, "dentro da pagina id?");
 
   useEffect(() => {
     (async () => {
@@ -33,10 +32,9 @@ export const CheckoutPayment = () => {
       try {
         const res = await getPaymentOrder({ order_uuid: id });
         setData(res);
-        console.log(res, "resposta order");
       } catch (error: any) {
         toast.warning(`Erro: ${error.detail}.`);
-        // navigate("/"); descomentar ao finalizar.
+        navigate("/");
       }
     })();
   }, [id]);
@@ -68,6 +66,7 @@ export const CheckoutPayment = () => {
   return (
     <PageContainer className="text-white">
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        {/*MOBILE */}
         <div className="md:hidden mb-6">
           <div className="flex rounded-full bg-gray-800/50 p-1.5 backdrop-blur-sm border border-gray-700/60">
             <button
@@ -93,6 +92,13 @@ export const CheckoutPayment = () => {
           </div>
         </div>
 
+        {data?.expires_at && (
+          <Contador
+            initialSeconds={data?.expires_at}
+            onExpire={() => navigate("/")}
+          />
+        )}
+
         <div
           className={`
             rounded-2xl overflow-hidden
@@ -111,7 +117,7 @@ export const CheckoutPayment = () => {
             <PixPayment
               isModalOpen={isOpen}
               isPix={isPix}
-              total={data?.total}
+              total={data?.total || 0}
               setActiveMethod={setActiveMethod}
               loading={isPixLoading}
               data={pixData}

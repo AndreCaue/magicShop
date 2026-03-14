@@ -7,6 +7,7 @@ import {
   clearCart,
 } from "../Repositories/shop/cart";
 import type { Cart } from "@/global/cart";
+import { toast } from "sonner";
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -31,8 +32,9 @@ export const useCart = () => {
 
   const addMutation = useMutation({
     mutationFn: addToCart,
-    onSuccess: (response) => {
-      queryClient.setQueryData(["cart"], response.cart);
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast.success(res.message);
     },
   });
 

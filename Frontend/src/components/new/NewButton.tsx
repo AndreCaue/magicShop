@@ -10,7 +10,7 @@ type TNewButton = {
   isSkeletonLoading?: boolean;
   disabled?: boolean;
   typeB?: "button" | "submit" | "reset" | undefined;
-  variant?: "default" | "proceed" | "reject";
+  variant?: "default" | "proceed" | "reject" | "ghost";
   icon?: ReactNode;
 };
 
@@ -20,6 +20,7 @@ const variantStyles = {
     "bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white border border-green-700",
   reject:
     "bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white border border-red-700",
+  ghost: "bg-transparent text-white border hover:bg-black hover:font-bold",
 };
 
 export const NewButton = ({

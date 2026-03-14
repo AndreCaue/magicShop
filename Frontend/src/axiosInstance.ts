@@ -16,7 +16,7 @@ export const setAccessToken = (token: string | null) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const processQueue = (error: any = null, token: string | null = null) => {
   failedQueue.forEach((prom) =>
-    error ? prom.reject(error) : prom.resolve(token)
+    error ? prom.reject(error) : prom.resolve(token),
   );
   failedQueue = [];
 };
@@ -34,16 +34,16 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (err) => Promise.reject(err)
+  (err) => Promise.reject(err),
 );
+
+const authRoutes = ["/auth/token", "/auth/login", "/auth/logout"];
 
 api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
     const originalRequest = error.config;
-
-    const authRoutes = ["/auth/token", "/auth/login", "/auth/logout"];
 
     if (authRoutes.some((route) => originalRequest.url?.includes(route))) {
       return Promise.reject(error);
@@ -88,7 +88,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

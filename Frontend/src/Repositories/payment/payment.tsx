@@ -85,6 +85,7 @@ export interface IPixDataResponse {
   imagem_qrcode: string | null;
   location: string;
   pix_copia_e_cola: string;
+  pixCopiaECola?: string;
   txid: string;
 }
 

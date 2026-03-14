@@ -13,7 +13,7 @@ export const MainGames = () => {
         >
           Maze
         </div>
-        <div>Maze</div>
+        <div onClick={() => navigate("puzzle-1")}>Puzzle</div>
         <div>Maze</div>
         <div>Maze</div>
         <div>Maze</div>

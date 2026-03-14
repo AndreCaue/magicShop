@@ -1,4 +1,4 @@
-import { Check, CircleHelp } from "lucide-react";
+import { CircleHelp } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
@@ -49,6 +49,7 @@ type TSelectForm = {
   placeholder?: string;
   ariaLabel?: string;
   searchAriaLabel?: string;
+  bgTransparent?: boolean;
   hideCommand?: boolean;
   filter?: (value: string, search: string) => number;
 };
@@ -88,6 +89,7 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
   placeholder = "Selecione...",
   ariaLabel,
   hideCommand = false,
+  bgTransparent = false,
   searchAriaLabel = "Digite para filtrar os itens da lista",
   ...props
 }) => {
@@ -154,7 +156,11 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
       ) : (
         <>
           <FormLabel>
-            {props.label}
+            <>
+              {props.label}
+              {props.required && <p className="text-red-500">*</p>}
+            </>
+
             {"\n"}
             {tooltip && (
               <Popup
@@ -164,7 +170,6 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
                 }
               />
             )}
-            {props.required && <p className="text-red-500">*</p>}
           </FormLabel>
 
           <div
@@ -226,11 +231,17 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
               )}
 
               <PopoverContent
-                className="group max-w-full p-0"
+                className={cn(
+                  "group max-w-full p-0",
+                  bgTransparent && "bg-transparent text-white font-bold",
+                )}
                 style={{ width: popoverResizeWidth }}
                 data-testid="triggerDropdown"
               >
-                <Command filter={props.filter}>
+                <Command
+                  filter={props.filter}
+                  className={cn(bgTransparent && "bg-transparent text-white")}
+                >
                   {hideCommand ? null : (
                     <CommandInput
                       placeholder="Pesquisar"
@@ -256,16 +267,23 @@ const InternalSelectForm: React.FC<TInternalSelectForm> = ({
                           onSelect={() =>
                             handleSelect(option.value, option.text)
                           }
-                          className="py-2 text-lg"
+                          className={cn(
+                            "py-2 text-lg border-b",
+                            bgTransparent &&
+                              "text-white data-[selected=true]:text-white data-[selected=true]:bg-black",
+                          )}
                         >
-                          <Check
+                          <div
                             className={cn(
-                              "mr-2 h-4 w-4",
+                              "ml-2 -mr-2 h-4 w-4 rotate-90 text-center",
                               option.value === field.value
                                 ? "opacity-100"
                                 : "opacity-0",
+                              bgTransparent && "bg-transparent text-white",
                             )}
-                          />
+                          >
+                            &spades;
+                          </div>
                           {option.text}
                         </CommandItem>
                       ))}

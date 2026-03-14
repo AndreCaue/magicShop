@@ -89,7 +89,7 @@ export function OrderSummaryModal({
               <div className="p-6 pb-4">
                 <DialogHeader className="relative">
                   <DialogTitle className="text-lg font-medium text-slate-100 flex items-center gap-2">
-                    Resumo do Pedido #{data.id}
+                    Resumo do Pedido #{data.uuid}
                   </DialogTitle>
                   <Button
                     variant="ghost"
@@ -134,7 +134,7 @@ export function OrderSummaryModal({
                               side="right"
                             />
                           </div>
-                        )}{" "}
+                        )}
                       </div>
                     </div>
                     {expanded ? (

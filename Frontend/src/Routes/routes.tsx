@@ -15,6 +15,7 @@ import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/Recovery
 import { Register } from "@/Pages/Login/subPages/Register/Register";
 import { Games } from "./Games";
 import { CheckoutPayment } from "@/Pages/Checkout/CheckoutPayment";
+import OrdersPage from "@/Pages/User/Orders/OrdersPage";
 
 export const AppRoutes = () => {
   return (
@@ -51,6 +52,9 @@ export const AppRoutes = () => {
           {/* <Route path="/teste" element={<TesteDef />} /> */}
           <Route path="/jogos/*" element={<Games />} />
           {/* Jogos */}
+
+          {/*User */}
+          <Route path="/user/pedidos" element={<OrdersPage />} />
         </Route>
       </Route>
 

@@ -50,11 +50,15 @@ type TItem = {
 export function AppSidebar() {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
-  const { setOpenMobile } = useSidebar();
+  const { setOpenMobile, setOpen } = useSidebar();
 
-  const handleClickLogout = (URL: string) => {
-    logout();
+  const handleClick = (id: number, URL: string) => {
+    if (id === 91) {
+      logout();
+    }
     navigate(URL);
+    setOpen(false);
+    setOpenMobile(false);
   };
 
   const items: TItem[] = [
@@ -142,11 +146,19 @@ export function AppSidebar() {
         title: "Logout",
         url: "/login",
       },
+      { id: 92, title: "Pedidos", url: "/user/pedidos" },
+      {
+        id: 93,
+        title: "User (em desenvolvimento)",
+        url: "/user",
+        disabled: true,
+      },
     ],
   };
 
   const handleClickNavigate = (URL: string) => {
     navigate(URL);
+    setOpen(false);
     setOpenMobile(false);
   };
 
@@ -209,12 +221,13 @@ export function AppSidebar() {
             className="gap-2 text-center flex flex-col"
           >
             {userOptions.subItem?.map((item) => (
-              <DropdownMenuItem className="w-[250px] hover:bg-gray-100">
+              <DropdownMenuItem className="w-[250px] border mb-1 hover:bg-black hover:text-white hover:border-white cursor-pointer border-black rounded-full">
                 <button
-                  className="cursor-pointer"
-                  onClick={() => handleClickLogout(item.url)}
+                  className="cursor-pointer "
+                  onClick={() => handleClick(item.id, item.url)}
+                  disabled={item.disabled}
                 >
-                  <span>{item.title}</span>
+                  {item.title}
                 </button>
               </DropdownMenuItem>
             ))}

@@ -264,10 +264,10 @@ ${each.has_interest ? `- Juros de R$ ${(each.total_value - orderData.total).toFi
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.15 }}
         className={`
-              flex-1 flex flex-col relative
+              flex-1 flex flex-col relative 
               p-5 sm:p-6 md:p-8 lg:p-9
               ${!isPix ? "bg-gradient-to-b from-blue-950/25 to-transparent" : ""}
-              transition-all duration-700
+              transition-all duration-700 min-w-[425px]
             `}
       >
         <div className="hidden md:flex items-center gap-3 mb-6">

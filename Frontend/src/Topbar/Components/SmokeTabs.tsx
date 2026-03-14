@@ -2,11 +2,12 @@ import { SmokeLink } from "@/components/new/SmokeLink";
 import { SmokeButton } from "@/components/new/SmokeButton";
 import { cn } from "@/lib/utils";
 import { SmokeSubTab, SmokeSubTabConteudo, SmokeSubTabJogos } from "../utils";
+import { useEffect, useRef } from "react";
 
 type TSmokeTabs = {
   tabs: { id: string; label: string }[];
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
+  activeTab: string | null;
+  onTabChange: (tabId: string | null) => void;
   className?: string;
   isMobile?: boolean;
 };
@@ -19,8 +20,28 @@ export const SmokeTabs = ({
   isMobile = false,
 }: TSmokeTabs) => {
   function onClickCloseSubtab() {
-    onTabChange("");
+    onTabChange(null);
   }
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!activeTab) return;
+
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        onTabChange(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeTab, onTabChange]);
 
   const tabContent: Record<string, React.ReactNode> = {
     loja: (
@@ -57,6 +78,7 @@ export const SmokeTabs = ({
             background="light"
             onClick={onClickCloseSubtab}
             goTo={`/${tab.link}`}
+            key={tab.label}
           />
         ))}
       </div>
@@ -64,7 +86,7 @@ export const SmokeTabs = ({
   };
 
   return (
-    <>
+    <div ref={containerRef}>
       <nav className={cn("hidden lg:flex lg:justify-around", className)}>
         {tabs.map((tab) => (
           <SmokeButton
@@ -76,9 +98,11 @@ export const SmokeTabs = ({
           />
         ))}
       </nav>
-      <nav className="hidden lg:flex bg-slate-200/40s">
-        {tabContent[activeTab]}
-      </nav>
-    </>
+      {activeTab && (
+        <nav className="hidden lg:flex bg-slate-200/40 z-10">
+          {tabContent[activeTab]}
+        </nav>
+      )}
+    </div>
   );
 };

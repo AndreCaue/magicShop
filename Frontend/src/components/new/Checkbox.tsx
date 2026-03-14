@@ -41,7 +41,7 @@ const CustomCheckbox = ({ checked }: CustomCheckboxProps) => {
         "flex h-5 w-5 items-center justify-center rounded border transition-all duration-200",
         checked
           ? "border-black bg-white text-red-500"
-          : "border-gray-400 bg-white"
+          : "border-gray-400 bg-white",
       )}
     >
       {checked && <span className="text-sm font-bold leading-none">♦</span>}
@@ -59,13 +59,14 @@ const CheckboxForm = <
   className,
   name,
   control,
+  required,
   isSkeletonLoading,
   ...props
 }: TCheckbox & UseControllerProps<TFieldValues, TName>) => {
   const handleCheckboxChange = (
     field: ControllerRenderProps<TFieldValues, TName>,
     checked: CheckedState,
-    item: TOptionsSelectForm
+    item: TOptionsSelectForm,
   ) => {
     if (!multiple) {
       return checked ? field.onChange(item.value) : field.onChange(null);
@@ -73,7 +74,7 @@ const CheckboxForm = <
 
     if (!checked) {
       return field.onChange(
-        field.value?.filter((value: any) => value !== item.value)
+        field.value?.filter((value: number) => value !== item.value),
       );
     }
 
@@ -93,7 +94,7 @@ const CheckboxForm = <
           className={cn(
             "flex flex-col",
             isSkeletonLoading && "space-y-2.5",
-            className
+            className,
           )}
         >
           {isSkeletonLoading ? (
@@ -108,7 +109,11 @@ const CheckboxForm = <
             </>
           ) : (
             <>
-              {label && <FormLabel>{label}</FormLabel>}
+              {label && (
+                <FormLabel>
+                  {label} {required && <span className="text-red-500">*</span>}
+                </FormLabel>
+              )}
 
               <div className="flex flex-wrap gap-4">
                 {options.map((option) => {

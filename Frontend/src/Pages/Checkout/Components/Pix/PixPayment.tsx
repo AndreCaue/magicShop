@@ -13,7 +13,6 @@ type TPixPayment = {
   isModalOpen: boolean;
   loading?: boolean;
   setModalOpen: Dispatch<React.SetStateAction<boolean>>;
-  pixCopyPaste: string;
   data?: IPixDataResponse;
 };
 
@@ -79,7 +78,9 @@ export const PixPayment = ({
                     ) : (
                       <QRCode
                         value={
-                          data?.pix_copia_e_cola || "Chave pix não encontrada"
+                          data?.pix_copia_e_cola ||
+                          data?.pixCopiaECola ||
+                          "Chave pix não encontrada"
                         }
                       />
                     )}
@@ -95,7 +96,7 @@ export const PixPayment = ({
                   <p className="text-sm text-gray-400 mb-2">Chave PIX</p>
                   <div className="flex items-center justify-between gap-3">
                     <code className="text-sm sm:text-base font-mono break-all">
-                      {data?.pix_copia_e_cola}
+                      {data?.pix_copia_e_cola || data?.pixCopiaECola}
                     </code>
                     <button
                       onClick={handleCopyPix}

@@ -6,6 +6,7 @@ import { TheWholeOfAParte } from "@/Pages/Games/Maze/TheWholeOfAPart";
 import { HiddenItIs } from "@/Pages/Games/Maze/HiddenItIs";
 import { HalfIsHere } from "@/Pages/Games/Maze/HalfIsHere";
 import { OClock } from "@/Pages/Games/Maze/OCloak";
+import EnigmaGame from "@/Pages/Games/VB/EnigmaGame";
 
 export const Games = () => {
   return (
@@ -17,6 +18,7 @@ export const Games = () => {
       <Route element={<HalfIsHere />} path="metade-esta-aqui" />
       <Route element={<TheOtherHalf />} path="a-outra-metade" />
       <Route element={<OClock />} path="o-clock" />
+      <Route element={<EnigmaGame />} path="puzzle-1" />
     </Routes>
   );
 };

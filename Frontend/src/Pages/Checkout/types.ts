@@ -42,6 +42,7 @@ interface OrderUser {
 
 export interface IOrderResponse {
   id: number;
+  uuid: string;
   status: OrderStatus;
   payment_status: PaymentStatus;
   subtotal: number;
@@ -51,8 +52,7 @@ export interface IOrderResponse {
   shipping_method: string;
   shipping_carrier: string;
   total: number;
-  created_at: string; // ISO date string
-  reservation_expires_at: string; // ISO date string
+  expires_at: number; // seconds
   shipping: ShippingAddress;
   items: OrderItem[];
   user: OrderUser;

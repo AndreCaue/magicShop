@@ -6,7 +6,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Skeleton } from "../ui/skeleton";
-import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 import type {
   FieldPath,
   FieldValues,
@@ -15,23 +15,22 @@ import type {
 import type React from "react";
 import { cn } from "@/lib/utils";
 
-type TInputForm = {
+type TTextAreaForm = {
   required?: boolean;
   label?: string;
   restrictInput?: RegExp;
   onChangeValue?: (value: string) => void;
   isSkeletonLoading?: boolean;
   placeholder?: string;
-  iconPlaceholder?: React.ReactElement;
   maxLength?: number;
   background?: "light" | "dark";
   onBlur?: () => void;
   className?: string;
   disabled?: boolean;
-  type?: string;
+  rows?: number;
 };
 
-const InputForm = <
+const TextAreaForm = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
@@ -40,8 +39,6 @@ const InputForm = <
   control,
   name,
   required,
-  type = "text",
-  iconPlaceholder,
   onChangeValue,
   placeholder = "Digite ...",
   restrictInput,
@@ -50,7 +47,8 @@ const InputForm = <
   isSkeletonLoading,
   background = "light",
   disabled,
-}: TInputForm & UseControllerProps<TFieldValues, TName>) => {
+  rows = 4,
+}: TTextAreaForm & UseControllerProps<TFieldValues, TName>) => {
   return (
     <FormField
       control={control}
@@ -60,7 +58,7 @@ const InputForm = <
           {isSkeletonLoading ? (
             <>
               <Skeleton className="h-[23px] w-1/2 max-w-full" />
-              <Skeleton className="h-[40px] w-full max-w-full lg:h-[42px]" />
+              <Skeleton className="h-[90px] w-full max-w-full" />
             </>
           ) : (
             <>
@@ -78,10 +76,17 @@ const InputForm = <
               </FormLabel>
 
               <FormControl>
-                <Input
+                <Textarea
                   {...field}
+                  rows={rows}
                   placeholder={placeholder}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  maxLength={maxLength}
+                  disabled={disabled}
+                  className={cn(
+                    background === "dark" && "bg-transparent text-white",
+                    "h-5",
+                  )}
+                  onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
                     if (restrictInput)
                       event.target.value = event.target.value.replace(
                         restrictInput,
@@ -92,13 +97,9 @@ const InputForm = <
                     onChangeValue?.(event.target.value);
                   }}
                   onBlur={onBlur}
-                  background={background}
-                  maxLength={maxLength}
-                  type={type}
-                  icon={iconPlaceholder}
-                  disabled={disabled}
                 />
               </FormControl>
+
               <FormMessage />
             </>
           )}
@@ -108,6 +109,6 @@ const InputForm = <
   );
 };
 
-InputForm.displayName = "InputForm";
+TextAreaForm.displayName = "TextAreaForm";
 
-export { InputForm };
+export { TextAreaForm };
