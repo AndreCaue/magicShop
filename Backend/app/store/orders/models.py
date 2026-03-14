@@ -1,8 +1,10 @@
 import uuid
-from sqlalchemy import Column, Integer, Float, ForeignKey, String, DateTime
+from sqlalchemy import Column, Integer, Float, ForeignKey, String, DateTime, Enum as SqlEnum
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from app.database import Base
+from .enums import PaymentStatus, OrderStatus
+from app.payment.refund.enums import PaymentMethod
 
 
 class Order(Base):
@@ -18,13 +20,17 @@ class Order(Base):
     )
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    status = Column(String, default="pending")
-
+    status = Column(SqlEnum(OrderStatus), default=OrderStatus.PENDING)
+    payment_status = Column(SqlEnum(PaymentStatus),
+                            default=PaymentStatus.PENDING)
     efipay_charge_pix_id = Column(String, index=True, nullable=True)
     efipay_charge_card_id = Column(String, index=True, nullable=True)
-    payment_status = Column(String, default="aguardando_pagamento")
+
+    delivered_at = Column(DateTime, nullable=True, index=True)
+    shipped_at = Column(DateTime, nullable=True)
 
     paid_at = Column(DateTime, nullable=True)
+    payment_method = Column(SqlEnum(PaymentMethod), nullable=True)
     reservation_expires_at = Column(DateTime, nullable=True)
 
     shipping_carrier = Column(String, nullable=False)
@@ -38,7 +44,8 @@ class Order(Base):
     total = Column(Float)
 
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(
+        timezone.utc), onupdate=datetime.now(timezone.utc))
 
     # pix
     pix_charge = relationship(
@@ -52,6 +59,12 @@ class Order(Base):
         uselist=False,
         cascade="all, delete-orphan"
     )
+    refunds = relationship(
+        "RefundRequest",
+        back_populates="order",
+        cascade="all, delete-orphan",  # opcional: deleta refunds se order for deletado
+        passive_deletes=True
+    )
 
 
 class OrderItem(Base):
@@ -60,6 +73,7 @@ class OrderItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    product_name = Column(String(200), nullable=False)
     img_product = Column(String, nullable=True, default='')
     quantity = Column(Integer, nullable=False)
     unit_price = Column(Float, nullable=False)

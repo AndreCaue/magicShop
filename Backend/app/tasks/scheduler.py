@@ -23,8 +23,8 @@ async def cleanup_expired_reservations():
             db.query(Order)
             .filter(
                 Order.reservation_expires_at < now,
-                Order.status.in_(["pending", "awaiting_payment"]),
-                Order.payment_status == "aguardando_pagamento",
+                Order.status.in_(["PENDING"]),
+                Order.payment_status == "PENDING",
             )
             .all()
         )

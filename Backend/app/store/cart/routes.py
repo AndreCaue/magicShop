@@ -12,6 +12,7 @@ from app.schemas import UserOut
 from app.store.orders.models import Order, OrderItem, OrderShipping
 from datetime import datetime, timezone, timedelta
 import re
+from ..orders.enums import OrderStatus, PaymentStatus
 
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
@@ -105,22 +106,21 @@ def add_to_cart(
         cart_item = CartItem(
             cart_id=cart.id,
             product_id=product.id,
+            product_name=product.name,
             quantity=quantity,
             unit_price=product.price,
             total_price=product.price * quantity,
             discount=product.discount * quantity,
-            img_product=product.image_urls[0]
+            img_product=product.image_urls[0],
+            sku=product.sku,
 
         )
         db.add(cart_item)
 
     db.commit()
 
-    updated_cart = get_cart_with_items(db, user.id)
-
     return AddToCartResponse(
         message="Item adicionado ao carrinho com sucesso.",
-        cart=updated_cart
     )
 
 
@@ -186,14 +186,22 @@ async def checkout_cart(
 
     existing_order = db.query(Order).filter(
         Order.user_id == user.id,
-        Order.status.in_(["pending", "awaiting_payment"]),
+        Order.status == OrderStatus.PENDING,
         Order.reservation_expires_at > datetime.now(timezone.utc)
     ).first()
 
     if existing_order:
+        remaining_seconds = int(
+            (existing_order.reservation_expires_at.replace(
+                tzinfo=timezone.utc) - datetime.now(timezone.utc)).total_seconds()
+        )
+
         return {
-            "message": "Você já possui um pedido em andamento. Complete o pagamento.",
-            "redirect": f"/checkout/{existing_order.uuid}"
+            "message": f"Você já possui um pedido em andamento ou aguardando pagamento. Complete o pagamento ou espero até {existing_order.reservation_expires_at.isoformat()}.",
+            "redirect": f"/checkout/{existing_order.uuid}",
+            "expires_in_minutes": max(remaining_seconds // 60, 0),
+            "expires_in_seconds": max(remaining_seconds, 0),
+            "can_retry_after": existing_order.reservation_expires_at.isoformat()
         }
 
     cart = db.query(Cart).options(joinedload(Cart.items)).filter(
@@ -289,8 +297,8 @@ async def checkout_cart(
             user_id=user.id,
             subtotal=subtotal,
             total=total,
-            status="pending",
-            payment_status="aguardando_pagamento",
+            status=OrderStatus.PENDING,
+            payment_status=PaymentStatus.PENDING,
             reservation_expires_at=datetime.now(
                 timezone.utc) + timedelta(minutes=PRAZO_RESERVA_MINUTOS),
             shipping_carrier=selected.empresa,
@@ -322,10 +330,11 @@ async def checkout_cart(
             db.add(OrderItem(
                 order_id=order.id,
                 product_id=item.product_id,
+                product_name=item.product_name,
                 quantity=item.quantity,
                 unit_price=item.unit_price,
                 total_price=item.total_price,
-                img_product=product.image_urls[0]
+                img_product=item.img_product
             ))
             db.query(Product).filter(Product.id == item.product_id).update(
                 {Product.reserved_stock: Product.reserved_stock + item.quantity}
@@ -343,5 +352,6 @@ async def checkout_cart(
 
     return {
         "message": "Checkout realizado. Finalize o pagamento em até 30 minutos.",
-        "redirect": f"/checkout/{order.uuid}"
+        "redirect": f"/checkout/{order.uuid}",
+        "expires_in_seconds": PRAZO_RESERVA_MINUTOS * 60
     }

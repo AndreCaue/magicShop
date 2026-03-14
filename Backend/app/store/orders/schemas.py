@@ -1,16 +1,12 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
+from app.payment.refund.enums import PaymentMethod
 
 
 class OrderShippingOut(BaseModel):
-    street: str
-    number: str
-    complement: Optional[str] = None
-    neighborhood: str
-    city: str
-    state: str
-    postal_code: str
+    address: str
 
 
 class OrderItemOut(BaseModel):
@@ -29,8 +25,7 @@ class OrderUserOut(BaseModel):
 
 class OrderDetailOut(BaseModel):
     id: UUID
-    status: str
-    payment_status: str
+    uuid: str
     subtotal: float
     shipping_method: str
     shipping_carrier: str
@@ -38,10 +33,36 @@ class OrderDetailOut(BaseModel):
     shipping_discount: Optional[float] = 0
     shipping_original: float
     shipping_delivery_days: int
-    # Falta imagem da empresa do transporte, melhoria futura.
+    expires_at: Optional[int]
     total: float
-    created_at: Optional[str] = None
-    reservation_expires_at: Optional[str] = None
     user: Optional[OrderUserOut] = None
     shipping: Optional[OrderShippingOut] = None
     items: List[OrderItemOut]
+
+
+class HasOrderDetail(BaseModel):
+    success: bool
+    message: str
+    redirect: Optional[str]
+    expires_at: Optional[int] = None
+
+
+class OrderItemSummaryOut(BaseModel):
+    name: str
+    qty: int
+    price: float
+    order_item_id: int
+
+
+class OrderListItemOut(BaseModel):
+    id: UUID
+    short_id: str
+    status: str
+    total: float
+    created_at: datetime
+    items: List[OrderItemSummaryOut]
+    shipping_carrier: Optional[str]
+    payment_method: PaymentMethod
+    recipient_name: Optional[str]
+
+    model_config = {"from_attributes": True}

@@ -26,7 +26,8 @@ class PixCharge(Base):
     status = Column(String(50), default="ATIVA", index=True)
     order_id = Column(Integer, ForeignKey("orders.id"), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(
+        timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     paid_at = Column(DateTime, nullable=True)
     end_to_end_id = Column(String(100), unique=True, nullable=True)
 

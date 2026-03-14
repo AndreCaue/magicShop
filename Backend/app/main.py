@@ -16,6 +16,7 @@ from .payment.routes import router as payment_router
 from .core.routes import router as test_router
 from .payment.webhook.routes import router as webhook_router
 from .store.orders.routes import router as orders_router
+from .payment.refund.routes import router as refund_router
 from app.tasks.scheduler import start_scheduler, scheduler
 from contextlib import asynccontextmanager
 
@@ -95,6 +96,7 @@ app.include_router(payment_router)
 app.include_router(test_router)
 app.include_router(webhook_router)
 app.include_router(orders_router)
+app.include_router(refund_router)
 
 
 @app.get("/")

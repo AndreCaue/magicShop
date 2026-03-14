@@ -14,7 +14,8 @@ class Cart(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     status = Column(String, default="active")
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(
+        timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     items = relationship("CartItem", back_populates="cart",
                          cascade="all, delete-orphan")
@@ -26,11 +27,13 @@ class CartItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     cart_id = Column(Integer, ForeignKey("carts.id"), nullable=False)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    product_name = Column(String, nullable=False)
     quantity = Column(Integer, default=1)
     unit_price = Column(Float, nullable=False)
     total_price = Column(Float, nullable=False)
     img_product = Column(String, nullable=True)
     discount = Column(Float, nullable=True)
+    sku = Column(String(50), nullable=True)
 
     cart = relationship("Cart", back_populates="items")
     product = relationship("Product")

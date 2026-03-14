@@ -39,7 +39,6 @@ class AddToCartRequest(BaseModel):
 
 class AddToCartResponse(BaseModel):
     message: str
-    cart: CartResponse
 
 # Checkout
 

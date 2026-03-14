@@ -1,10 +1,13 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
+from app.payment.refund.enums import RefundReasonCode
+
 
 class ShippingPresetDropdown(BaseModel):
     id: int
     name: str
     model_config = ConfigDict(from_attributes=True)
+
 
 class ShippingPresetResponse(BaseModel):
     id: int
@@ -15,6 +18,7 @@ class ShippingPresetResponse(BaseModel):
     width_cm: float
     length_cm: float
     model_config = ConfigDict(from_attributes=True)
+
 
 class ShippingPresetCreate(BaseModel):
     name: str
@@ -27,6 +31,7 @@ class ShippingPresetCreate(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class ShippingPresetUpdate(BaseModel):
     name: Optional[str] = None
     weight_grams: Optional[int] = None
@@ -36,4 +41,21 @@ class ShippingPresetUpdate(BaseModel):
     length_cm: Optional[float] = None
     is_active: Optional[bool] = None
 
-    model_config = ConfigDict(from_attributes=True)    
+    model_config = ConfigDict(from_attributes=True)
+
+
+REFUND_REASON_METADATA = {
+    RefundReasonCode.DEFECTIVE_PRODUCT: (1, "Produto com defeito"),
+    RefundReasonCode.WRONG_PRODUCT: (2, "Produto errado enviado"),
+    RefundReasonCode.NOT_RECEIVED: (3, "Produto não recebido"),
+    RefundReasonCode.REGRET: (4, "Arrependimento (CDC 7 dias)"),
+    RefundReasonCode.DUPLICATE_ORDER: (5, "Pedido duplicado"),
+    RefundReasonCode.DAMAGED_IN_SHIPPING: (6, "Avariado no transporte"),
+    RefundReasonCode.OTHER: (7, "Outro motivo"),
+}
+
+
+class RefundReasonResponse(BaseModel):
+    id: int
+    code: RefundReasonCode
+    text: str

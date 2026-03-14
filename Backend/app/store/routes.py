@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List
 import httpx
 import os
+import uuid
 
 from app.auth.dependencies import get_db, require_master_full_access
 from app.store.models import Product
@@ -81,6 +82,12 @@ async def create_product(
         for img in images:
             url = await upload_to_imgbb(img)
             image_urls.append(url)
+    sku = f"DI-{uuid.uuid4().hex[:6].upper()}"
+
+    existing_product = db.query(Product).filter(Product.sku == sku).first()
+    if existing_product:
+        # Regera caso muito raro de colisão
+        sku = f"DI-{uuid.uuid4().hex[:6].upper()}"
 
     new_product = Product(
         name=name,
@@ -94,6 +101,7 @@ async def create_product(
         category_id=category_id,
         discount=discount,
         shipping_preset_id=preset_id,
+        sku=sku,
         image_urls=image_urls or None
     )
 

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, field_validator, Field, model_validator
 from typing import List, Optional
 from uuid import UUID
+from app.payment.refund.enums import RefundReasonCode
 
 
 class Item(BaseModel):
@@ -50,3 +51,13 @@ class PixRequest(BaseModel):
 class InstallmentsRequest(BaseModel):
     total_value: float
     brand: str
+
+
+class RefundRequest(BaseModel):
+    order_uuid: str
+    amount: Optional[int] = None
+
+
+class RefundEmailRequest(BaseModel):
+    email: str
+    reason_code: RefundReasonCode

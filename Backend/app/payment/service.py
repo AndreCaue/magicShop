@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 from app.core.config import settings
 from pycpfcnpj import cpfcnpj
 from uuid import UUID
+from ..store.orders.enums import OrderStatus, PaymentStatus
+from ..payment.refund.enums import PaymentMethod
 
 SANDBOX = settings.EFI_SANDBOX
 
@@ -24,6 +26,46 @@ class EfiService:
     def __init__(self, sandbox: bool = True):
         self.sandbox = sandbox
         self.client = EfiClient(sandbox=sandbox).efi
+
+    def release_stock(self, order, db):
+        for item in order.items:
+            product = db.query(Product).filter(
+                Product.id == item.product_id).first()
+            if product and product.reserved_stock >= item.quantity:
+                product.reserved_stock -= item.quantity
+
+    def reserve_stock(self, order, db):
+
+        try:
+            for item in order.items:
+                product = db.query(Product).filter(
+                    Product.id == item.product_id
+                ).first()
+
+                if product is None:
+                    continue
+
+                if product.reserved_stock is None:
+                    product.reserved_stock = 0
+
+                estoque_disponivel = product.stock - product.reserved_stock
+                if estoque_disponivel < item.quantity:
+                    raise ValueError(
+                        f"Estoque insuficiente para '{product.name}' "
+                        f"(disponível: {estoque_disponivel}, solicitado: {item.quantity})"
+                    )
+
+                product.reserved_stock += item.quantity
+                product.updated_at = datetime.now(timezone.utc)
+                db.add(product)
+
+            order.stock_reserved = True
+            order.updated_at = datetime.now(timezone.utc)
+            db.add(order)
+
+        except Exception as e:
+            db.rollback()
+            raise
 
     def get_pix_charge_details(self, txid: str) -> dict:
         """
@@ -71,7 +113,13 @@ class EfiService:
                     order.payment.status = "pago"
                     order.status = "confirmed"
                 elif current_status == 'EXPIRADA':
-                    order.payment_status = "expirado"
+                    if order:
+                        order.payment_status = PaymentStatus.EXPIRED
+
+                elif current_status == "REMOVIDA_PELO_USUARIO_RECEBEDOR":
+                    if (order):
+                        order.payment_status = PaymentStatus.CANCELED
+                        order.status = OrderStatus.CANCELED
 
                 db.commit()
                 db.refresh(existing)
@@ -94,6 +142,7 @@ class EfiService:
                     "charge_id": existing.id,
                     "warning": f"Não foi possível consultar status atual: {str(ve)}"
                 }
+
         solicitacao = f"{settings.STORE_NAME} - Pedido #{order.uuid}"
 
         body = {
@@ -171,7 +220,6 @@ class EfiService:
 
         for event in pix_events:
             txid = event.get("txid")
-
             if not txid:
                 continue
 
@@ -194,32 +242,49 @@ class EfiService:
             pix_charge.status = status
             pix_charge.updated_at = datetime.now(timezone.utc)
 
-            if status == "EXPIRADA" and pix_charge.order:
-                pix_charge.order.payment_status = "expirado"
+            order = pix_charge.order
 
             if status == "CONCLUIDA" and pix_list:
                 pix_charge.paid_at = datetime.now(timezone.utc)
                 pix_charge.end_to_end_id = pix_list[0].get("endToEndId")
 
-                if pix_charge.order:
-                    pix_charge.order.payment_status = "pago"
-                    pix_charge.order.status = "confirmed"
+                if order:
+                    pix_charge.order.payment_status = PaymentStatus.PAID
+                    pix_charge.order.status = OrderStatus.CONFIRMED
                     pix_charge.order.updated_at = datetime.now(timezone.utc)
+                    pix_charge.order.payment_method = PaymentMethod.PIX
+                    order.paid_at = datetime.now(timezone.utc)
+                    self.reserve_stock(order, db)
 
             elif status == "EXPIRADA":
-                if pix_charge:
-                    pix_charge.order.payment_status = "expirado"
-                    pix_charge.order.updated_at = datetime.now(timezone.utc)
+                if order:
+                    order.payment_status = PaymentStatus.EXPIRED
+                    order.status = OrderStatus.CANCELED
+                    order.updated_at = datetime.now(timezone.utc)
+
+                    self.release_stock(order, db)
 
             elif status == "REMOVIDA_PELO_USUARIO_RECEBEDOR":
-                if pix_charge.order:
-                    pix_charge.order.payment_status = "cancelado"
-                    pix_charge.order.updated_at = datetime.now(timezone.utc)
+                if order:
+                    order.payment_status = PaymentStatus.CANCELED
+                    order.status = OrderStatus.CANCELED
+                    order.updated_at = datetime.now(timezone.utc)
 
+                    self.release_stock(order, db)
             db.commit()
             processed_count += 1
 
         return {"processed": processed_count}
+
+    def configure_webhook(self, chave_pix: str, webhook_url: str) -> dict:
+        body = {"webhookUrl": webhook_url}
+        params = {"chave": chave_pix}
+
+        headers = {}
+        if self.sandbox:
+            headers["x-skip-mtls-checking"] = "true"
+        return self.client.pix_config_webhook(params=params, body=body, headers=headers)
+# Cartão
 
     def create_card_one_step(self, order_uuid: UUID, payment_token: str, installments: int, db: Session, user_id: int, name_on_card: str) -> dict:
         order = db.query(Order).filter(Order.uuid == str(order_uuid)).first()
@@ -239,7 +304,7 @@ class EfiService:
                 "Esse pedido está em processo de pagamento, seja por via cartão ou pix. Em caso de dúvida entre em contato com o suporte."
             )
 
-        if order.payment_status in ("pago", "approved", "capturado", "autorizado", "paid"):
+        if order.payment_status in (PaymentStatus.PAID):
             raise ValueError(
                 f"Pedido já processado com sucesso (status: {order.payment_status})"
             )
@@ -328,6 +393,7 @@ class EfiService:
 
             charge_data = result.get("data", {})
             charge_id = charge_data.get("charge_id")
+            charge_status = charge_data.get("status")
 
             if not charge_id:
                 order.payment_status = "erro_gateway"
@@ -337,6 +403,19 @@ class EfiService:
 
             order.efipay_charge_card_id = str(charge_id)
             order.updated_at = datetime.now(timezone.utc)
+
+            if charge_status in ("aprroved", "paid"):
+                if order.payment_status != PaymentStatus.PAID:
+                    self.reserve_stock(order, db)
+                    order.payment_status = PaymentStatus.PAID
+                    order.payment_method = PaymentMethod.CREDIT_CARD
+                    order.status = OrderStatus.CONFIRMED
+                    order.paid_at = datetime.now(timezone.utc)
+                    order.updated_at = datetime.now(timezone.utc)
+
+            elif charge_status in ("failed", "error"):
+                order.payment_status = PaymentStatus.FAILED
+                order.status = OrderStatus.CANCELED
 
             db.commit()
 
@@ -348,6 +427,7 @@ class EfiService:
                 "total": charge_data.get("total"),
                 "payment": charge_data.get("payment"),
             }
+
         except Exception as e:
             db.rollback()
             if isinstance(e, ValueError):
@@ -399,13 +479,52 @@ class EfiService:
         except Exception as e:
             raise ValueError(f"Erro ao buscar parcelas: {str(e)}")
 
-    def configure_webhook(self, chave_pix: str, webhook_url: str) -> dict:
-        body = {"webhookUrl": webhook_url}
-        params = {"chave": chave_pix}
+    def get_card_charge_details(self, charge_id: str | int) -> dict:
+        """Consulta detalhes da cobrança de cartão pela Efí."""
+        try:
+            response = self.client.detail_charge(params={"id": int(charge_id)})
+            if not isinstance(response, dict) or "data" not in response:
+                raise ValueError(
+                    "Resposta inválida ao consultar cobrança cartão")
+            return response.get("data", {})
+        except Exception as e:
+            raise ValueError(
+                f"Erro ao consultar cobrança cartão (id={charge_id}): {str(e)}")
 
-        print(f"self {self.sandbox}")
+    def refund_card_charge(self, charge_id: str | int, amount: int | None = None) -> dict:
+        """Solicita estorno (total ou parcial) de cobrança de cartão."""
+        body = {}
+        if amount is not None:
+            if amount <= 0:
+                raise ValueError("Amount deve ser positivo em centavos")
+            body["amount"] = amount
 
-        headers = {}
-        if self.sandbox:
-            headers["x-skip-mtls-checking"] = "true"
-        return self.client.pix_config_webhook(params=params, body=body, headers=headers)
+        try:
+
+            result = self.client.request(
+                method="POST",
+                endpoint=f"/v1/charge/card/{charge_id}/refund",
+                body=body or None
+            )
+
+            if not isinstance(result, dict) or result.get("code") not in (200, 201):
+                error_msg = result.get("error_description") or result.get(
+                    "mensagem") or "Erro desconhecido"
+                raise ValueError(
+                    f"Falha no estorno: {error_msg} (code: {result.get('code')})")
+
+            return {
+                "status": "success",
+                "message": result.get("message", "Estorno solicitado com sucesso"),
+                "response": result
+            }
+
+        except AttributeError as e:
+            raise AttributeError(
+                f"SDK não tem o método esperado (_make_request / post / call). "
+                f"Erro: {e}. Veja dir(self.client) ou código-fonte do EfiClient."
+            )
+
+        except Exception as e:
+            raise ValueError(
+                f"Erro ao solicitar estorno cartão (id={charge_id}): {str(e)}")

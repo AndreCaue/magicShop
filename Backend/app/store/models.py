@@ -13,6 +13,8 @@ class Product(Base):
     stock = Column(Integer, nullable=False,)
     reserved_stock = Column(Integer)
 
+    sku = Column(String(50), unique=True, nullable=True)
+
     shipping_preset_id = Column(
         Integer, ForeignKey("shipping_presets.id")
     )

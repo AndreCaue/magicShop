@@ -3,13 +3,14 @@ from .schemas import CartResponse, CartItemResponse
 from .models import Cart, CartItem
 from ...store.models import Product
 
+
 def get_cart_with_items(db: Session, user_id: int) -> CartResponse:
 
     cart = db.query(Cart).filter(
         Cart.user_id == user_id,
         Cart.status == 'active'
     ).first()
-    
+
     if not cart:
         return CartResponse(
             id=0,
@@ -18,7 +19,7 @@ def get_cart_with_items(db: Session, user_id: int) -> CartResponse:
             items=[],
             total=0.0
         )
-    
+
     cart_items = db.query(CartItem).filter(
         CartItem.cart_id == cart.id
     ).all()
@@ -44,12 +45,12 @@ def get_cart_with_items(db: Session, user_id: int) -> CartResponse:
             product_name=product.name,
             product_image_urls=product.image_urls or [],
             height=product.height_cm or 0.0,
-            width=product.width_cm or 0.0,  
+            width=product.width_cm or 0.0,
             weight=product.weight_grams or 0.0,
             length=product.length_cm or 0.0
         ))
 
-        total += cart_item.total_price - cart_item.discount
+        total += cart_item.total_price
 
     return CartResponse(
         id=cart.id,

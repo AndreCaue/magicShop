@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
-from .schemas import PixRequest, CardOneStepRequest, InstallmentsRequest
+from .schemas import PixRequest, CardOneStepRequest, InstallmentsRequest, RefundRequest, RefundEmailRequest
 from .models import PixCharge
 from app.store.orders.models import Order
 from sqlalchemy.orm import Session
@@ -8,6 +8,7 @@ from app.models import User
 import os
 from app.auth.dependencies import get_db, get_current_user
 from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime, timezone
 
 
 router = APIRouter(prefix="/payment", tags=["payment"])
@@ -42,7 +43,7 @@ def create_pix(
     if order.user_id != current_user.id:
         raise HTTPException(403, "Você não tem permissão para este pedido")
 
-    if order.payment_status != "aguardando_pagamento":
+    if order.payment_status != "pending":
         raise HTTPException(
             400, "Este pedido já foi processado ou está em outro status")
 
@@ -105,7 +106,6 @@ async def create_card_payment(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Erro ao processar pagamento com cartão: {str(e)}")
-    # OBS: verificar no pagamento do cartão se usa efipay_charge_id alterado para efipay_charge_card_id
 
 
 @router.post("/card/installments")
@@ -115,6 +115,45 @@ def get_installments(request: InstallmentsRequest):
         return {"success": True, "installments": result}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/refund-card")
+def refund_card(
+    data: RefundRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # parei aqui, verificar essa rota se é possivel testar sandbox.
+    # verificar para pix o mesmo.
+
+    order = db.query(Order).filter(Order.uuid == data.order_uuid).first()
+    if not order:
+        raise HTTPException(404, "Pedido não encontrado")
+    if order.user_id != current_user.id:
+        raise HTTPException(403, "Sem permissão")
+    if not order.efipay_charge_card_id:
+        raise HTTPException(400, "Pedido sem cobrança de cartão")
+
+    try:
+        details = service.get_card_charge_details(order.efipay_charge_card_id)
+        if details.get("status") != "paid":
+            raise HTTPException(
+                400, f"Status inválido para estorno: {details.get('status')}")
+
+        result = service.refund_card_charge(
+            charge_id=order.efipay_charge_card_id,
+            amount=data.amount
+        )
+
+        order.payment_status = "refunded"
+        order.updated_at = datetime.now(timezone.utc)
+        db.commit()
+
+        return result
+    except ValueError as ve:
+        raise HTTPException(400, str(ve))
+    except Exception as e:
+        raise HTTPException(500, f"Erro interno: {str(e)}")
 
 
 @router.post('/webhook/pix')
