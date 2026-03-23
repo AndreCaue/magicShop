@@ -5,6 +5,7 @@ import {
   ShoppingCart,
   MonitorPlay,
   GamepadDirectional,
+  ListOrdered,
 } from "lucide-react";
 
 import {
@@ -31,6 +32,8 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { useAuth } from "@/Hooks/useAuth";
+import { useEffect, useState } from "react";
+import { getSidebarOptions } from "@/Repositories/sidebar";
 
 type TItem = {
   id: number;
@@ -47,10 +50,24 @@ type TItem = {
     | undefined;
 };
 
+const iconMap: Record<string, any> = {
+  ShoppingCart,
+  Database,
+  MonitorPlay,
+  GamepadDirectional,
+  Settings,
+  User2,
+  ListOrdered,
+};
+
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
   const { setOpenMobile, setOpen } = useSidebar();
+  const [sidebarData, setSidebarData] = useState<{
+    items: TItem[];
+    userOptions: TItem;
+  } | null>(null);
 
   const handleClick = (id: number, URL: string) => {
     if (id === 91) {
@@ -61,100 +78,110 @@ export function AppSidebar() {
     setOpenMobile(false);
   };
 
-  const items: TItem[] = [
-    {
-      id: 1,
-      title: "Loja",
-      url: "/",
-      icon: ShoppingCart,
-      subItem: [
-        {
-          id: 10,
-          title: "Baralhos",
-          url: "/loja/baralhos",
-        },
-        {
-          id: 11,
-          title: "Acessórios",
-          url: "/loja/acessorios",
-        },
-        {
-          id: 12,
-          title: "Trukes",
-          url: "/loja/trukes",
-        },
-        {
-          id: 13,
-          title: "Marcas",
-          url: "/loja/marcas",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Conteúdo",
-      url: "/conteudo",
-      icon: MonitorPlay,
-      subItem: [
-        { id: 20, title: "Vídeos", url: "/conteudo/videos" },
-        { id: 21, title: "E-Books", url: "/conteudo/books" },
-      ],
-    },
-    {
-      id: 3,
-      title: "Jogos",
-      url: "/jogos",
-      icon: GamepadDirectional,
-      subItem: [{ id: 30, title: "Jogos", url: "/jogos" }],
-    },
+  useEffect(() => {
+    (async () => {
+      const res = await getSidebarOptions();
+      if (!res) return;
+      setSidebarData(res);
+    })();
+  }, []);
 
-    {
-      id: 5,
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-      subItem: [
-        { id: 50, title: "Em desenvolvimento", url: "/", disabled: true },
-      ],
-    },
-  ];
+  // const items: TItem[] = [
+  //   {
+  //     id: 1,
+  //     title: "Loja",
+  //     url: "/",
+  //     icon: ShoppingCart,
+  //     subItem: [
+  //       {
+  //         id: 10,
+  //         title: "Baralhos",
+  //         url: "/loja/baralhos",
+  //       },
+  //       {
+  //         id: 11,
+  //         title: "Acessórios",
+  //         url: "/loja/acessorios",
+  //       },
+  //       {
+  //         id: 12,
+  //         title: "Trukes",
+  //         url: "/loja/trukes",
+  //       },
+  //       {
+  //         id: 13,
+  //         title: "Marcas",
+  //         url: "/loja/marcas",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Conteúdo",
+  //     url: "/conteudo",
+  //     icon: MonitorPlay,
+  //     subItem: [
+  //       { id: 20, title: "Vídeos", url: "/conteudo/videos" },
+  //       { id: 21, title: "E-Books", url: "/conteudo/books" },
+  //     ],
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Jogos",
+  //     url: "/jogos",
+  //     icon: GamepadDirectional,
+  //     subItem: [{ id: 30, title: "Jogos", url: "/jogos" }],
+  //   },
 
-  const masterItems: TItem[] = [
-    {
-      id: 99,
-      title: "Cadastros",
-      url: "/",
-      icon: Database,
-      subItem: [
-        {
-          id: 11,
-          title: "Produtos",
-          url: "/master",
-        },
-      ],
-    },
-  ];
+  //   {
+  //     id: 5,
+  //     title: "Settings",
+  //     url: "#",
+  //     icon: Settings,
+  //     subItem: [
+  //       { id: 50, title: "Em desenvolvimento", url: "/", disabled: true },
+  //     ],
+  //   },
+  // ];
 
-  const userOptions: TItem = {
-    id: 9,
-    title: "Username",
-    url: "/login",
-    icon: User2,
-    subItem: [
-      {
-        id: 91,
-        title: "Logout",
-        url: "/login",
-      },
-      { id: 92, title: "Pedidos", url: "/user/pedidos" },
-      {
-        id: 93,
-        title: "User (em desenvolvimento)",
-        url: "/user",
-        disabled: true,
-      },
-    ],
-  };
+  // const masterItems: TItem[] = [
+  //   {
+  //     id: 99,
+  //     title: "Cadastros",
+  //     url: "/",
+  //     icon: Database,
+  //     subItem: [
+  //       {
+  //         id: 11,
+  //         title: "Produtos",
+  //         url: "/master",
+  //       },
+  //     ],
+  //   },
+  // ];
+
+  // const userOptions: TItem = {
+  //   id: 9,
+  //   title: "Username",
+  //   url: "/login",
+  //   icon: User2,
+  //   subItem: [
+  //     {
+  //       id: 91,
+  //       title: "Logout",
+  //       url: "/login",
+  //     },
+  //     { id: 92, title: "Pedidos", url: "/user/pedidos" },
+  //     {
+  //       id: 93,
+  //       title: "User (em desenvolvimento)",
+  //       url: "/user",
+  //       disabled: true,
+  //     },
+  //   ],
+  // };
+
+  const UserIcon = iconMap[sidebarData?.userOptions?.icon] ?? User2;
 
   const handleClickNavigate = (URL: string) => {
     navigate(URL);
@@ -168,38 +195,41 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent className="md:py-20 min-w-[250px]">
             <SidebarMenu>
-              {(user?.isMaster ? masterItems : items).map((item, index) => (
-                <Collapsible className="group/collapsible" key={index + 1}>
-                  <SidebarGroup key={index}>
-                    <SidebarGroupLabel asChild>
-                      <CollapsibleTrigger className="hover:bg-gray-100 gap-4 group-data-[state=open]/collapsible:bg-gray-200 cursor-pointer border">
-                        <item.icon />
-                        {item.title}
-                        <span className="ml-auto -rotate-90 transition-transform group-data-[state=open]/collapsible:-rotate-180 text-black">
-                          {item.subItem ? <>&spades;</> : null}
-                        </span>
-                      </CollapsibleTrigger>
-                    </SidebarGroupLabel>
-                    {item.subItem && item.subItem.length > 0
-                      ? item.subItem.map((sub, i) => (
-                          <CollapsibleContent
-                            className="flex pl-6 py-1"
-                            key={i}
-                          >
-                            <SidebarMenuButton
-                              onClick={() => handleClickNavigate(sub.url)}
-                              disabled={sub.disabled || false}
-                              className="cursor-pointer"
+              {(sidebarData?.items ?? []).map((item, index) => {
+                const IconComponent = iconMap[item.icon];
+                return (
+                  <Collapsible className="group/collapsible" key={index + 1}>
+                    <SidebarGroup key={index}>
+                      <SidebarGroupLabel asChild>
+                        <CollapsibleTrigger className="hover:bg-gray-100 gap-4 group-data-[state=open]/collapsible:bg-gray-200 cursor-pointer border">
+                          <IconComponent />
+                          {item.title}
+                          <span className="ml-auto -rotate-90 transition-transform group-data-[state=open]/collapsible:-rotate-180 text-black">
+                            {item.subItem ? <>&spades;</> : null}
+                          </span>
+                        </CollapsibleTrigger>
+                      </SidebarGroupLabel>
+                      {item.subItem && item.subItem.length > 0
+                        ? item.subItem.map((sub, i) => (
+                            <CollapsibleContent
+                              className="flex pl-6 py-1"
+                              key={i}
                             >
-                              <span className="mx-2 rotate-90">♠</span>
-                              {sub.title}
-                            </SidebarMenuButton>
-                          </CollapsibleContent>
-                        ))
-                      : null}
-                  </SidebarGroup>
-                </Collapsible>
-              ))}
+                              <SidebarMenuButton
+                                onClick={() => handleClickNavigate(sub.url)}
+                                disabled={sub.disabled || false}
+                                className="cursor-pointer"
+                              >
+                                <span className="mx-2 rotate-90">♠</span>
+                                {sub.title}
+                              </SidebarMenuButton>
+                            </CollapsibleContent>
+                          ))
+                        : null}
+                    </SidebarGroup>
+                  </Collapsible>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -209,8 +239,8 @@ export function AppSidebar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton>
-              <userOptions.icon />
-              {userOptions.title}
+              <UserIcon />
+              {sidebarData?.userOptions?.title}
               <span className="ml-auto transition-transform duration-200 -rotate-90 [button[data-state=open]_&]:rotate-0">
                 ♠
               </span>
@@ -220,8 +250,11 @@ export function AppSidebar() {
             side="top"
             className="gap-2 text-center flex flex-col"
           >
-            {userOptions.subItem?.map((item) => (
-              <DropdownMenuItem className="w-[250px] border mb-1 hover:bg-black hover:text-white hover:border-white cursor-pointer border-black rounded-full">
+            {sidebarData?.userOptions?.subItem?.map((item) => (
+              <DropdownMenuItem
+                key={item.id}
+                className="w-[250px] border mb-1 hover:bg-black hover:text-white hover:border-white cursor-pointer border-black rounded-full"
+              >
                 <button
                   className="cursor-pointer "
                   onClick={() => handleClick(item.id, item.url)}

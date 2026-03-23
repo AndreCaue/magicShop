@@ -74,7 +74,7 @@ export const ExpandedRow = ({
                 )}
                 <button className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-mono text-white/50 transition-colors hover:bg-white/10 hover:text-white/80">
                   <Package size={11} />
-                  Ver NF
+                  Ver +
                 </button>
               </div>
             </div>

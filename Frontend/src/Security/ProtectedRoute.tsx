@@ -1,12 +1,12 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/Hooks/useAuth";
-import { SimbolLoading } from "../components/new/CustomLoading/SimbolLoading";
+import { SymbolLoading } from "../components/new/CustomLoading/SymbolLoading";
 
 export const PrivateRoute = () => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
   if (loading) {
-    return <SimbolLoading />;
+    return <SymbolLoading />;
   }
 
   console.log(isAuthenticated, "Autenticado?");

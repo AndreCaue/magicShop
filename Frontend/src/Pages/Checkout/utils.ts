@@ -1,10 +1,14 @@
 import { getViaCep } from "@/Repositories/help";
 import { getEstadoPorUF } from "@/helpers/estados";
-import { getShippingPrice } from "@/Repositories/shipping/calculate";
-import { useShippingStore } from "@/stores/useShippingStore";
+import {
+  useShippingStore,
+  type ShippingOption,
+} from "@/stores/useShippingStore";
 import { useCart } from "@/Hooks/useCart";
 import type { UseFormSetValue } from "react-hook-form";
 import type { TForm } from "./types";
+import { getShippingPrice } from "@/Repositories/melhorenvio/frete";
+const CEP_ORIGEM = import.meta.env.VITE_CEP_ORIGEM;
 
 export const fetchAddressByCep = async (
   cep: string,
@@ -36,22 +40,24 @@ export const UseCalculateShipping = () => {
 
     try {
       const payload = {
+        itens: items.map((item) => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+        })),
         cep_destino: cleaned,
-        peso_gramas: items[0]?.weight || 500,
-        largura_cm: items[0]?.width || 16,
-        altura_cm: items[0]?.height || 6,
-        comprimento_cm: items[0]?.length || 23,
-        valor_declarado: items[0]?.unit_price || 0,
-        cep_origem: "13454183",
+        valor_declarado: items.reduce(
+          (acc, item) => acc + item.unit_price * item.quantity,
+          0,
+        ),
+        cep_origem: CEP_ORIGEM,
       };
 
-      const options = (await getShippingPrice(payload)).data;
+      const options: ShippingOption[] = await getShippingPrice(payload);
       if (options.length === 0) return;
 
       setShippingOptions(options);
-      const cheapest = options.reduce(
-        (prev: { preco: number }, curr: { preco: number }) =>
-          curr.preco < prev.preco ? curr : prev,
+      const cheapest = options.reduce((prev, curr) =>
+        curr.preco < prev.preco ? curr : prev,
       );
       setSelectedShipping(cheapest);
       setValue("frete_opcao", cheapest.id, { shouldValidate: true });

@@ -7,27 +7,25 @@ import {
   getOrderIfHas,
   type TGetOrderIfHas,
 } from "@/Repositories/payment/orders";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { HasOrderDialog } from "./HasOrderDialog";
+import { SymbolLoading } from "@/components/new/CustomLoading/SymbolLoading";
+import { useQuery } from "@tanstack/react-query";
 
 export const Checkout = () => {
   const { items } = useCart();
-  const [hasOrder, setHasOrder] = useState<TGetOrderIfHas>();
   const [isOpen, setOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const res = await getOrderIfHas();
-      console.log(res);
-      if (!res) return;
-      setOpen(res?.success);
-      setHasOrder(res);
-    })();
-  }, []);
+  const { data: hasOrder, isLoading } = useQuery<TGetOrderIfHas | null>({
+    queryKey: ["existingOrder"],
+    queryFn: () => getOrderIfHas(),
+  });
 
-  if (hasOrder)
+  if (hasOrder?.success)
     return <HasOrderDialog data={hasOrder} isOpen={isOpen} setOpen={setOpen} />;
+
+  if (isLoading) return <SymbolLoading />;
 
   return (
     <PageContainer>
@@ -38,6 +36,7 @@ export const Checkout = () => {
         </div>
       ) : (
         <div className=" text-white flex flex-col gap-5">
+          <SymbolLoading />
           <span className="text-2xl">Sem itens no carrinho</span>
           <SmokeLink goTo="/" textLabel="Voltar" />
         </div>

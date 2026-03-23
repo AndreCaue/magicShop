@@ -42,7 +42,7 @@ export const HasOrderDialog = ({ data, isOpen, setOpen }: THasOrderDialog) => {
         </DialogContent>
       </Dialog>
 
-      {data?.expires_at && (
+      {Boolean(data?.expires_at) && (
         <Contador
           initialSeconds={data?.expires_at}
           onExpire={() => navigate("/")}

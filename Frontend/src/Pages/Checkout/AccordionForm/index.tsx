@@ -70,7 +70,7 @@ export const AccordionForm = () => {
     <Accordion
       type="single"
       collapsible
-      className="w-full bg-gray-300 pb-20 col-span-2 rounded-lg"
+      className="min-w-[400px] w-full bg-gray-300 lg:pb-20 col-span-2 rounded-lg"
       value={activeStep}
     >
       <Form {...form}>

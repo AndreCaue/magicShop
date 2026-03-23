@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Images } from "./Components/Images";
 import { useCart } from "@/Hooks/useCart";
+import { SymbolLoading } from "@/components/new/CustomLoading/SymbolLoading";
 
 export const IndividualProduct = () => {
   const [product, setProduct] = useState<IProduct>({} as IProduct);
@@ -43,7 +44,7 @@ export const IndividualProduct = () => {
       <PageContainer>
         <div className="flex items-center justify-center h-96">
           <div className="animate-pulse text-muted-foreground">
-            Carregando produto...
+            <SymbolLoading /> Carregando produto...
           </div>
         </div>
       </PageContainer>

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import CartEmpty from "./CartEmpty";
@@ -9,7 +9,6 @@ import {
   type TGetOrderIfHas,
 } from "@/Repositories/payment/orders";
 
-import { toast } from "sonner";
 import { HasOrderDialog } from "../Checkout/HasOrderDialog";
 
 export default function CartPage() {
@@ -20,10 +19,7 @@ export default function CartPage() {
   useEffect(() => {
     (async () => {
       const res = await getOrderIfHas();
-      if (!res?.success)
-        return toast.error(
-          "Algo deu errado, recarregue a pagina ou entre em contato com o suporte.",
-        );
+      if (!res?.success) return;
       setOpen(res?.success);
       setHasOrder(res);
     })();

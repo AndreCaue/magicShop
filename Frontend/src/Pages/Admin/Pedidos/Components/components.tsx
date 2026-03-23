@@ -7,7 +7,6 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
-import type { IOrder } from "./OrdersPage";
 
 export type TOrderStatus =
   | "pending"

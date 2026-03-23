@@ -2,6 +2,7 @@ import type { IOrderResponse } from "@/Pages/Checkout/types";
 import api from "../../axiosInstance";
 import axios from "axios";
 import { toast } from "sonner";
+import { handleErrorReq } from "@/helpers/generics";
 
 export const getPaymentOrder = async ({
   order_uuid,
@@ -71,7 +72,8 @@ export const getUserOrderList = async () => {
     const response = await api.get<TGetUserOrderList[]>("/orders/list");
 
     return response.data;
-  } catch (err: any) {
-    console.log(err);
+  } catch (err) {
+    handleErrorReq(err);
+    throw err;
   }
 };

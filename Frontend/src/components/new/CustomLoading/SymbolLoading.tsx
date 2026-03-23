@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const symbols = ["♠", "♥", "♦", "♣"];
 
-export const SimbolLoading = () => {
+export const SymbolLoading = () => {
   return (
     <div className="flex flex-col items-center justify-center">
       <motion.div

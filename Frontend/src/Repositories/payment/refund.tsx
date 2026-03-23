@@ -1,5 +1,5 @@
 import api from "@/axiosInstance";
-import { handleError } from "@/helpers/generics";
+import { handleErrorReq } from "@/helpers/generics";
 
 type TItemRefund = {
   order_item_id: number;
@@ -19,6 +19,6 @@ export const createRefundRequest = async (params: TCreateRefundRequest) => {
 
     return res.data;
   } catch (err) {
-    handleError(err);
+    handleErrorReq(err);
   }
 };

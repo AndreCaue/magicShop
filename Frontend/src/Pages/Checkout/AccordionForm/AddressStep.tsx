@@ -16,7 +16,9 @@ import {
   type ShippingOption,
 } from "@/stores/useShippingStore";
 import { useCart } from "@/Hooks/useCart";
-import { getShippingPrice } from "@/Repositories/shipping/calculate";
+import { getShippingPrice } from "@/Repositories/melhorenvio/frete";
+
+const CEP_ORIGEM = import.meta.env.VITE_CEP_ORIGEM;
 
 type Props = {
   navigateToSteps: (
@@ -96,16 +98,19 @@ export default function AddressStep({
 
     try {
       const payload = {
+        itens: items.map((item) => ({
+          product_id: item.product_id, // ajuste para o nome do campo item
+          quantity: item.quantity,
+        })),
         cep_destino: cleanedCep,
-        peso_gramas: items[0]?.weight || 500,
-        largura_cm: items[0]?.width || 16,
-        altura_cm: items[0]?.height || 6,
-        comprimento_cm: items[0]?.length || 23,
-        valor_declarado: items[0]?.unit_price || 0,
-        cep_origem: "13454056",
+        valor_declarado: items.reduce(
+          (acc, item) => acc + item.unit_price * item.quantity,
+          0,
+        ),
+        cep_origem: CEP_ORIGEM,
       };
 
-      const options: ShippingOption[] = (await getShippingPrice(payload)).data;
+      const options: ShippingOption[] = await getShippingPrice(payload);
 
       if (options.length === 0) {
         setShippingOptions([]);

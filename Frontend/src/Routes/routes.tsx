@@ -16,6 +16,7 @@ import { Register } from "@/Pages/Login/subPages/Register/Register";
 import { Games } from "./Games";
 import { CheckoutPayment } from "@/Pages/Checkout/CheckoutPayment";
 import OrdersPage from "@/Pages/User/Orders/OrdersPage";
+import AdminOrdersPage from "@/Pages/Admin/Pedidos";
 
 export const AppRoutes = () => {
   return (
@@ -60,6 +61,7 @@ export const AppRoutes = () => {
 
       <Route element={<MasterProtectedRouter />}>
         <Route path="/master" element={<EspecialRoutes />} />
+        <Route path="/master/pedidos" element={<AdminOrdersPage />} />
       </Route>
 
       {/* <Route path="*" element={<Navigate to={"/login"} replace />} /> */}

@@ -29,7 +29,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Header, StatusBadge, type TOrderStatus } from "./componentes";
 import { ExpandedRow } from "./Components/ExpandedRow";
-import { SimbolLoading } from "@/components/new/CustomLoading/SimbolLoading";
+import { SymbolLoading } from "@/components/new/CustomLoading/SymbolLoading";
 import { DialogRefund } from "./Components/DialogRefund";
 
 // PENDING = "pending"            # pedido criado
@@ -161,7 +161,7 @@ export default function OrdersPage() {
 
   const STATUS_FILTERS: { value: TOrderStatus | "all"; label: string }[] = [
     { value: "all", label: "Todos" },
-    { value: "pending", label: "Pendentes" },
+    { value: "pending", label: "Pendentes" }, // verificar no banckend como mudar status quando vencido.
     { value: "processing", label: "Preparação para envio" },
     { value: "shipped", label: "Em trânsito" },
     { value: "delivered", label: "Entregues" },
@@ -175,7 +175,7 @@ export default function OrdersPage() {
       {isError ? (
         <>Deu erro tente novamente.</>
       ) : ordersLoading ? (
-        <SimbolLoading />
+        <SymbolLoading />
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 font-sans pt-20">
           <main
@@ -191,7 +191,7 @@ export default function OrdersPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               >
-                <Header />
+                <Header ordersLength={orders?.length} />
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div className="relative w-full max-w-xs">
                     <Search

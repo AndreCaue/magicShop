@@ -55,7 +55,7 @@ export const formatDate = (date: string) => {
   return format(date, "dd/MM/yyyy", { locale: ptBR });
 };
 
-export const handleError = (err: unknown) => {
+export const handleErrorReq = (err: unknown) => {
   if (axios.isAxiosError(err)) {
     return null;
   }

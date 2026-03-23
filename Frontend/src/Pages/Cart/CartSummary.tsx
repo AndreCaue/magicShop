@@ -5,12 +5,13 @@ import {
   useShippingStore,
   type ShippingOption,
 } from "@/stores/useShippingStore";
-import { getShippingPrice } from "@/Repositories/shipping/calculate";
 import { Link } from "react-router-dom";
 import { Loader2, Truck, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ShippingPrice } from "../Checkout/Components/ShippingPrice";
 import { RadioSuit } from "./Components/CustomRadio";
+import { getShippingPrice } from "@/Repositories/melhorenvio/frete";
+const CEP_ORIGEM = import.meta.env.VITE_CEP_ORIGEM;
 
 export default function CartSummary() {
   const { subtotal, items, discount } = useCart();
@@ -53,16 +54,19 @@ export default function CartSummary() {
 
     try {
       const payload = {
+        itens: items.map((item) => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+        })),
         cep_destino: cleanedCep,
-        peso_gramas: items[0]?.weight || 500,
-        largura_cm: items[0]?.width || 16,
-        altura_cm: items[0]?.height || 6,
-        comprimento_cm: items[0]?.length || 23,
-        valor_declarado: items[0]?.unit_price || 0,
-        cep_origem: "13454056",
+        valor_declarado: items.reduce(
+          (acc, item) => acc + item.unit_price * item.quantity,
+          0,
+        ),
+        cep_origem: CEP_ORIGEM,
       };
 
-      const options: ShippingOption[] = (await getShippingPrice(payload)).data;
+      const options: ShippingOption[] = await getShippingPrice(payload); // .data?
 
       if (options.length === 0) {
         setError("Nenhuma opção de entrega disponível para este CEP");

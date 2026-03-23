@@ -51,7 +51,7 @@ export const LogoTitle = ({ isMobile }: { isMobile?: boolean }) => {
         }}
         className={cn(
           "text-slate-200 absolute -bottom-8 left-[25%] -rotate-45",
-          "ex564"
+          "ex564",
         )}
       >
         D
@@ -65,7 +65,7 @@ export const LogoTitle = ({ isMobile }: { isMobile?: boolean }) => {
         }}
         className={cn(
           "text-white absolute left-[40%] -bottom-7 rotate-40",
-          "ex564"
+          "ex564",
         )}
       >
         I
