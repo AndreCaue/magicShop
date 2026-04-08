@@ -13,7 +13,8 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
         raise Exception("RESEND_API_KEY NÃO DEFINIDA EM PRODUÇÃO")
 
     if settings.ENVIRONMENT == "production":
-         from_email = "Doce Ilusão <lojamagica@doceilusao.store>"
+        # Verificar isso aqui em prod.
+        from_email = "Doce Ilusão <lojamagica@doceilusao.store>"
     else:
         from_email = (
             os.getenv("FROM_EMAIL_DEV")
@@ -67,7 +68,8 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
         smtp_pass = os.getenv("SMTP_PASS")
 
         if not smtp_user or not smtp_pass:
-            raise ValueError("SMTP_USER e SMTP_PASS são obrigatórios em development")
+            raise ValueError(
+                "SMTP_USER e SMTP_PASS são obrigatórios em development")
 
         msg = MIMEMultipart("alternative")
         msg["From"] = from_email
@@ -83,12 +85,10 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
                 server.login(smtp_user, smtp_pass)
                 server.send_message(msg)
 
-
         except Exception as e:
             print("❌ EXCEÇÃO AO ENVIAR EMAIL VIA SMTP")
             print(str(e))
             raise
-
 
 
 async def send_reset_password_email(to_email: str, username: str, reset_link: str):
@@ -160,4 +160,3 @@ async def send_reset_password_email(to_email: str, username: str, reset_link: st
             server.starttls()
             server.login(smtp_user, smtp_pass)
             server.send_message(msg)
-
