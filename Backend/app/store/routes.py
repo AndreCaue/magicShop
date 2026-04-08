@@ -1,66 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
-from sqlalchemy.orm import Session, joinedload
-from typing import List
-import httpx
-import os
-import uuid
+from fastapi import APIRouter, Depends, status, UploadFile, File, Form
+from sqlalchemy.orm import Session
+from typing import List, Optional
 
 from app.auth.dependencies import get_db, require_master_full_access
-from app.store.models import Product
-from app.store.schemas import ProductResponse
+from app.store.schemas import ProductResponse, ProductOption
+from app.store.service import ProductService
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
-IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
-
-
-async def upload_to_imgbb(image: UploadFile, api_key: str = IMGBB_API_KEY):
-    if not api_key:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Chave de API do ImgBB não configurada."
-        )
-    allowed_types = ["image/jpeg", "image/png"]
-    if image.content_type not in allowed_types:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Tipo de imagem inválido. Tipos permitidos: {', '.join(allowed_types)}"
-        )
-    url = "https://api.imgbb.com/1/upload"
-    async with httpx.AsyncClient() as client:
-        try:
-            content = await image.read()
-            files = {"image": (image.filename, content, image.content_type)}
-            data = {"key": api_key}
-            response = await client.post(url, files=files, data=data)
-            response.raise_for_status()
-            return response.json()["data"]["url"]
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Erro ao fazer upload da imagem: {str(e)}"
-            )
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Erro inesperado ao fazer upload: {str(e)}"
-            )
-
 
 @router.get("", response_model=List[ProductResponse])
-async def list_products(
-    db: Session = Depends(get_db),
-):
-    products = db.query(Product).options(joinedload(Product.category)).all()
-    return products
+async def list_products(db: Session = Depends(get_db)):
+    service = ProductService(db)
+    return service.list_products()
 
 
 @router.post("/register", response_model=ProductResponse, status_code=status.HTTP_201_CREATED,
-             dependencies=[Depends(require_master_full_access)]
-             )
+             dependencies=[Depends(require_master_full_access)])
 async def create_product(
     name: str = Form(...),
-    description: str = Form(None),
+    description: Optional[str] = Form(None),
     price: float = Form(...),
     stock: int = Form(...),
     weight_grams: int = Form(..., gt=0),
@@ -73,23 +32,8 @@ async def create_product(
     images: List[UploadFile] = File(None),
     db: Session = Depends(get_db),
 ):
-    if height_cm + width_cm + length_cm > 200:
-        raise HTTPException(
-            status_code=400, detail="Soma das dimensões excede 200cm (limite Correios)")
-
-    image_urls = []
-    if images:
-        for img in images:
-            url = await upload_to_imgbb(img)
-            image_urls.append(url)
-    sku = f"DI-{uuid.uuid4().hex[:6].upper()}"
-
-    existing_product = db.query(Product).filter(Product.sku == sku).first()
-    if existing_product:
-        # Regera caso muito raro de colisão
-        sku = f"DI-{uuid.uuid4().hex[:6].upper()}"
-
-    new_product = Product(
+    service = ProductService(db)
+    product = await service.create_product(
         name=name,
         description=description,
         price=price,
@@ -99,26 +43,61 @@ async def create_product(
         width_cm=width_cm,
         length_cm=length_cm,
         category_id=category_id,
+        preset_id=preset_id,
         discount=discount,
-        shipping_preset_id=preset_id,
-        sku=sku,
-        image_urls=image_urls or None
+        images=images,
     )
+    return ProductResponse.model_validate(product, from_attributes=True)
 
-    db.add(new_product)
-    db.commit()
-    db.refresh(new_product)
 
-    return ProductResponse.model_validate(new_product, from_attributes=True)
+@router.get("/options", response_model=List[ProductOption])
+async def get_product_options(db: Session = Depends(get_db)):
+    service = ProductService(db)
+    return service.get_product_options()
 
 
 @router.get("/{product_id}", response_model=ProductResponse)
-async def get_product_by_id(
+async def get_product_by_id(product_id: int, db: Session = Depends(get_db)):
+    service = ProductService(db)
+    product = service.get_product(product_id)
+    return ProductResponse.model_validate(product, from_attributes=True)
+
+
+@router.put("/{product_id}", response_model=ProductResponse, dependencies=[Depends(require_master_full_access)])
+async def update_product(
     product_id: int,
+    name: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    price: Optional[float] = Form(None),
+    stock: Optional[int] = Form(None),
+    weight_grams: Optional[int] = Form(None, gt=0),
+    height_cm: Optional[float] = Form(None, ge=1, le=105),
+    width_cm: Optional[float] = Form(None, ge=1, le=105),
+    length_cm: Optional[float] = Form(None, ge=1, le=105),
+    category_id: Optional[int] = Form(None),
+    preset_id: Optional[int] = Form(None),
+    discount: Optional[float] = Form(None, ge=0),
+    images: Optional[List[UploadFile]] = File(None),
+    replace_images: bool = Form(False),
+    delete_image_indices: Optional[List[int]] = Form(None),
     db: Session = Depends(get_db),
 ):
-    product = db.query(Product).options(joinedload(
-        Product.category)).filter(Product.id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Produto não encontrado.")
-    return product
+    service = ProductService(db)
+    product = await service.update_product(
+        product_id=product_id,
+        name=name,
+        description=description,
+        price=price,
+        stock=stock,
+        weight_grams=weight_grams,
+        height_cm=height_cm,
+        width_cm=width_cm,
+        length_cm=length_cm,
+        category_id=category_id,
+        preset_id=preset_id,
+        discount=discount,
+        images=images,
+        replace_images=replace_images,
+        delete_image_indices=delete_image_indices,
+    )
+    return ProductResponse.model_validate(product, from_attributes=True)

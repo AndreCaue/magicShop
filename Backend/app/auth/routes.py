@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Security, Response, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
 import secrets
@@ -10,10 +11,11 @@ from uuid import uuid4
 from .. import models, schemas
 from .schemas import ForgotPasswordRequest, ResetPasswordRequest
 from ..database import SessionLocal
-from .dependencies import get_current_user, get_current_user_from_cookie
+from .dependencies import get_current_user, get_current_user_from_cookie, require_master_full_access
 from .email_service import send_verification_email, send_reset_password_email
 from .jwt import decode_token, hash_password, verify_password, create_access_token, save_refresh_token, RefreshToken, revoke_refresh_token, is_refresh_token_valid, create_reset_password_token, verify_reset_password_token
 from ..core.config import settings
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -41,11 +43,16 @@ def generate_verification_code():
 
 
 @router.post("/register", response_model=schemas.UserOut)
-def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def register(request: Request, user: schemas.UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(models.User).filter(
         models.User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email já cadastrado")
+
+    if len(user.password) < 6:
+        raise HTTPException(
+            status_code=400, datail='Senha deve ter 6 caracteres')
 
     hashed_pw = hash_password(user.password)
 
@@ -73,7 +80,9 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/verify", response_model=schemas.VerifyEmailResponse)
+@limiter.limit("5/minute")
 def verify_email(
+    request: Request,
     data: schemas.VerifyEmailRequest,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
@@ -117,18 +126,20 @@ def verify_email(
 
 
 @router.post("/forgot-password")
+@limiter.limit("3/minute")
 async def forgot_password(
-    request: ForgotPasswordRequest,
+    request: Request,
+    body: ForgotPasswordRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     user = db.query(models.User).filter(
-        models.User.email == request.email.lower()).first()
+        models.User.email == body.email.lower()).first()
 
     if not user:
         return {"message": "Se o e-mail estiver cadastrado, enviaremos um link de recuperação."}
 
-    reset_token = create_reset_password_token(user_id=user.id)
+    reset_token = create_reset_password_token(user_uuid=user.uuid)
 
     if settings.ENVIRONMENT == 'production':
         reset_link = f"https://doceilusao.store/reset_password?token={reset_token}"
@@ -146,17 +157,19 @@ async def forgot_password(
 
 
 @router.post("/reset-password")
+@limiter.limit("3/minute")
 def reset_password(
-    request: ResetPasswordRequest,
+    request: Request,
+    body: ResetPasswordRequest,
     db: Session = Depends(get_db)
 ):
-    user_id = verify_reset_password_token(request.token)
+    user_uuid = verify_reset_password_token(body.token)
 
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(models.User).filter(models.User.uuid == user_uuid).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    hashed_password = hash_password(request.new_password)
+    hashed_password = hash_password(body.new_password)
 
     user.password = hashed_password
     user.updated_at = datetime.now(timezone.utc)
@@ -167,7 +180,9 @@ def reset_password(
 
 
 @router.post("/token", response_model=schemas.Token)
+@limiter.limit("10/minute")
 def login(
+    request: Request,
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
@@ -244,24 +259,28 @@ def basic_area(current_user: models.User = Security(get_current_user, scopes=["b
 def premium_area(current_user: models.User = Security(get_current_user, scopes=["premium"])):
     return {"message": f"Acesso premium concedido para {current_user.email}"}
 
+class UpgradeUserRequest(BaseModel): # mover de lugar.
+    user_uuid: str
+
 
 @router.put("/upgrade")
 def upgrade_user_to_premium(
-    current_user: models.User = Security(get_current_user, scopes=["basic"]),
-    db: Session = Depends(get_db)
+    body: UpgradeUserRequest,
+    current_admin: models.User = Security(require_master_full_access),
+    db: Session = Depends(get_db),
 ):
+    """Promove um usuário para premium. Apenas master pode executar esta ação."""
     db_user = db.query(models.User).filter(
-        models.User.id == current_user.id).first()
+        models.User.uuid == body.user_uuid).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    if "premium" not in db_user.scopes:
-        db_user.scopes.append("premium")
+    if "premium" not in (db_user.scopes or []):
+        db_user.scopes = list(db_user.scopes or []) + ["premium"]
         db.commit()
         db.refresh(db_user)
 
     return {"message": f"Usuário {db_user.email} agora é premium!", "scopes": db_user.scopes}
-
 
 @router.post("/refresh", response_model=schemas.Token)
 def refresh_token(

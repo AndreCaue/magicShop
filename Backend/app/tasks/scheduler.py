@@ -1,11 +1,14 @@
-# app/tasks/scheduler.py
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-from app.auth.dependencies import get_db  # ou SessionLocal se for sync
-from app.store.orders.models import Order, OrderItem  # ajuste o import
-from app.store.models import Product  # ajuste
+import logging
+from app.database import SessionLocal
+from app.store.orders.models import Order, OrderItem
+from app.store.models import Product
+from app.store.orders.enums import OrderStatus, PaymentStatus
+
+logger = logging.getLogger(__name__)
 
 scheduler = AsyncIOScheduler()
 
@@ -15,7 +18,7 @@ async def cleanup_expired_reservations():
     Limpa reservas expiradas de pedidos não pagos.
     Roda a cada X minutos (ex: 5 ou 10 min). 6h
     """
-    db: Session = next(get_db())  # ou SessionLocal() se sync
+    db: Session = SessionLocal()
 
     try:
         now = datetime.now(timezone.utc)
@@ -23,8 +26,8 @@ async def cleanup_expired_reservations():
             db.query(Order)
             .filter(
                 Order.reservation_expires_at < now,
-                Order.status.in_(["PENDING"]),
-                Order.payment_status == "PENDING",
+                Order.status == OrderStatus.PENDING,  
+                Order.payment_status == PaymentStatus.PENDING, 
             )
             .all()
         )
@@ -37,16 +40,21 @@ async def cleanup_expired_reservations():
                 product = db.query(Product).filter(
                     Product.id == item.product_id).first()
                 if product:
-                    product.reserved_stock -= item.quantity
+                    product.reserved_stock = max(
+                        0, (product.reserved_stock or 0) - (item.quantity or 0)
+                    )
 
+            order.status = OrderStatus.CANCELED
+            order.payment_status = PaymentStatus.CANCELED
             order.reservation_expires_at = None
+            order.updated_at = datetime.now(timezone.utc)
 
         db.commit()
-        print(f"[Cleanup] {len(expired_orders)} reservas expiradas liberadas.")
+        logger.info(f"[Cleanup] {len(expired_orders)} reservas expiradas liberadas.")
 
     except Exception as e:
         db.rollback()
-        print(f"[Cleanup Error] {e}")
+        logger.error(f"[Cleanup] Erro ao limpar reservas expiradas: {e}", exc_info=True)
     finally:
         db.close()
 
@@ -61,4 +69,4 @@ def start_scheduler():
     )
 
     scheduler.start()
-    print("Scheduler iniciado: cleanup de reservas a cada 10 min")
+    logger.info("Scheduler iniciado: cleanup de reservas expiradas a cada 6 horas")

@@ -1,16 +1,26 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from sqlalchemy.orm import Session
+import logging
 from app.auth.dependencies import get_db
+from app.core.webhook_auth import verify_efipay_webhook_token
 from app.store.orders.models import Order
 from datetime import datetime, timezone
 from app.store.orders.enums import OrderStatus, PaymentStatus
 from app.payment.service import EfiService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/webhook", tags=["Webhook"])
 
 
 @router.post("/efipay")
 async def efipay_webhook(request: Request, db: Session = Depends(get_db)):
+    """
+    Webhook da Efí para cobranças de cartão.
+    URL deve incluir: ?webhook_token=<WEBHOOK_SECRET>
+    """
+    verify_efipay_webhook_token(request)
+
     try:
         payload = await request.json()
     except Exception:
@@ -35,7 +45,7 @@ async def efipay_webhook(request: Request, db: Session = Depends(get_db)):
     if not order:
         return {"received": True, "warning": "Pedido não encontrado"}
 
-    # 🔒 evita reprocessamento
+    # Evita reprocessamento
     if order.payment_status == PaymentStatus.PAID and status == "confirmed":
         return {"received": True, "ignored": "já pago"}
 
@@ -71,18 +81,9 @@ async def efipay_webhook(request: Request, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(500, "Erro ao atualizar pedido")
 
+    logger.info(f"Webhook EfiPay processado: order={order.uuid}, status={status}")
     return {
         "received": True,
-        "order_id": order.id,
+        "order_id": order.uuid,
         "status": status,
-    }
-
-
-@router.get("/efipay/test")
-async def test_webhook_endpoint():
-    """Endpoint de teste para verificar se o webhook está acessível"""
-    return {
-        "status": "ok",
-        "message": "Webhook endpoint Efipay está funcionando!",
-        "timestamp": datetime.now(timezone.utc).isoformat()
     }

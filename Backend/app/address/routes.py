@@ -90,5 +90,5 @@ async def buscar_cep(
         except Exception as fallback_error:
             raise HTTPException(
                 status_code=503,
-                detail="Serviço de CEP temporariamente indisponível. Tente novamente mais tarde."
+                detail="Serviço de CEP temporariamente indisponível ou CEP Inválido. Tente novamente mais tarde."
             )

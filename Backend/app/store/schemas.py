@@ -8,7 +8,9 @@ class ProductBase(BaseModel):
     description: Optional[str] = Field(None, max_length=2000)
     price: float = Field(..., ge=0.01, description="Preço em reais")
     stock: int = Field(..., ge=0)
+    reserved_stock: int | None = None
     image_urls: Optional[List[str]] = None
+    sku: Optional[str] = None
     category_id: int = Field(..., gt=0)
     shipping_preset_id: int = Field(..., gt=0)
 
@@ -19,8 +21,8 @@ class ProductBase(BaseModel):
     width_cm: float = Field(..., ge=1, le=105, description="Largura em cm")
     length_cm: float = Field(..., ge=1, le=105,
                              description="Comprimento em cm")
-    discount: float = Field(..., ge=0.01,
-                            description="Desconto propocional ao frete.")
+    discount: Optional[float] = Field(None, ge=0,
+                                      description="Desconto proporcional ao frete.")
 
     @field_validator("height_cm", "width_cm", "length_cm")
     @classmethod
@@ -55,6 +57,13 @@ class ProductResponse(ProductBase):
         from_attributes=True,
         populate_by_name=True,
     )
+
+
+class ProductOption(BaseModel):
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CartItemFrete(BaseModel):

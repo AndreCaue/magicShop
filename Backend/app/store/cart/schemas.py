@@ -22,7 +22,6 @@ class CartItemResponse(BaseModel):
 
 class CartResponse(BaseModel):
     id: int
-    user_id: int
     status: str
     items: List[CartItemResponse]
     discount: Optional[float] | None = None
@@ -40,10 +39,9 @@ class AddToCartRequest(BaseModel):
 class AddToCartResponse(BaseModel):
     message: str
 
-# Checkout
-
 
 class CheckoutRequest(BaseModel):
+    cart_id: int
     recipient_name: str = Field(..., min_length=3)
     recipient_document: str = Field(..., min_length=11, max_length=14)
     recipient_email: EmailStr
@@ -54,7 +52,7 @@ class CheckoutRequest(BaseModel):
     complement: Optional[str] = None
     neighborhood: str
     city: str
-    state: str = Field(..., min_length=2, max_length=2)  # ex: "SP"
+    state: str = Field(..., min_length=2, max_length=2) 
     postal_code: str = Field(..., min_length=8, max_length=8)
     shipping_option_id: int
 

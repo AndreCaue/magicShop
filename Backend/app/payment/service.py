@@ -10,6 +10,7 @@ from pycpfcnpj import cpfcnpj
 from uuid import UUID
 from ..store.orders.enums import OrderStatus, PaymentStatus
 from ..payment.refund.enums import PaymentMethod
+from app.melhorenvio.service import registrar_envio_cart, gerar_etiqueta_melhor_envio
 
 SANDBOX = settings.EFI_SANDBOX
 
@@ -28,11 +29,27 @@ class EfiService:
         self.client = EfiClient(sandbox=sandbox).efi
 
     def release_stock(self, order, db):
-        for item in order.items:
-            product = db.query(Product).filter(
-                Product.id == item.product_id).first()
-            if product and product.reserved_stock >= item.quantity:
-                product.reserved_stock -= item.quantity
+        try:
+            for item in order.items:
+                product = db.query(Product).filter(
+                    Product.id == item.product_id).first()
+
+                if product is None:
+                    continue
+
+                reserved = product.reserved_stock or 0
+                quantity = item.quantity or 0
+                product.reserved_stock = max(0, reserved - quantity)
+                product.updated_at = datetime.now(timezone.utc)
+                db.add(product)
+
+            order.stock_reserved = False
+            order.updated_at = datetime.now(timezone.utc)
+            db.add(order)
+
+        except Exception as e:
+            db.rollback()
+            raise
 
     def reserve_stock(self, order, db):
 
@@ -348,7 +365,7 @@ class EfiService:
         body = {
             "items": items_list,
             "metadata": {
-                "notification_url": f"{WEBHOOK_URL}/webhook/efipay",
+                "notification_url": f"{WEBHOOK_URL}/efipay",
                 "custom_id": f"order_{order.uuid}",
             },
             "payment": {
@@ -377,7 +394,6 @@ class EfiService:
             body["shippings"] = [{
                 "name": f"Frete - {order.shipping_carrier} {order.shipping_method}",
                 "value": int(order.shipping_cost * 100)
-                # "payeeCode": "..." se necessário
             }]
 
         # Chamada ao SDK
@@ -404,7 +420,7 @@ class EfiService:
             order.efipay_charge_card_id = str(charge_id)
             order.updated_at = datetime.now(timezone.utc)
 
-            if charge_status in ("aprroved", "paid"):
+            if charge_status in ("approved", "paid"):
                 if order.payment_status != PaymentStatus.PAID:
                     self.reserve_stock(order, db)
                     order.payment_status = PaymentStatus.PAID
@@ -434,6 +450,102 @@ class EfiService:
                 raise
             raise ValueError(
                 f"Erro interno no processamento do cartão: {str(e)}")
+
+    def process_card_webhook(self, notification_token: str, db: Session) -> dict:
+        """
+        Processa notificação de cartão da Efí.
+        Fluxo:
+          1. Consulta o token via get_notification para obter charge_id e status atual.
+          2. Localiza o Order pelo efipay_charge_card_id.
+          3. Atualiza status do pedido conforme o status retornado.
+        """
+        try:
+            notification_data = self.client.get_notification(
+                params={"token": notification_token}
+            )
+        except Exception as e:
+            print(f"Erro ao consultar notificação Efí: {str(e)}")
+            return {"processed": 0}
+
+        events = notification_data.get("data", [])
+        if not events:
+            return {"processed": 0}
+
+        last_event = events[-1]
+        identifiers = last_event.get("identifiers", {})
+        charge_id = str(identifiers.get("charge_id", ""))
+        status = last_event.get("status", {}).get("current", "").lower()
+
+        if not charge_id or not status:
+      
+            return {"processed": 0}
+
+        order = db.query(Order).filter(
+            Order.efipay_charge_card_id == charge_id
+        ).first()
+
+        if not order:
+        
+            return {"processed": 0}
+
+    # Evita reprocessar pedidos já finalizados
+        if order.payment_status == PaymentStatus.PAID:
+            return {"processed": 0}
+
+
+
+        now = datetime.now(timezone.utc) 
+
+
+        if status in ("paid", "approved"):
+            if order.payment_status != PaymentStatus.PAID:
+                order.payment_status = PaymentStatus.PAID
+                order.status = OrderStatus.CONFIRMED
+                order.payment_method = PaymentMethod.CREDIT_CARD
+                order.paid_at = now
+                order.reservation_expires_at = now
+                order.updated_at = now
+
+                self.reserve_stock(order, db)
+
+        elif status in ("refused", "failed"):
+            order.payment_status = PaymentStatus.FAILED
+            order.status = OrderStatus.CANCELED
+            order.updated_at = datetime.now(timezone.utc)
+
+            self.release_stock(order, db)
+
+        elif status == "refunded":
+            order.payment_status = PaymentStatus.REFUNDED
+            order.status = OrderStatus.CANCELED
+            order.reservation_expires_at = None
+            order.updated_at = datetime.now(timezone.utc)
+
+            self.release_stock(order, db)
+
+
+        elif status in ("canceled", "cancelled"):
+            order.payment_status = PaymentStatus.CANCELED
+            order.status = OrderStatus.CANCELED
+            order.updated_at = datetime.now(timezone.utc)
+            order.reservation_expires_at = None
+
+            self.release_stock(order, db)
+
+        elif status in ("unpaid", "waiting"):
+            print(
+                f"Pedido {order.uuid} ainda aguardando confirmação ({status})")
+            return {"processed": 0}
+
+        else:
+            print(
+                f"Status Efipay não tratado: {status} (order {order.uuid})")
+            return {"processed": 0}
+
+        db.commit()
+        db.refresh(order)
+
+        return {"processed": 1}
 
     def get_card_installments(self, data: InstallmentsRequest) -> list[dict]:
         valor_centavos = int(data.total_value * 100)

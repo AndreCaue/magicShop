@@ -62,7 +62,7 @@ class OrderListItemOut(BaseModel):
     created_at: datetime
     items: List[OrderItemSummaryOut]
     shipping_carrier: Optional[str]
-    payment_method: PaymentMethod
+    payment_method: Optional[PaymentMethod] = None
     recipient_name: Optional[str]
 
     model_config = {"from_attributes": True}

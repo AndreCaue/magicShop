@@ -18,7 +18,6 @@ class CreateRefundRequest(BaseModel):
     description: Optional[str] = None
     items: Optional[List[RefundItemRequest]] = None
 
-    # refund_type: RefundType = RefundType.FULL
 
 
 class AddEvidenceRequest(BaseModel):

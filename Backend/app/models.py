@@ -1,21 +1,23 @@
+import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON
 from sqlalchemy.orm import relationship
 from app.database import Base
 from .auth.jwt import RefreshToken
+from .contents.models import Content
 
 
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    # uuid = Column(
-    #     String(36),
-    #     default=lambda: str(uuid.uuid4()),
-    #     unique=True,
-    #     nullable=False,
-    #     index=True
-    # ) Feature / futuro.
+    uuid = Column(
+        String(36),
+        default=lambda: str(uuid.uuid4()),
+        unique=True,
+        nullable=False,
+        index=True
+    )
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
 
@@ -30,6 +32,10 @@ class User(Base):
 
     refresh_tokens = relationship(
         RefreshToken, back_populates="user", cascade="all, delete-orphan")
+
+    contents = relationship(
+        Content, back_populates="user", cascade="all, delete-orphan")
+   # content_likes = relationship("ContentLike", backref="user", cascade="all, delete-orphan")
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(
         timezone.utc), onupdate=datetime.now(timezone.utc))

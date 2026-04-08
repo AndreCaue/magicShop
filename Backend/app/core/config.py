@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 
 
     DATABASE_URL_DEV: str | None = None
     DATABASE_URL: str | None = None
@@ -26,11 +26,32 @@ class Settings(BaseSettings):
     EFI_CERTIFICATE_PATH: str
     EFI_SANDBOX: bool = True
 
+    AWS_ACCESS_KEY_ID: str | None = None
+    AWS_SECRET_ACCESS_KEY: str | None = None
+    AWS_REGION: str | None = "sa-east-1"
+    S3_BUCKET_PUBLIC_DEV: str | None = None
+    S3_BUCKET_PUBLIC_PROD: str | None = None
+    S3_BUCKET_PRIVATE_DEV: str | None = None
+    S3_BUCKET_PRIVATE_PROD: str | None = None
+
     CEP_KEY: str
+    STORE_NAME: str
+    STORE_PHONE: str
+    STORE_EMAIL: str
+    STORE_DOCUMENT: str
+    STORE_POSTAL_CODE: str
+    STORE_STREET: str
+    STORE_NUMBER: str
+    STORE_NEIGHBORHOOD: str
+    STORE_CITY: str
+    STORE_STATE: str
+
     PIX_KEY: str
     STORE_NAME: str
     NGROK_URL: str
     WEBHOOK_URL: str
+
+    WEBHOOK_SECRET: str = ""
 
     CREATE_TABLES: bool
 

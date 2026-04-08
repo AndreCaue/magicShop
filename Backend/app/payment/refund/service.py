@@ -1,4 +1,3 @@
-# payment/refund/service.py
 
 from fastapi import HTTPException, Depends
 from sqlalchemy import select, and_
@@ -102,7 +101,6 @@ def _validate_card_payment(order: Order) -> None:
 def _validate_refund_deadline(request: CreateRefundRequest, order: Order) -> None:
     """Validação de prazo CDC (exemplo básico)."""
     if request.reason_code == RefundReasonCode.REGRET:
-        # alterar aqui para delivered_at: / feature
         if datetime.now(timezone.utc) - order.created_at > timedelta(days=7):
             raise HTTPException(
                 400, "Prazo de 7 dias para arrependimento expirado (art. 49 CDC)"
@@ -235,7 +233,7 @@ def _create_refund_record(
         amount_requested=amount_calculated,
         amount_approved=None,
         status=RefundStatus.PENDING,
-        gateway_payment_id=order.efipay_charge_pix_id,  # or txid
+        gateway_payment_id=order.efipay_charge_pix_id, 
         gateway_extra={"e2e_id": order.pix_charge.end_to_end_id},
     )
     db.add(refund)
@@ -391,7 +389,6 @@ def approve_and_process_refund(
             }
         )
 
-        # Sucesso
         transaction.gateway_response_json = json.dumps(response)
         transaction.status = RefundTransactionStatus.PROCESSING
         transaction.processed_at = datetime.now(timezone.utc)

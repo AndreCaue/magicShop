@@ -163,3 +163,32 @@ def get_current_user_from_cookie(
     return user
 
 
+async def get_token_from_request_optional(request: Request) -> str | None:
+    auth = request.headers.get("Authorization")
+    scheme, token = get_authorization_scheme_param(auth)
+
+    if not token:
+        token = request.cookies.get("access_token")
+
+    return token
+
+
+def get_current_user_optional(
+    db: Session = Depends(get_db),
+    token: str | None = Depends(get_token_from_request_optional),
+) -> User | None:
+    if not token:
+        return None
+        
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "access":
+            return None
+        email: str = payload.get("sub")
+        if email is None:
+            return None
+    except JWTError:
+        return None
+
+    user = db.query(User).filter(User.email == email).first()
+    return user

@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Body
+from fastapi import APIRouter, Depends, HTTPException, Query, Body, status
 from sqlalchemy.orm import Session, joinedload
 from typing import List
 from .service import get_cart_with_items
-from app.melhorenvio.service import cotar_frete
+from app.melhorenvio.service import cotar_frete_service
 
 from app.auth.dependencies import get_db, require_user
 from app.store.models import Product
@@ -12,7 +12,9 @@ from app.schemas import UserOut
 from app.store.orders.models import Order, OrderItem, OrderShipping
 from datetime import datetime, timezone, timedelta
 import re
+import logging
 from ..orders.enums import OrderStatus, PaymentStatus
+from app.core.config import settings
 
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
@@ -81,7 +83,7 @@ def add_to_cart(
 
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
-        raise HTTPException(404, "Produto não encontrado.")
+        raise HTTPException(404, "Produto não entrado.")
     if product.stock < quantity:
         raise HTTPException(
             400, "Quantidade solicitada maior que estoque disponível.")
@@ -183,6 +185,18 @@ async def checkout_cart(
     user: UserOut = Depends(require_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Checkout interno
+    """
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "EMAIL_NOT_VERIFIED",
+                "message": "Seu e-mail precisa ser verificado antes de realizar uma compra.",
+
+            }
+        )
 
     existing_order = db.query(Order).filter(
         Order.user_id == user.id,
@@ -197,19 +211,30 @@ async def checkout_cart(
         )
 
         return {
-            "message": f"Você já possui um pedido em andamento ou aguardando pagamento. Complete o pagamento ou espero até {existing_order.reservation_expires_at.isoformat()}.",
+            "message": f"Você já possui um pedido em andamento.",
             "redirect": f"/checkout/{existing_order.uuid}",
-            "expires_in_minutes": max(remaining_seconds // 60, 0),
-            "expires_in_seconds": max(remaining_seconds, 0),
-            "can_retry_after": existing_order.reservation_expires_at.isoformat()
+            "expires_in_seconds": max(remaining_seconds, 0)
         }
 
-    cart = db.query(Cart).options(joinedload(Cart.items)).filter(
-        Cart.user_id == user.id, Cart.status == "active"
+    cart = db.query(Cart).filter(
+        Cart.id == checkout_data.cart_id,
+        Cart.user_id == user.id,
+        Cart.status == "active"
+    ).options(
+        joinedload(Cart.items).joinedload(CartItem.product)
     ).first()
 
-    if not cart or not cart.items:
-        raise HTTPException(400, "Carrinho vazio.")
+    if not cart:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Carrinho não encontrado ou não pertence a você."
+        )
+
+    if not cart.items:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Carrinho vazio."
+        )
 
     product_ids = [i.product_id for i in cart.items]
     products = {
@@ -225,7 +250,7 @@ async def checkout_cart(
     total_weight = 0
     max_height = 0
     max_width = 0
-    max_length = 0
+    max_length = 0 
     declared_value = 0
 
     for item in cart.items:
@@ -262,22 +287,19 @@ async def checkout_cart(
     if subtotal <= 0:
         raise HTTPException(400, 'Subtotal Inválido')
 
-    opcoes = await cotar_frete(
+    opcoes = await cotar_frete_service(
         cep_destino=checkout_data.postal_code,
-        peso_gramas=total_weight,
-        altura_cm=max_height,
-        comprimento_cm=max_length,
-        largura_cm=max_width,
         valor_declarado=declared_value,
-        usar_seguro=checkout_data.usar_seguro,
-        cep_origem="13454056"
+        cart=cart,
+        db=db,
+        cep_origem=settings.CEP_KEY
     )
 
     if not opcoes:
         raise HTTPException(400, "Nenhuma opção de frete disponível")
 
     selected = next(
-        (s for s in opcoes if s.id == checkout_data.shipping_option_id), None
+        (s for s in opcoes if s.id == str(checkout_data.shipping_option_id)), None
     )
 
     if not selected:
@@ -303,6 +325,7 @@ async def checkout_cart(
                 timezone.utc) + timedelta(minutes=PRAZO_RESERVA_MINUTOS),
             shipping_carrier=selected.empresa,
             shipping_method=selected.nome,
+            shipping_service_id=selected.id,
             shipping_cost=final_shipping,
             shipping_discount=shipping_discount_total,
             shipping_original=original_shipping,
@@ -345,13 +368,15 @@ async def checkout_cart(
 
     except Exception as e:
         db.rollback()
+
         raise HTTPException(
             500, "Erro ao processar o checkout. Tente novamente.")
 
     db.refresh(order)
 
     return {
-        "message": "Checkout realizado. Finalize o pagamento em até 30 minutos.",
+        "success": True,
+        "message": "Checkout realizado com sucesso. Finalize o pagamento em até 30 minutos.",
         "redirect": f"/checkout/{order.uuid}",
-        "expires_in_seconds": PRAZO_RESERVA_MINUTOS * 60
+        "expires_in_seconds": PRAZO_RESERVA_MINUTOS * 60,
     }

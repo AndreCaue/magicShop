@@ -2,13 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session, joinedload
 from app.models import User
 from typing import Optional, List
+from sqlalchemy import func
 
 from uuid import UUID
-from app.auth.dependencies import get_db, require_user
+from app.auth.dependencies import get_db, require_user, require_master_full_access
 from app.store.orders.models import Order, OrderItem
 from app.store.orders.enums import PaymentStatus
 from .schemas import OrderDetailOut, HasOrderDetail, OrderListItemOut
 from datetime import datetime, timezone, tzinfo
+from .services import finalizar_envio_pedido, get_admin_orders
+import logging
 
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
@@ -25,7 +28,7 @@ async def get_order_detail(
     """
 
     NO_ORDER = {
-        "message": None,
+        "message": '',
         "success": False,
         "redirect": None,
         "expires_at": 0,
@@ -197,8 +200,6 @@ async def get_order_for_payment(
     return {
         "id": order.uuid,
         "uuid": short_uuid,
-        # "user_id": order.user_id,
-        # "status": order.status,
         "payment_status": order.payment_status,
         "subtotal": float(order.subtotal),
         "shipping_cost": float(order.shipping_cost),
@@ -220,12 +221,6 @@ async def get_order_for_payment(
 
         "shipping": {
             "address": f"{order.shipping.street} - {order.shipping.number} - {order.shipping.neighborhood}",
-            #     "number": order.shipping.number if order.shipping else None,
-            #     "complement": order.shipping.complement if order.shipping else None,
-            # "neighborhood": order.shipping.neighborhood if order.shipping else None,
-            #     "city": order.shipping.city if order.shipping else None,
-            #     "state": order.shipping.state if order.shipping else None,
-            #     "postal_code": order.shipping.postal_code if order.shipping else None,
         } if order.shipping else None,
         "items": [
             {
@@ -238,4 +233,156 @@ async def get_order_for_payment(
             }
             for item in order.items
         ],
+    }
+
+
+@router.get("/list/admin")
+async def list_admin_orders(
+    user: User = Depends(require_master_full_access),
+    db: Session = Depends(get_db),
+    status: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+):
+    try:
+        orders, total = get_admin_orders(
+            db=db,
+            status=status,
+            page=page,
+            page_size=page_size,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500, detail="Erro interno ao listar pedidos")
+
+    return {
+        "data": orders,
+        "pagination": {
+            "page": page,
+            "page_size": page_size,
+            "total": total,
+        },
+    }
+
+
+@router.get("/admin/{order_uuid}")
+async def get_admin_order(
+    order_uuid: str,
+    _: User = Depends(require_master_full_access),
+    db: Session = Depends(get_db),
+):
+    """
+    Retorna todos os dados detalhados de um pedido para o admin.
+    """
+
+    order = (
+        db.query(Order)
+        .options(
+            joinedload(Order.items),
+            joinedload(Order.shipping),
+            joinedload(Order.refunds),
+        )
+        .filter(Order.uuid == order_uuid)
+        .first()
+    )
+
+    if not order:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    items = [
+        {
+            "id": item.id,
+            "name": item.product_name,
+            "qty": item.quantity,
+            "unit_price": float(item.unit_price),
+            "total_price": float(item.total_price),
+            "image": item.img_product,
+        }
+        for item in order.items
+    ]
+
+    shipping = None
+    if order.shipping:
+        shipping = {
+            "recipient_name": order.shipping.recipient_name,
+            "recipient_phone": order.shipping.recipient_phone,
+            "recipient_email": order.shipping.recipient_email,
+            "street": order.shipping.street,
+            "number": order.shipping.number,
+            "complement": order.shipping.complement,
+            "city": order.shipping.city,
+            "state": order.shipping.state,
+            "postal_code": order.shipping.postal_code,
+        }
+
+    refunds = [
+        {
+            "id": refund.id,
+            "status": refund.status,
+            "created_at": refund.created_at,
+        }
+        for refund in order.refunds
+    ]
+
+    return {
+        "id": order.uuid,
+        "short_id": f"P-{str(order.uuid)[:5].upper()}",
+        "status": order.status,
+        "payment_status": order.payment_status,
+        "payment_method": order.payment_method,
+        "subtotal": float(order.subtotal),
+        "total": float(order.total),
+        "created_at": order.created_at,
+        "paid_at": order.paid_at,
+        "shipping_carrier": order.shipping_carrier,
+        "shipping_method": order.shipping_method,
+        "shipping_cost": order.shipping_cost,
+        "shipping_delivery_days": order.shipping_delivery_days,
+        "melhorenvio_shipment_id": order.melhorenvio_shipment_id,
+        "items": items,
+        "shipping": shipping,
+        "refunds": refunds,
+    }
+
+
+@router.post("/{order_uuid}/checkout")
+async def gerar_etiqueta(
+    order_uuid: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_master_full_access),
+):
+    """
+     Checkout externo.
+     Geração etiqueta.
+    """
+    order = (
+        db.query(Order)
+        .options(joinedload(Order.shipments))
+        .filter(Order.uuid == order_uuid)
+        .first()
+    )
+
+    if not order:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+
+    if order.payment_status != PaymentStatus.PAID:
+        raise HTTPException(
+            status_code=400, detail="Pedido não pago — não é possível gerar etiqueta")
+
+    try:
+        shipment_data = await finalizar_envio_pedido(order, db)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logging.error(f"[gerar_etiqueta] Erro inesperado: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail="Erro interno ao gerar etiqueta")
+
+    return {
+        "success": True,
+        "message": "Etiqueta gerada com sucesso",
+        "order_uuid": order_uuid,
+        "data": shipment_data,
     }

@@ -73,26 +73,26 @@ def is_refresh_token_valid(db: Session, jti: str) -> bool:
     return token is not None
 
 
-def create_reset_password_token(user_id: int) -> str:
+def create_reset_password_token(user_uuid: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=30)
     to_encode = {
         "exp": expire,
-        "sub": str(user_id),
+        "sub": user_uuid,
         "type": "password_reset"
     }
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
-def verify_reset_password_token(token: str) -> int:
+def verify_reset_password_token(token: str) -> str:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         
         if payload.get("type") != "password_reset":
             raise HTTPException(status_code=400, detail="Token inválido")
         
-        user_id: str = payload.get("sub")
-        if not user_id:
+        user_uuid: str = payload.get("sub")
+        if not user_uuid:
             raise HTTPException(status_code=400, detail="Token inválido")
         
-        return int(user_id)
+        return user_uuid
     except JWTError:
         raise HTTPException(status_code=400, detail="Token inválido ou expirado")

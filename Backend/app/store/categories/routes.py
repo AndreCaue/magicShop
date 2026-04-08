@@ -45,7 +45,6 @@ async def create_category(
 async def list_categories(
     db: Session = Depends(get_db),
 ):
-
     return db.query(Category).all()
 
 

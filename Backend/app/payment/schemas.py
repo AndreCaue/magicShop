@@ -27,7 +27,7 @@ class BillingAddress(BaseModel):
 
 class ShippingInfo(BaseModel):
     name: str
-    value: int  # cents
+    value: int 
     payee_code: Optional[str] = None
 
 

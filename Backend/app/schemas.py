@@ -8,7 +8,7 @@ class UserCreate(BaseModel):
 
 
 class UserOut(BaseModel):
-    id: int
+    uuid: str
     email: EmailStr
     scopes: Optional[List[str]] = []
     is_verified: Optional[bool] = False

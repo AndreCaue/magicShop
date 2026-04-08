@@ -107,7 +107,7 @@ def pix_create_devolution_manual(e2e_id: str, devolucao_id: str, valor: str, des
         url,
         json=body,
         headers=headers,
-        cert=(cert_path, None),  # mTLS: (cert, key) - se key separado, ajuste
+        cert=(cert_path, None), 
         verify=True
     )
 
@@ -134,7 +134,6 @@ def create_pix_devolution(e2e_id: str, devolucao_id: str, valor: float, descrica
 
     # sandbox
     url = f"https://pix-h.api.efipay.com.br/v2/pix/{e2e_id}/devolucao/{devolucao_id}"
-    # Para produção: https://pix.api.efipay.com.br/...
 
     headers = {
         "Authorization": f"Basic {auth_b64}",
@@ -152,11 +151,10 @@ def create_pix_devolution(e2e_id: str, devolucao_id: str, valor: float, descrica
             url,
             json=body,
             headers=headers,
-            # (cert, key) - None se não tiver key separado
             cert=(cert_path, None),
             timeout=30
         )
-        response.raise_for_status()  # levanta exceção se não 2xx
+        response.raise_for_status()  
         return response.json()
     except requests.exceptions.HTTPError as http_err:
         raise HTTPException(

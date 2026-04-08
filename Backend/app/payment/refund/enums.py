@@ -23,7 +23,6 @@ class RefundType(str, Enum):
 
 
 class RefundMethod(str, Enum):
-    # Estorno no método original (PIX, cartão)
     ORIGINAL_PAYMENT = "original_payment"
     # STORE_CREDIT = "store_credit"
     BANK_TRANSFER = "bank_transfer"
@@ -40,8 +39,8 @@ class RefundReasonCode(str, Enum):
 
 
 class RefundTransactionStatus(str, Enum):
-    # Parei, feature futura.
-    PENDING = "pending"       # Aguardando envio para Efipay
-    PROCESSING = "processing"  # Enviado para Efipay, aguardando confirmação
-    SUCCEEDED = "succeeded"   # Estorno confirmado pela Efipay
-    FAILED = "failed"         # Falha retornada pela Efipay
+    # Parei aqui, #Feature futura.
+    PENDING = "pending"      
+    PROCESSING = "processing"  
+    SUCCEEDED = "succeeded"   
+    FAILED = "failed"        
