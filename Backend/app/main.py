@@ -32,8 +32,8 @@ from slowapi import _rate_limit_exceeded_handler
 from app.core.limiter import limiter
 import logging
 
-if settings.ENVIRONMENT == "development":
-    models.Base.metadata.create_all(bind=engine)
+# if settings.ENVIRONMENT == "development":
+models.Base.metadata.create_all(bind=engine)
 
 
 @asynccontextmanager
@@ -56,8 +56,8 @@ app = FastAPI(
     docs_url=None,
     redoc_url="/redoc" if is_dev else None,
     openapi_url="/openapi.json" if is_dev else None,
-    title=f"{settings.APP_NAME}",  
-    redirect_slashes=False, 
+    title=f"{settings.APP_NAME}",
+    redirect_slashes=False,
     lifespan=lifespan
 )
 
