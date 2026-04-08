@@ -16,8 +16,6 @@ import httpx
 import math
 
 
-CEP_KEY = settings.CEP_KEY
-
 logger = logging.getLogger(__name__)
 
 
@@ -85,22 +83,21 @@ async def registrar_envio_cart(
         products.append({
             "name": item.product_name,
             "quantity": int(item.quantity),
-            "unitary_value": float(item.unit_price)  
+            "unitary_value": float(item.unit_price)
         })
 
     declared_value = max(5, order.subtotal or (
         order.total - (order.shipping_cost or 0)))
 
-
     payload = {
-        "service": order.shipping_service_id,  
+        "service": order.shipping_service_id,
 
         "from": from_address,
         "to": {
             "name": shipping.recipient_name,
             "email": shipping.recipient_email,
             "phone": shipping.recipient_phone,
-            "document": shipping.recipient_document,  
+            "document": shipping.recipient_document,
             "address": shipping.street,
             "complement": shipping.complement or "",
             "number": shipping.number,
@@ -199,7 +196,6 @@ async def listar_itens_carrinho_melhor_envio() -> List[Dict[str, Any]]:
     except httpx.RequestError as e:
         raise ValueError(f"Erro de conexão com Melhor Envio: {e}")
 
-
     if isinstance(response, list):
         return response
 
@@ -261,7 +257,7 @@ async def criar_logistica_reversa(order_me_id: str, customer) -> dict:  # rever 
         "order_id": order_me_id,
         "new_sender_mail": customer.email,
         "new_sender_phone": customer.phone,
-        "insurance_value": 0, 
+        "insurance_value": 0,
         "package": {
             "weight": 1.0,
             "height": 10,
@@ -335,7 +331,6 @@ def _calcular_embalagem(produtos_qtd: list[tuple[Product, int]]) -> dict:
     }
 
 
-
 async def cotar_frete_service(
     cart: Cart,
     cep_destino: str,
@@ -344,7 +339,7 @@ async def cotar_frete_service(
     cep_origem: str | None = None,
 ) -> list[CotacaoFreteResponse]:
 
-    itens = cart.items 
+    itens = cart.items
 
     ids = [item.product_id for item in itens]
     produtos_db = db.query(Product).filter(Product.id.in_(ids)).all()

@@ -15,7 +15,6 @@ import logging
 router = APIRouter(prefix="/melhor-envio", tags=["Frete - Melhor Envio"])
 
 
-
 @router.post(
     "/cotar",
     response_model=List[CotacaoFreteResponse],
@@ -54,10 +53,10 @@ async def cotar_frete_route(
     try:
         opcoes = await asyncio.wait_for(
             cotar_frete_service(
-                cart=cart,                        
+                cart=cart,
                 cep_destino=payload.cep_destino,
                 valor_declarado=payload.valor_declarado,
-                cep_origem=settings.CEP_KEY,
+                cep_origem=settings.STORE_POSTAL_CODE,
                 db=db,
             ),
             timeout=15.0,
@@ -77,7 +76,7 @@ async def cotar_frete_route(
     return opcoes
 
 
-@router.post( 
+@router.post(
     "/registrar-envio",
     response_model=MECartResponse,
     summary="Registrar envio no Melhor Envio após pagamento (POST /me/cart)",
@@ -111,7 +110,7 @@ async def registrar_envio(payload: MECartCreateRequest, db: Session = Depends(ge
         raise HTTPException(500, detail=f"Erro interno: {repr(e)}")
 
 
-@router.get( 
+@router.get(
     "/carrinho",
     response_model=List[Dict[str, Any]],
     summary="Listar todos os itens no carrinho do Melhor Envio (apenas master)",

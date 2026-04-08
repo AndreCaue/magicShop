@@ -34,7 +34,6 @@ class Settings(BaseSettings):
     S3_BUCKET_PRIVATE_DEV: str | None = None
     S3_BUCKET_PRIVATE_PROD: str | None = None
 
-    CEP_KEY: str
     STORE_NAME: str
     STORE_PHONE: str
     STORE_EMAIL: str

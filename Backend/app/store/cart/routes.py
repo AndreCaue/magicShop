@@ -250,7 +250,7 @@ async def checkout_cart(
     total_weight = 0
     max_height = 0
     max_width = 0
-    max_length = 0 
+    max_length = 0
     declared_value = 0
 
     for item in cart.items:
@@ -292,7 +292,7 @@ async def checkout_cart(
         valor_declarado=declared_value,
         cart=cart,
         db=db,
-        cep_origem=settings.CEP_KEY
+        cep_origem=settings.STORE_POSTAL_CODE
     )
 
     if not opcoes:
