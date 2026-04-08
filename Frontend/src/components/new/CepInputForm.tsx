@@ -63,7 +63,7 @@ const CepInputForm = <
             <>
               <FormLabel
                 className={cn(
-                  background === "light" ? "text-black" : "text-white"
+                  background === "light" ? "text-black" : "text-white",
                 )}
               >
                 {label}

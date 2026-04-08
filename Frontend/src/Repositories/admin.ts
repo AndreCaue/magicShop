@@ -105,3 +105,63 @@ export const getAdminOrderDetails = async (
     throw err;
   }
 };
+
+export type TUpdateProductCard = {
+  name?: string;
+  description?: string;
+  price?: number;
+  stock?: number;
+
+  weight_grams?: number;
+  height_cm?: number;
+  width_cm?: number;
+  length_cm?: number;
+
+  category_id?: number;
+  preset_id?: number;
+  discount?: number;
+
+  images?: File[];
+  replace_images?: boolean;
+  delete_image_indices?: number[];
+};
+
+export const updateProductCards = async (
+  product_id: number,
+  params: TUpdateProductCard,
+) => {
+  try {
+    const form = new FormData();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+
+      if (key === "images" && Array.isArray(value)) {
+        (value as File[]).forEach((file) => {
+          form.append("images", file);
+        });
+        return;
+      }
+
+      if (key === "delete_image_indices" && Array.isArray(value)) {
+        (value as number[]).forEach((index) => {
+          form.append("delete_image_indices", String(index));
+        });
+        return;
+      }
+
+      form.append(key, String(value));
+    });
+
+    const res = await api.put(`/products/${product_id}`, form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res.data;
+  } catch (err) {
+    handleErrorReq(err);
+    throw err;
+  }
+};

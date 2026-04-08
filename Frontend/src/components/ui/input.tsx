@@ -4,7 +4,7 @@ import { Eye, Truck } from "lucide-react";
 
 interface InputProps extends React.ComponentProps<"input"> {
   icon?: React.ReactNode;
-  onClick?: () => void;
+  setToggle?: React.Dispatch<React.SetStateAction<boolean>>;
   typeInput?: string;
   toggleEye?: boolean;
   background?: "light" | "dark";
@@ -16,13 +16,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       className,
       type,
       icon,
-      onClick,
+      setToggle,
       typeInput,
       toggleEye = false,
       background = "dark",
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <div className="relative flex items-center">
@@ -32,7 +32,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               "absolute left-3 flex items-center pointer-events-none",
               background === "light"
                 ? "text-black placeholder:text-black/50"
-                : "text-white"
+                : "text-white",
             )}
           >
             {icon}
@@ -47,7 +47,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             background === "light"
               ? "text-black placeholder:text-black/50"
               : "text-white",
-            className
+            className,
           )}
           ref={ref}
           {...props}
@@ -56,21 +56,21 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {typeInput === "inputpass" && (
           <Eye
             className="absolute right-0 text-white hover:text-white/50 hover:cursor-pointer mx-2"
-            onClick={() => onClick?.()}
+            onClick={() => setToggle?.((prev) => !prev)}
           />
         )}
 
         {typeInput === "frete" && (
           <button
             className="absolute mr-2 right-0 text-black hover:text-black/50 hover:cursor-pointer hover:scale-105"
-            onClick={() => onClick?.()}
+            type="button"
           >
             <Truck />
           </button>
         )}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = "Input";

@@ -1,10 +1,11 @@
 import api from "@/axiosInstance";
 
-type TGetProductResponse = {
+export type TGetProductResponse = {
   name: string;
   description: string;
   price: number;
   stock: number;
+  reserved_stock: number;
   image_urls: string[];
   category_id: number;
   shipping_preset_id: number;
@@ -23,12 +24,12 @@ type TGetProductResponse = {
   };
 };
 
-export const getListOfProducts = async () => {
+export const getProducts = async () => {
   const response = await api.get<TGetProductResponse[]>("/products");
   return response.data;
 };
 
-export const getIndividualProducts = async (id: number) => {
+export const getProductById = async (id: number) => {
   const response = await api.get<IProduct>(`/products/${id}`);
   return response.data;
 };

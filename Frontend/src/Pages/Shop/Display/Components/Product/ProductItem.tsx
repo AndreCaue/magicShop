@@ -7,6 +7,8 @@ type TProductItem = {
   image: string;
   name: string;
   price: number;
+  reserved_stock: number;
+  stock: number;
   discount: number;
 };
 
@@ -15,10 +17,14 @@ export const ProductItem = ({
   image,
   name,
   price,
+  reserved_stock,
+  stock,
   discount,
 }: TProductItem) => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const hasValidStoke = stock > reserved_stock;
 
   return (
     <motion.div
@@ -36,7 +42,7 @@ export const ProductItem = ({
       <motion.div
         variants={cardMotion}
         className="bg-neutral-900/60 backdrop-blur-md border border-white/5 rounded-xl overflow-hidden shadow-2xl cursor-pointer"
-        onClick={() => navigate(`${location.pathname}/product/${id}`)}
+        onClick={() => navigate(`${location.pathname}/baralho/${id}`)}
       >
         <div className="aspect-[3/4] relative overflow-hidden bg-black/40">
           <motion.img
@@ -46,6 +52,11 @@ export const ProductItem = ({
             whileHover={{ scale: 1.08 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
           />
+          {!hasValidStoke && (
+            <div className="absolute z-10 bg-red-500 text-white h-fit w-full right-0 bottom-0 top-50 text-center">
+              Estoque indisponível no momento.
+            </div>
+          )}
         </div>
         {Number(discount) > 99 ? (
           <span className="absolute top-6 -right-3 rotate-45 w-24 h-6 text-center bg-green-500 text-white rouded-t-2xl">

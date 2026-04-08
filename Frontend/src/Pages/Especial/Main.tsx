@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { CategoriaForm } from "./Formularios/CategoryForm";
 import { PresetsForm } from "./Formularios/PresetsForm";
+import { EditBaralhoForm } from "./Formularios/EditForm";
 
 const tabList = [
   { key: "baralhos", label: "Baralhos", icon: <DeckCardsSvg /> },
@@ -32,6 +33,11 @@ const tabList = [
     label: "Dimensões",
     icon: <RulerDimensionLineIcon className="text-white" />,
   },
+  {
+    key: "edit",
+    label: "Editar Produtos", // migrar futuramente.
+    icon: <RulerDimensionLineIcon className="text-white" />,
+  },
 ] as const;
 
 type TTags = (typeof tabList)[number]["key"];
@@ -47,6 +53,7 @@ export const MainEspecial = () => {
     books: <div>Livros em breve...</div>,
     category: <CategoriaForm />,
     presets: <PresetsForm />,
+    edit: <EditBaralhoForm />,
   };
 
   return (

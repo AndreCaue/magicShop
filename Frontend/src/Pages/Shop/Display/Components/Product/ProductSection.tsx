@@ -25,6 +25,8 @@ export const ProductSection = ({ products }: TBrandSectionProps) => {
             discount={product.discount}
             image={product.image_urls[0]}
             name={product.name}
+            reserved_stock={product.reserved_stock}
+            stock={product.stock}
             price={product.price}
             key={product.id}
           />

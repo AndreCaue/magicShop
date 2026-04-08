@@ -55,7 +55,9 @@ export const VerifyDialog = ({ isOpen, setIsOpen }: TVerifyDialog) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-black">
         <DialogHeader>
-          <DialogTitle className="text-white">Verificar Email</DialogTitle>
+          <DialogTitle className="text-white">
+            Verifique sua caixa de entrada. Te enviamos um email!
+          </DialogTitle>
           <DialogDescription>
             Após a verificação do email, funções serão liberadas!
           </DialogDescription>

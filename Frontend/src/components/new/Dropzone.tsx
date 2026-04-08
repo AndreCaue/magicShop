@@ -55,36 +55,21 @@ export const UploadImage = <
         const onDrop = useCallback(
           (acceptedFiles: File[]) => {
             setIsUploading(true);
-            const newFiles = acceptedFiles.slice(
-              0,
-              maxFiles - currentUploadedFiles.length
-            );
-            const promises = newFiles.map((file: File) => {
-              return new Promise<UploadedFile>((resolve) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                  resolve({
-                    name: file.name,
-                    url: reader.result as string,
-                    file,
-                  });
-                };
-                reader.readAsDataURL(file);
-              });
-            });
 
-            Promise.all(promises)
-              .then((results: UploadedFile[]) => {
-                const updatedFiles = [...currentUploadedFiles, ...results];
-                field.onChange(updatedFiles);
-                setIsUploading(false);
-              })
-              .catch(() => {
-                setIsUploading(false);
-                console.error("Erro ao processar arquivos");
-              });
+            const newFiles = acceptedFiles
+              .slice(0, maxFiles - currentUploadedFiles.length)
+              .map((file: File) => ({
+                name: file.name,
+                url: URL.createObjectURL(file), // ✅ preview
+                file: file, // ✅ File real
+              }));
+
+            const updatedFiles = [...currentUploadedFiles, ...newFiles];
+            field.onChange(updatedFiles);
+
+            setIsUploading(false);
           },
-          [currentUploadedFiles.length, maxFiles, field.onChange]
+          [currentUploadedFiles, maxFiles, field.onChange],
         );
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -96,8 +81,10 @@ export const UploadImage = <
         });
 
         const removeFile = (indexToRemove: number) => {
+          URL.revokeObjectURL(currentUploadedFiles[indexToRemove].url);
+
           const updatedFiles = currentUploadedFiles.filter(
-            (_, index: number) => index !== indexToRemove
+            (_, index: number) => index !== indexToRemove,
           );
           field.onChange(updatedFiles);
         };
@@ -142,7 +129,7 @@ export const UploadImage = <
                                   <X className="w-4 h-4" />
                                 </button>
                               </div>
-                            )
+                            ),
                           )}
                         </div>
                         <div className="flex items-center space-x-2 text-green-400">

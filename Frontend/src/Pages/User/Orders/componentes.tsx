@@ -7,7 +7,6 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
-import type { IOrder } from "./OrdersPage";
 
 export type TOrderStatus =
   | "pending"
@@ -15,7 +14,7 @@ export type TOrderStatus =
   | "processing"
   | "shipped"
   | "delivered"
-  | "cancelled"
+  | "canceled"
   | "refunded"
   | "failed";
 
@@ -53,7 +52,7 @@ const STATUS_CONFIG: Record<
     color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
     glow: "shadow-emerald-500/10",
   },
-  cancelled: {
+  canceled: {
     label: "Cancelado",
     icon: <XCircle size={13} />,
     color: "text-red-400 bg-red-400/10 border-red-400/20",

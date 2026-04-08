@@ -19,8 +19,6 @@ export const AdminOrderDetailsModal = ({ orderId, onClose }: Props) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="w-full max-w-3xl rounded-2xl bg-zinc-900 p-6">
-        {/* HEADER */}
-
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-white">
             Pedido {data?.short_id}
@@ -35,8 +33,6 @@ export const AdminOrderDetailsModal = ({ orderId, onClose }: Props) => {
 
         {data && (
           <div className="space-y-6">
-            {/* PRODUTOS */}
-
             <div>
               <p className="text-xs text-white/40 mb-2">PRODUTOS</p>
 
@@ -58,8 +54,6 @@ export const AdminOrderDetailsModal = ({ orderId, onClose }: Props) => {
               </div>
             </div>
 
-            {/* PAGAMENTO */}
-
             <div>
               <p className="text-xs text-white/40 mb-2">PAGAMENTO</p>
 
@@ -69,8 +63,6 @@ export const AdminOrderDetailsModal = ({ orderId, onClose }: Props) => {
                 <p>Total: R$ {data.total.toFixed(2)}</p>
               </div>
             </div>
-
-            {/* ENDEREÇO */}
 
             {data.shipping && (
               <div>

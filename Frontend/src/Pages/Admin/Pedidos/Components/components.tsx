@@ -14,7 +14,7 @@ export type TOrderStatus =
   | "processing"
   | "shipped"
   | "delivered"
-  | "cancelled"
+  | "canceled"
   | "refunded"
   | "failed";
 
@@ -52,7 +52,7 @@ const STATUS_CONFIG: Record<
     color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
     glow: "shadow-emerald-500/10",
   },
-  cancelled: {
+  canceled: {
     label: "Cancelado",
     icon: <XCircle size={13} />,
     color: "text-red-400 bg-red-400/10 border-red-400/20",
@@ -76,7 +76,7 @@ const StatusBadge = ({ status }: { status: TOrderStatus }) => {
   const cfg = STATUS_CONFIG[status];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-mono tracking-widest ${cfg.color}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-mono tracking-widest ${cfg?.color}`}
     >
       {cfg.icon}
       {cfg.label}

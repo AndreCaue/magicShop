@@ -20,7 +20,7 @@ const Row = ({ label, price, showIcon, isDiscount }: TRow) => {
         {showIcon && (
           <NewTooltip
             icon={<Info />}
-            link="/"
+            link="/politica-interna"
             className="text-green-500"
             textContent="Desconto do produto aplicado"
           />
@@ -39,7 +39,10 @@ export const Summary = () => {
   const [isFreeShipping, setIsFreeShipping] = useState(false);
 
   const getTotal = () => {
-    const frete = (selectedShipping?.preco || 0) - Number(discount);
+    const frete = Math.max(
+      0,
+      (selectedShipping?.preco || 0) - Number(discount),
+    );
 
     if (isFreeShipping) {
       return subtotal;
@@ -58,6 +61,7 @@ export const Summary = () => {
 
       return setIsFreeShipping(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedShipping?.preco, discount]);
 
   return (
@@ -67,7 +71,7 @@ export const Summary = () => {
         <div className="border-b mx-32" />
       </h1>
       {items.map((item) => (
-        <div className="flex justify-between">
+        <div className="flex justify-between" key={item.product_name}>
           <span key={item.id}>- {item.product_name}</span>
           <span>Qntd: {item.quantity}</span>
         </div>

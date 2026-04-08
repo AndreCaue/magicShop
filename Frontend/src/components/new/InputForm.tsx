@@ -14,6 +14,7 @@ import type {
 } from "react-hook-form";
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 type TInputForm = {
   required?: boolean;
@@ -51,6 +52,10 @@ const InputForm = <
   background = "light",
   disabled,
 }: TInputForm & UseControllerProps<TFieldValues, TName>) => {
+  const [toggleEye, setToggleEye] = useState(false);
+
+  const isPassword = type === "password" ? "inputpass" : "";
+
   return (
     <FormField
       control={control}
@@ -95,6 +100,9 @@ const InputForm = <
                   background={background}
                   maxLength={maxLength}
                   type={type}
+                  toggleEye={toggleEye}
+                  setToggle={setToggleEye}
+                  typeInput={isPassword}
                   icon={iconPlaceholder}
                   disabled={disabled}
                 />

@@ -52,7 +52,7 @@ export interface IOrderResponse {
   shipping_method: string;
   shipping_carrier: string;
   total: number;
-  expires_at: number; // seconds
+  expires_at: number;
   shipping: ShippingAddress;
   items: OrderItem[];
   user: OrderUser;

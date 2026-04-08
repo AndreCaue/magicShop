@@ -1,8 +1,8 @@
 import { NewButton } from "@/components/new/NewButton";
 import QuantitySelector from "@/components/new/QuantitySelector";
 import { PageContainer } from "@/Pages/Home/Components/PageContainer";
-import { getIndividualProducts } from "@/Repositories/shop/getters";
-import { ShoppingCart, Truck, CreditCard } from "lucide-react";
+import { getProductById } from "@/Repositories/shop/getters";
+import { ShoppingCart, Truck, CreditCard, Info } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -21,20 +21,21 @@ export const IndividualProduct = () => {
   useEffect(() => {
     (async () => {
       if (!id) return;
-      const res = await getIndividualProducts(Number(id));
+      const res = await getProductById(Number(id));
       setProduct(res);
     })();
   }, [id]);
 
-  const handleAddCart = async () => {
+  const handleAddCart = () => {
     if (quantity < 1) return toast.error("Selecione a quantidade");
 
     setIsLoading(true);
-    await addToCart({ product_id: product.id, quantity });
+    addToCart({ product_id: product.id, quantity });
     setIsLoading(false);
   };
 
   const handleBuyNow = () => {
+    addToCart({ product_id: product.id, quantity });
     if (quantity < 1) return toast.error("Selecione a quantidade");
     navigate("/checkout");
   };
@@ -50,6 +51,10 @@ export const IndividualProduct = () => {
       </PageContainer>
     );
   }
+  const parcelas = Math.floor(product.price / 10) || 1;
+
+  const hasValidStock = product.stock > product.reserved_stock;
+  const remainStock = product.stock - product.reserved_stock;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-30">
@@ -63,7 +68,8 @@ export const IndividualProduct = () => {
                 {product.name}
               </h1>
               <p className="text-sm text-muted-foreground mt-2">
-                Vendidos: 0 • Em estoque: {product.stock} unidades
+                Vendidos: {product.reserved_stock} - • Em estoque: {remainStock}{" "}
+                unidades
               </p>
             </div>
 
@@ -72,8 +78,10 @@ export const IndividualProduct = () => {
                 R$ {Number(product.price).toFixed(2).replace(".", ",")}
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                ou em até{" "}
-                <b className="text-slate-200">12x sem juros (em breve)</b>
+                até <b className="text-slate-200">{parcelas}x</b> no cartão.
+              </p>
+              <p className="text-sm text-muted-foreground mt-2 flex gap-2">
+                <Info size={20} /> valor mínimo da parcela 10 reais.
               </p>
             </div>
 
@@ -83,7 +91,7 @@ export const IndividualProduct = () => {
                   Quantidade:
                 </span>
                 <QuantitySelector
-                  maxQuantity={product.stock}
+                  maxQuantity={remainStock}
                   getQuantity={setQuantity}
                   initialValue={quantity}
                   disabled={isLoading}
@@ -95,28 +103,32 @@ export const IndividualProduct = () => {
               <NewButton
                 label="Comprar agora"
                 onClick={handleBuyNow}
-                disabled={isLoading || product.stock === 0}
+                disabled={isLoading || product.stock === 0 || !hasValidStock}
                 className="h-10 text-lg font-semibold"
               />
               <NewButton
                 label="Adicionar ao carrinho"
                 icon={<ShoppingCart className="w-5 h-5" />}
                 onClick={handleAddCart}
-                disabled={isLoading || product.stock === 0}
-                className="h-10 text-lg"
+                disabled={isLoading || product.stock === 0 || !hasValidStock}
+                className="h-10 text-lg onclick:animate-bounce"
               />
             </div>
 
             <div className="space-y-3 pt-6 border-t text-sm text-muted-foreground">
-              <div className="flex items-center gap-3">
-                <Truck className="w-5 h-5" />
-                <span className="flex gap-2">
-                  Frete grátis acima de<p className="text-green-500">R$100</p>{" "}
+              {/* <div className="flex items-center gap-3">
+                <Truck className="w-5 h-5" /> 
+                <span className="flex gap-2">  # FEATURE
+                  Frete grátis acima de
+                  <p className="text-green-500">R$100</p>{" "}
                 </span>
-              </div>
+              </div> */}
               <div className="flex items-center gap-3">
                 <CreditCard className="w-5 h-5" />
-                <span>Parcele sem juros </span>
+                <span>
+                  Parcele até em <b className="text-green-400">3x</b> sem
+                  juros{" "}
+                </span>
               </div>
             </div>
           </div>

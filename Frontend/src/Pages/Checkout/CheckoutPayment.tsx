@@ -66,7 +66,6 @@ export const CheckoutPayment = () => {
   return (
     <PageContainer className="text-white">
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {/*MOBILE */}
         <div className="md:hidden mb-6">
           <div className="flex rounded-full bg-gray-800/50 p-1.5 backdrop-blur-sm border border-gray-700/60">
             <button

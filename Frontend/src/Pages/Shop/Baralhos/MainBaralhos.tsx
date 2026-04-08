@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getListOfProducts } from "@/Repositories/shop/getters";
+import { getProducts } from "@/Repositories/shop/getters";
 import DisplayContent from "../Display/DisplayContent";
 
 export const MainBaralhos = () => {
@@ -7,7 +7,7 @@ export const MainBaralhos = () => {
 
   useEffect(() => {
     (async () => {
-      const res = await getListOfProducts();
+      const res = await getProducts();
       setProducts(res);
     })();
   }, []);

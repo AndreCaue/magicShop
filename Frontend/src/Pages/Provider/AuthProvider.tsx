@@ -1,17 +1,38 @@
 import api, { setAccessToken } from "@/axiosInstance";
-import { useState, useEffect, type ReactNode } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type ReactNode,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AuthContext } from "../Context/AuthContext";
 
 export type TUser = {
+  uuid?: string;
   email: string;
   scopes: string[];
-  isMaster?: boolean;
+  isMaster: boolean;
   isBasic: boolean;
-  isPremium?: boolean;
+  isPremium: boolean;
   isVerified: boolean;
 };
+
+function mapUserResponse(data: Record<string, unknown>): TUser {
+  const scopes: string[] = Array.isArray(data.scopes) ? data.scopes : [];
+
+  return {
+    uuid: data.uuid ? String(data.uuid) : undefined,
+    email: String(data.email ?? ""),
+    scopes,
+    isMaster: Boolean(data.is_master),
+    isBasic: scopes.includes("basic"),
+    isPremium: scopes.includes("premium"),
+    isVerified: Boolean(data.is_verified),
+  };
+}
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,41 +40,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const loadUser = async () => {
+  const loadUser = useCallback(async (): Promise<TUser | null> => {
     try {
       const response = await api.get("/auth/me");
-
-      const userData: TUser = {
-        email: response.data.email,
-        scopes: response.data.scopes || [],
-        isMaster: response.data.scopes?.includes("master"),
-        isBasic: response.data.scopes?.includes("basic") || false,
-        isPremium: response.data.scopes?.includes("premium"),
-        isVerified: !!response.data.is_verified,
-      };
-
+      const userData = mapUserResponse(response.data);
       setUser(userData);
       setIsAuthenticated(true);
+      return userData;
     } catch (error) {
-      console.error("erro:", error);
+      console.error("Erro ao carregar usuário:", error);
       setUser(null);
       setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
+      return null;
     }
-  };
+  }, []);
 
-  const login = async (token: string, userData: TUser) => {
-    setAccessToken(token);
-    setUser(userData);
-    setIsAuthenticated(true);
-    await loadUser();
-  };
+  const logoutRef = useRef<() => Promise<void>>(async () => {});
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
-      const res = await api.post("/auth/logout");
-      if (!res) return;
+      await api.post("/auth/logout");
       toast.success("Logout realizado com sucesso.");
     } catch (error) {
       console.error("Erro ao chamar logout backend:", error);
@@ -63,32 +69,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem("is_verify");
-
-      document.cookie =
-        "access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
-      document.cookie =
-        "refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
-
       navigate("/login");
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    logoutRef.current = logout;
+  }, [logout]);
 
   useEffect(() => {
     const handleUnauthorized = () => {
-      logout();
-      navigate("/login");
+      logoutRef.current();
     };
 
     window.addEventListener("unauthorized", handleUnauthorized);
     return () => window.removeEventListener("unauthorized", handleUnauthorized);
   }, []);
 
+  const login = useCallback(
+    async (token: string) => {
+      setAccessToken(token);
+      await loadUser();
+    },
+    [loadUser],
+  );
+
   useEffect(() => {
     const bootstrapAuth = async () => {
       try {
         const response = await api.post("/auth/refresh");
         const accessToken = response.data.access_token;
-
         setAccessToken(accessToken);
         await loadUser();
       } catch {
@@ -101,7 +111,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     bootstrapAuth();
-  }, []);
+  }, [loadUser]);
 
   return (
     <AuthContext.Provider

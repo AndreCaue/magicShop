@@ -28,7 +28,7 @@ type TForm = z.infer<typeof formSchema>;
 
 export const Topbar = () => {
   const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState<string | null>("");
   const navigate = useNavigate();
   const { cart } = useCart();
   const { user, logout } = useAuth();

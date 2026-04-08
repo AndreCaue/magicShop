@@ -11,8 +11,6 @@ interface TAddress {
   erro?: boolean;
 }
 
-// CUPOM: MELHOR10EM10
-
 export function useViaCep(cep: string) {
   const [address, setAddress] = useState<TAddress | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,7 +30,7 @@ export function useViaCep(cep: string) {
       setError(false);
       try {
         const response = await axios.get(
-          `https://viacep.com.br/ws/${clearCEP}/json/`
+          `https://viacep.com.br/ws/${clearCEP}/json/`,
         );
 
         if (response.data.erro) {

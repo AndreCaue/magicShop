@@ -15,8 +15,11 @@ import { getValidationLogin } from "@/Repositories/auth";
 import type { TUser } from "@/Pages/Provider/AuthProvider";
 
 const formSchema = z.object({
-  email: z.string(),
-  senha: z.string(),
+  email: z.email({ message: "Email inválido." }),
+  senha: z
+    .string()
+    .min(1, "Senha é obrigatória")
+    .min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
 
 type TForm = Required<z.infer<typeof formSchema>>;

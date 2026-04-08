@@ -5,14 +5,12 @@ import { toast, Toaster } from "sonner";
 import { useEffect, useState } from "react";
 import { VerifyDialog } from "./Components/VerifyDialog";
 
-const initialLocalStorage = localStorage.getItem("is_verify") === "true";
+// const initialLocalStorage = localStorage.getItem("is_verify") === "true";
 
 export const Home = () => {
-  const [isVerified, setIsVerified] = useState(initialLocalStorage);
-
+  // const [isVerified, setIsVerified] = useState(initialLocalStorage);
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log(isVerified); // change later
   const handleVerifyEmail = () => {
     setIsOpen(true);
   };
@@ -30,7 +28,7 @@ export const Home = () => {
 
   useEffect(() => {
     const verified = localStorage.getItem("is_verify") === "true";
-    setIsVerified(verified);
+    // setIsVerified(verified);
 
     if (!verified) {
       handleToastDuration();

@@ -45,7 +45,7 @@ export default function AdminOrdersPage() {
   } = useQuery<TCartMEResponse[]>({
     queryKey: ["cartME"],
     queryFn: getCartME,
-    enabled: false, // 👈 só executa manualmente
+    enabled: false,
   });
 
   const buyLabelMutation = useMutation({
@@ -77,7 +77,6 @@ export default function AdminOrdersPage() {
       queryClient.setQueryData(["cartME"], (old: any[] = []) =>
         old.filter((item) => item.id !== id),
       );
-      // atualização rápida! rever
       return { previousCart };
     },
 
@@ -124,8 +123,6 @@ export default function AdminOrdersPage() {
     setCartDialogOpen(true);
     await refetchCart();
   };
-
-  // onClickBuyLabel
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 pt-20">

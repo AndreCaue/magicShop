@@ -104,9 +104,7 @@ export default function Contador({
         {topLabel && <span>{topLabel}</span>}
 
         <div>
-          {/* Timer */}
           <div className="relative">
-            {/* Glow de urgência */}
             <AnimatePresence>
               {urgency && !expired && (
                 <motion.div
@@ -151,7 +149,6 @@ export default function Contador({
             </motion.div>
           </div>
 
-          {/* Barra de progresso */}
           {!expired && (
             <div className="w-48 h-px bg-white/5 rounded-full overflow-hidden">
               <motion.div
@@ -170,7 +167,6 @@ export default function Contador({
             </div>
           )}
 
-          {/* Aviso de urgência */}
           <AnimatePresence>
             {urgency && !expired && (
               <motion.p

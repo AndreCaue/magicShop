@@ -8,6 +8,8 @@ import { useCart } from "@/Hooks/useCart";
 import type { UseFormSetValue } from "react-hook-form";
 import type { TForm } from "./types";
 import { getShippingPrice } from "@/Repositories/melhorenvio/frete";
+import { toast } from "sonner";
+import axios from "axios";
 const CEP_ORIGEM = import.meta.env.VITE_CEP_ORIGEM;
 
 export const fetchAddressByCep = async (
@@ -16,17 +18,24 @@ export const fetchAddressByCep = async (
 ) => {
   if (cep.length < 8) return;
 
-  const response = await getViaCep(cep);
+  try {
+    const response = await getViaCep(cep);
 
-  console.log(response, "teste cep");
-
-  if (response) {
-    setValue("endereco", response.logradouro || "");
-    setValue("bairro", response.bairro || "");
-    setValue("cidade", response.localidade || "");
-    setValue("estado", response.estado ?? getEstadoPorUF(response.uf));
-    setValue("uf", response.uf);
-    setValue("complemento", response.complemento || "");
+    if (response) {
+      setValue("endereco", response.logradouro || "");
+      setValue("bairro", response.bairro || "");
+      setValue("cidade", response.localidade || "");
+      setValue("estado", response.estado ?? getEstadoPorUF(response.uf));
+      setValue("uf", response.uf);
+      setValue("complemento", response.complemento || "");
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      toast.error(
+        err?.response?.data?.detail ||
+          "Algo deu errado, tente novamente mais tarde.",
+      );
+    }
   }
 };
 

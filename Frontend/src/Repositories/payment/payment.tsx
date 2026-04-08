@@ -1,7 +1,8 @@
+import { handleErrorReq } from "@/helpers/generics";
 import api from "../../axiosInstance";
 
 type TPaymentCard = {
-  order_uuid: number;
+  order_uuid: string;
   payment_token: string;
   installments: number;
   name_on_card: string;
@@ -10,7 +11,7 @@ type TPaymentCard = {
 type TPaymenteResponse = {
   success: boolean;
   data: {
-    order_uuid: number;
+    order_uuid: string;
     charge_id: number;
     status: string;
     installments: number;
@@ -70,14 +71,14 @@ export const getInstallments = async ({
 
     return response.data;
   } catch (err) {
-    console.log(err, "error");
+    handleErrorReq(err);
     return undefined;
   }
 };
 
 type TCreatePix = {
   expiracao?: number;
-  order_uuid: number;
+  order_uuid: string;
 };
 
 export interface IPixDataResponse {
@@ -102,6 +103,6 @@ export const createPix = async (params: TCreatePix) => {
 
     return response.data;
   } catch (error) {
-    console.log(error, "Falha ao gerar Pix", error);
+    handleErrorReq(error);
   }
 };

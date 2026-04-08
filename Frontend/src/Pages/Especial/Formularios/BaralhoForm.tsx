@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import { getShippingPresetsById } from "@/Repositories/shop/getters";
-import { formatedToDrop, type IDropdownOption } from "@/helpers/generics";
+import { formatedToDropdown, type IDropdownOption } from "@/helpers/generics";
 
 const formSchema = z.object({
   name: z.string(),
@@ -68,14 +68,14 @@ export const BaralhoForm = () => {
     const branchs = await getCategoryDropdown();
     if (!branchs) return;
 
-    setBranchs(formatedToDrop(branchs));
+    setBranchs(formatedToDropdown(branchs));
   };
 
   const getDropdownShip = async () => {
     const deckM = await getShippingPresets();
     if (!deckM) return;
 
-    setDeckModels(formatedToDrop(deckM));
+    setDeckModels(formatedToDropdown(deckM));
   };
 
   useEffect(() => {

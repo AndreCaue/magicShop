@@ -14,7 +14,7 @@ import { InputForm } from "@/components/new/InputForm";
 import { InputCardForm } from "@/components/new/InputCardForm";
 import { Form } from "@/components/ui/form";
 import { DropdownForm } from "@/components/new/DropdownForm";
-import type { IDropdownOption } from "@/helpers/generics";
+import { handleErrorReq, type IDropdownOption } from "@/helpers/generics";
 import type { IPaymentMethod } from "../../CheckoutPayment";
 import { SmokeButton } from "@/components/new/SmokeButton";
 import type { IOrderResponse } from "../../types";
@@ -251,8 +251,6 @@ ${each.has_interest ? `- Juros de R$ ${(each.total_value - orderData.total).toFi
         );
       }
     } catch (err: any) {
-      console.log(err);
-
       toast.error(err || err.detail || "Erro inesperado");
     }
   };

@@ -13,7 +13,7 @@ export const formSchema = z.object({
         message: "Informe nome e sobrenome",
       },
     ),
-  email: z.string().email("Email inválido"), // validação melhor, melhoria
+  email: z.email("Email inválido"),
   celular: z
     .string()
     .min(1, "Celular é obrigatório")

@@ -99,7 +99,6 @@ export const ExpandedRow = ({
             </div>
           </div>
 
-          {/* LOGÍSTICA */}
           <div className="space-y-4">
             <div>
               <p className="mb-3 flex items-center gap-2 font-mono text-xs tracking-widest text-white/30">
@@ -129,8 +128,7 @@ export const ExpandedRow = ({
               </p>
 
               <div className="flex flex-wrap gap-2">
-                {/* REEMBOLSO */}
-                {order.status === "confirmed" && (
+                {order.status === "confirmed" && ( // #FEATURE
                   <button
                     onClick={() => onClickOpen?.(order.short_id)}
                     className="flex items-center cursor-pointer gap-1.5 rounded-lg border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-xs font-mono text-violet-300 hover:bg-violet-400/20"
@@ -144,31 +142,26 @@ export const ExpandedRow = ({
                   </button>
                 )}
 
-                {/* GERAR ENVIO */}
-                {order.status === "confirmed" &&
-                  !order.melhorenvio_cart_id && ( //!
-                    <button
-                      onClick={() => onGenerateShipment?.(order.id)}
-                      className="flex items-center cursor-pointer gap-1.5 rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-1.5 text-xs font-mono text-orange-300 hover:bg-orange-400/20"
-                    >
-                      <Truck size={11} />
-                      Gerar envio
-                    </button>
-                  )}
+                {order.status === "confirmed" && !order.melhorenvio_cart_id && (
+                  <button
+                    onClick={() => onGenerateShipment?.(order.id)}
+                    className="flex items-center cursor-pointer gap-1.5 rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-1.5 text-xs font-mono text-orange-300 hover:bg-orange-400/20"
+                  >
+                    <Truck size={11} />
+                    Gerar envio
+                  </button>
+                )}
 
-                {/* COMPRAR ETIQUETA */}
-                {order.melhorenvio_cart_id && ( // rever. cart ou order_id?
+                {order.melhorenvio_cart_id && (
                   <button
                     onClick={() => onBuyLabel?.(order.id!)}
                     className="flex items-center cursor-pointer gap-1.5 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-mono text-emerald-300 hover:bg-emerald-400/20"
                   >
                     <Package size={11} />
                     Comprar etiqueta{" "}
-                    {/* Fazer a requisição de ecomprar etiqueta */}
                   </button>
                 )}
 
-                {/* VER PEDIDO */}
                 <button
                   onClick={() => setSelectedOrder(order.id)}
                   className="flex items-center hover:cursor-pointer gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-mono text-white/50 hover:bg-white/10 hover:text-white/80"
@@ -177,8 +170,7 @@ export const ExpandedRow = ({
                   Ver pedido
                 </button>
 
-                {/* RASTREIO FUTURO */}
-                {order.melhorenvio_cart_id && ( // rever
+                {order.melhorenvio_cart_id && ( // rever #FEATURE
                   <button className="flex items-center cursor-pointer gap-1.5 rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-xs font-mono text-sky-300 hover:bg-sky-400/20">
                     <ExternalLink size={11} />
                     Detalhes envio

@@ -17,7 +17,7 @@ export interface IDropdownOption {
   value: number;
 }
 
-export const formatedToDrop = (
+export const formatedToDropdown = (
   arr: ItemWithDescription[],
 ): IDropdownOption[] => {
   return (

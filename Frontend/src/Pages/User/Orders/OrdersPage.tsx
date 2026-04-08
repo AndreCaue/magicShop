@@ -32,14 +32,6 @@ import { ExpandedRow } from "./Components/ExpandedRow";
 import { SymbolLoading } from "@/components/new/CustomLoading/SymbolLoading";
 import { DialogRefund } from "./Components/DialogRefund";
 
-// PENDING = "pending"            # pedido criado
-// CONFIRMED = "confirmed"        # pagamento confirmado
-// PROCESSING = "processing"      # separando / embalando
-// SHIPPED = "shipped"            # enviado
-// DELIVERED = "delivered"        # entregue
-// CANCELED = "canceled"          # cancelado
-// REFUNDED = "refunded"          # reembolsado
-
 export interface IOrderItem {
   name: string;
   qty: number;
@@ -83,7 +75,6 @@ export default function OrdersPage() {
   const onClickRefund = (orderId: string) => {
     const currentOrder = orders?.filter((order) => order.short_id === orderId);
     if (!currentOrder?.length) return;
-    console.log(currentOrder, "order correta");
     setSelectedOrder(currentOrder[0]);
     setOpen(true);
   };
@@ -161,11 +152,11 @@ export default function OrdersPage() {
 
   const STATUS_FILTERS: { value: TOrderStatus | "all"; label: string }[] = [
     { value: "all", label: "Todos" },
-    { value: "pending", label: "Pendentes" }, // verificar no banckend como mudar status quando vencido.
+    { value: "pending", label: "Pendentes" },
     { value: "processing", label: "Preparação para envio" },
     { value: "shipped", label: "Em trânsito" },
     { value: "delivered", label: "Entregues" },
-    { value: "cancelled", label: "Cancelados" },
+    { value: "canceled", label: "Cancelados" },
     { value: "refunded", label: "Estornados" },
     { value: "failed", label: "Falhos" },
   ];

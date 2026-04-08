@@ -11,11 +11,17 @@ interface IProduct {
   description: string;
   price: number;
   stock: number;
+  reserved_stock: number;
   image_urls: string[];
   category_id: number;
   id: number;
   discount: number;
   category: ICategory;
+  weight_grams?: number;
+  height_cm?: number;
+  width_cm?: number;
+  length_cm?: number;
+  shipping_preset_id?: number;
 }
 
 interface IResMessage {

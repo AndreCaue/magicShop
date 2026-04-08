@@ -17,6 +17,7 @@ import {
 } from "@/stores/useShippingStore";
 import { useCart } from "@/Hooks/useCart";
 import { getShippingPrice } from "@/Repositories/melhorenvio/frete";
+import { handleErrorReq } from "@/helpers/generics";
 
 const CEP_ORIGEM = import.meta.env.VITE_CEP_ORIGEM;
 
@@ -36,7 +37,7 @@ export default function AddressStep({
   form,
 }: Props) {
   const [isFetchingCep, setIsFetchingCep] = useState(false);
-  const { items } = useCart();
+  const { items, cart } = useCart();
 
   const {
     cep: cepFromStore,
@@ -87,10 +88,9 @@ export default function AddressStep({
   }, [cepFromStore, form.setValue]);
 
   const handleCalculateShipping = async (value: string) => {
-    const cleanedCep = value.replace(/\D/g, "");
-    setCep(cleanedCep);
+    setCep(value);
 
-    if (cleanedCep.length !== 8) {
+    if (value.length < 8) {
       setShippingOptions([]);
       setSelectedShipping(null);
       return;
@@ -99,10 +99,11 @@ export default function AddressStep({
     try {
       const payload = {
         itens: items.map((item) => ({
-          product_id: item.product_id, // ajuste para o nome do campo item
+          product_id: item.product_id,
           quantity: item.quantity,
         })),
-        cep_destino: cleanedCep,
+        cep_destino: value,
+        cart_id: cart?.id,
         valor_declarado: items.reduce(
           (acc, item) => acc + item.unit_price * item.quantity,
           0,
@@ -123,7 +124,7 @@ export default function AddressStep({
         setSelectedShipping(cheapest);
       }
     } catch (err) {
-      console.error("Erro ao calcular frete:", err);
+      handleErrorReq(err);
       setShippingOptions([]);
       setSelectedShipping(null);
     }

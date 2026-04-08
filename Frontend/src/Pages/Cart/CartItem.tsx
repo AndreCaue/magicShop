@@ -14,7 +14,7 @@ export default function CartItem({ item }: any) {
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex gap-6 hover:shadow-md transition">
           <img
-            src={item.product_image_urls}
+            src={item.product_image_urls[0]}
             alt={item.name}
             className="w-32 h-32 object-cover rounded-lg flex-shrink-0"
           />

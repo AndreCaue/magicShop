@@ -11,10 +11,9 @@ import { cn } from "@/lib/utils";
 import { ShippingPrice } from "../Checkout/Components/ShippingPrice";
 import { RadioSuit } from "./Components/CustomRadio";
 import { getShippingPrice } from "@/Repositories/melhorenvio/frete";
-const CEP_ORIGEM = import.meta.env.VITE_CEP_ORIGEM;
 
 export default function CartSummary() {
-  const { subtotal, items, discount } = useCart();
+  const { subtotal, items, discount, cart } = useCart();
 
   const {
     shippingOptions,
@@ -58,15 +57,15 @@ export default function CartSummary() {
           product_id: item.product_id,
           quantity: item.quantity,
         })),
+        cart_id: cart?.id,
         cep_destino: cleanedCep,
         valor_declarado: items.reduce(
           (acc, item) => acc + item.unit_price * item.quantity,
           0,
         ),
-        cep_origem: CEP_ORIGEM,
       };
 
-      const options: ShippingOption[] = await getShippingPrice(payload); // .data?
+      const options: ShippingOption[] = await getShippingPrice(payload);
 
       if (options.length === 0) {
         setError("Nenhuma opção de entrega disponível para este CEP");

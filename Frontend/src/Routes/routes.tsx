@@ -1,6 +1,6 @@
 import { Home } from "@/Pages/Home/Home";
 
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Shop } from "./Shop";
 import { PrivateRoute } from "@/Security/ProtectedRoute";
 import { ForgotPassword } from "@/Pages/Login/subPages/ForgotPassword/Forgot";
@@ -64,7 +64,7 @@ export const AppRoutes = () => {
         <Route path="/master/pedidos" element={<AdminOrdersPage />} />
       </Route>
 
-      {/* <Route path="*" element={<Navigate to={"/login"} replace />} /> */}
+      <Route path="*" element={<Navigate to={"/login"} replace />} />
     </Routes>
   );
 };

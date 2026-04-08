@@ -7,8 +7,8 @@ export const Baralhos = () => {
   return (
     <Routes>
       <Route element={<MainBaralhos />} path="/" />
-      <Route element={<IndividualProduct />} path="/product/:id" />
-      <Route element={<Categoria />} path="branch/*" />
+      <Route element={<IndividualProduct />} path="/baralho/:id" />
+      <Route element={<Categoria />} path="branch/*" /> {/*Unused */}
     </Routes>
   );
 };

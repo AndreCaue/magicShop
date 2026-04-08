@@ -4,7 +4,6 @@ import {
   getCart,
   updateCartItemQuantity,
   removeFromCart,
-  clearCart,
 } from "../Repositories/shop/cart";
 import type { Cart } from "@/global/cart";
 import { toast } from "sonner";
@@ -53,13 +52,6 @@ export const useCart = () => {
     },
   });
 
-  const clearMutation = useMutation({
-    mutationFn: clearCart,
-    onSuccess: async () => {
-      await invalidateCart();
-    },
-  });
-
   const addToCartAction = (item: Parameters<typeof addToCart>[0]) => {
     addMutation.mutate(item);
   };
@@ -76,10 +68,6 @@ export const useCart = () => {
     removeMutation.mutate(itemId);
   };
 
-  const clearCartAction = () => {
-    clearMutation.mutate();
-  };
-
   const items = cart?.items ?? [];
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = items.reduce(
@@ -91,8 +79,7 @@ export const useCart = () => {
   const isMutating =
     addMutation.isPending ||
     updateQuantityMutation.isPending ||
-    removeMutation.isPending ||
-    clearMutation.isPending;
+    removeMutation.isPending;
 
   return {
     cart,
@@ -106,6 +93,5 @@ export const useCart = () => {
     addToCart: addToCartAction,
     updateQuantity,
     removeFromCartAction,
-    clearCart: clearCartAction,
   };
 };

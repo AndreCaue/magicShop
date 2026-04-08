@@ -40,7 +40,7 @@ export const CounterButton = ({
         isCounting
           ? "cursor-not-allowed opacity-80"
           : "hover:bg-slate-100 lg:hover:scale-105",
-        className
+        className,
       )}
       {...props}
     >
@@ -53,7 +53,6 @@ export const CounterButton = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
           >
-            {/* Contador com pulso */}
             <motion.span
               className="font-medium tabular-nums"
               animate={{ opacity: [0.5, 1, 0.5] }}

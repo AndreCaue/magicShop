@@ -102,7 +102,6 @@ export function OrderSummaryModal({
                 </DialogHeader>
 
                 <div className="mt-5 space-y-5">
-                  {/* Cabeçalho expansível dos itens */}
                   <button
                     onClick={() => setExpanded(!expanded)}
                     className="w-full flex items-center justify-between text-sm font-medium text-slate-300 hover:text-slate-100 transition-colors"
@@ -191,7 +190,6 @@ export function OrderSummaryModal({
 
                   <Separator className="bg-slate-800" />
 
-                  {/* Valores */}
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between text-slate-300">
                       <span>Subtotal</span>

@@ -86,101 +86,6 @@ export function AppSidebar() {
     })();
   }, []);
 
-  // const items: TItem[] = [
-  //   {
-  //     id: 1,
-  //     title: "Loja",
-  //     url: "/",
-  //     icon: ShoppingCart,
-  //     subItem: [
-  //       {
-  //         id: 10,
-  //         title: "Baralhos",
-  //         url: "/loja/baralhos",
-  //       },
-  //       {
-  //         id: 11,
-  //         title: "Acessórios",
-  //         url: "/loja/acessorios",
-  //       },
-  //       {
-  //         id: 12,
-  //         title: "Trukes",
-  //         url: "/loja/trukes",
-  //       },
-  //       {
-  //         id: 13,
-  //         title: "Marcas",
-  //         url: "/loja/marcas",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Conteúdo",
-  //     url: "/conteudo",
-  //     icon: MonitorPlay,
-  //     subItem: [
-  //       { id: 20, title: "Vídeos", url: "/conteudo/videos" },
-  //       { id: 21, title: "E-Books", url: "/conteudo/books" },
-  //     ],
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Jogos",
-  //     url: "/jogos",
-  //     icon: GamepadDirectional,
-  //     subItem: [{ id: 30, title: "Jogos", url: "/jogos" }],
-  //   },
-
-  //   {
-  //     id: 5,
-  //     title: "Settings",
-  //     url: "#",
-  //     icon: Settings,
-  //     subItem: [
-  //       { id: 50, title: "Em desenvolvimento", url: "/", disabled: true },
-  //     ],
-  //   },
-  // ];
-
-  // const masterItems: TItem[] = [
-  //   {
-  //     id: 99,
-  //     title: "Cadastros",
-  //     url: "/",
-  //     icon: Database,
-  //     subItem: [
-  //       {
-  //         id: 11,
-  //         title: "Produtos",
-  //         url: "/master",
-  //       },
-  //     ],
-  //   },
-  // ];
-
-  // const userOptions: TItem = {
-  //   id: 9,
-  //   title: "Username",
-  //   url: "/login",
-  //   icon: User2,
-  //   subItem: [
-  //     {
-  //       id: 91,
-  //       title: "Logout",
-  //       url: "/login",
-  //     },
-  //     { id: 92, title: "Pedidos", url: "/user/pedidos" },
-  //     {
-  //       id: 93,
-  //       title: "User (em desenvolvimento)",
-  //       url: "/user",
-  //       disabled: true,
-  //     },
-  //   ],
-  // };
-
   const UserIcon = iconMap[sidebarData?.userOptions?.icon] ?? User2;
 
   const handleClickNavigate = (URL: string) => {
@@ -234,7 +139,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {/* Footer */}
       <SidebarFooter>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

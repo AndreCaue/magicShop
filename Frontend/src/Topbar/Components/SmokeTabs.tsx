@@ -2,12 +2,12 @@ import { SmokeLink } from "@/components/new/SmokeLink";
 import { SmokeButton } from "@/components/new/SmokeButton";
 import { cn } from "@/lib/utils";
 import { SmokeSubTab, SmokeSubTabConteudo, SmokeSubTabJogos } from "../utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 
 type TSmokeTabs = {
   tabs: { id: string; label: string }[];
   activeTab: string | null;
-  onTabChange: (tabId: string | null) => void;
+  onTabChange: Dispatch<SetStateAction<string | null>>;
   className?: string;
   isMobile?: boolean;
 };

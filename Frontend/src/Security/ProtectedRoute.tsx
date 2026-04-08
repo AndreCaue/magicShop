@@ -9,7 +9,6 @@ export const PrivateRoute = () => {
     return <SymbolLoading />;
   }
 
-  console.log(isAuthenticated, "Autenticado?");
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

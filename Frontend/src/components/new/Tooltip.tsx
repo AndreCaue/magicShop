@@ -68,7 +68,7 @@ export const NewTooltip = ({
               <div>Sem desconto</div>
 
               <div>R$ 20,00</div>
-              <div>R$ 05,00</div>
+              <div>R$ 20,00</div>
               <div>R$ 0,00</div>
               <div>Frete grátis</div>
             </div>

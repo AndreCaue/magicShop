@@ -60,7 +60,6 @@ export const createCartMelhorEnvio = ({
     );
     return res;
   } catch (err) {
-    console.log(err, "erro");
     handleErrorReq(err);
     throw err;
   }
