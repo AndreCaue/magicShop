@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     MELHOR_ENVIO_TOKEN: str | None = None
     MELHOR_ENVIO_TOKEN_SANDBOX: str | None = None
-    MELHOR_ENVIO_ENV: Literal["production", "sandbox"] = "sandbox"
+    MELHOR_ENVIO_ENV: Literal["production", "sandbox"] = "production"
 
     EFI_CLIENT_ID: str
     EFI_CLIENT_SECRET: str

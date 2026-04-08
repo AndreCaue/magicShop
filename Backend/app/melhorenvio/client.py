@@ -18,7 +18,7 @@ class MelhorEnvioClient:
             token = settings.MELHOR_ENVIO_TOKEN_SANDBOX
             token_name = "MELHOR_ENVIO_TOKEN_SANDBOX"
         else:
-            token = settings.MELHOR_ENVIO_TOKEN or settings.MELHOR_ENVIO_TOKEN_SANDBOX
+            token = settings.MELHOR_ENVIO_TOKEN
             token_name = "MELHOR_ENVIO_TOKEN"
 
         if not token:
