@@ -8,10 +8,19 @@ from app.auth.dependencies import get_db, require_master_full_access, get_curren
 from app.models import User
 from app.store.orders.models import Order, OrderShipment
 from app.store.cart.models import Cart, CartItem
+from datetime import datetime
+from fastapi.responses import RedirectResponse
 
 from app.melhorenvio.service import cotar_frete_service, registrar_envio_cart, listar_itens_carrinho_melhor_envio, remover_item_carrinho_melhor_envio, criar_logistica_reversa
 from app.melhorenvio.schemas import CotacaoFreteResponse, MECartResponse, MECartCreateRequest, CotarFreteRequest
 import logging
+import httpx
+import os
+
+
+REDIRECT_URI = "https://doceilusao.store/melhor-envio/callback"
+
+TOKEN_URL = "https://melhorenvio.com.br/api/v2/oauth/token"
 router = APIRouter(prefix="/melhor-envio", tags=["Frete - Melhor Envio"])
 
 
@@ -191,3 +200,50 @@ async def gerar_reversa(order_id: str, db: Session = Depends(get_db)):
         "success": True,
         "data": response
     }
+
+
+@router.get("/callback")
+async def melhor_envio_callback(code: str):
+    """
+    Callback simples do Melhor Envio
+    Recebe o code → troca por token → mostra sucesso e redireciona para o Home
+    """
+    if not code:
+        raise HTTPException(
+            status_code=400, detail="Código de autorização não recebido")
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            TOKEN_URL,
+            data={
+                "grant_type": "authorization_code",
+                "client_id": settings.MELHOR_ENVIO_TOKEN,
+                "client_secret": settings.SECRET_KEY,
+                "redirect_uri": REDIRECT_URI,
+                "code": code,
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            timeout=30.0,
+        )
+
+        if response.status_code != 200:
+            error = response.json() if response.content else response.text
+            raise HTTPException(
+                status_code=400,
+                detail="Falha ao conectar com o Melhor Envio. Verifique os logs."
+            )
+
+        token_data = response.json()
+
+    access_token = token_data.get("access_token")
+
+    if not access_token:
+        raise HTTPException(
+            status_code=400, detail="Não foi possível obter o access token")
+
+    print("=" * 80)
+
+    print(access_token)
+    print("=" * 80)
+
+    return RedirectResponse(url="https://doceilusao.store/?melhor_envio=success")
