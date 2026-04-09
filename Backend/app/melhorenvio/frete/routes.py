@@ -18,7 +18,7 @@ import httpx
 import os
 
 
-REDIRECT_URI = "https://doceilusao.store/melhor-envio/callback"
+REDIRECT_URI = "https://api.doceilusao.store/melhor-envio/callback"
 
 TOKEN_URL = "https://melhorenvio.com.br/api/v2/oauth/token"
 router = APIRouter(prefix="/melhor-envio", tags=["Frete - Melhor Envio"])
