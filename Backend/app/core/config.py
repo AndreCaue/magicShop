@@ -46,7 +46,6 @@ class Settings(BaseSettings):
     STORE_STATE: str
 
     PIX_KEY: str
-    STORE_NAME: str
     NGROK_URL: str
     WEBHOOK_URL: str
 
