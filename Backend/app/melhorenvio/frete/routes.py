@@ -10,7 +10,7 @@ from app.store.orders.models import Order, OrderShipment
 from app.store.cart.models import Cart, CartItem
 from datetime import datetime, timedelta
 from fastapi.responses import RedirectResponse
-from app.melhorenvio.models import MelhorEnvioTokenModel
+from app.melhorenvio.models import MelhorEnvioToken
 from urllib.parse import urlencode
 
 from app.melhorenvio.service import cotar_frete_service, registrar_envio_cart, listar_itens_carrinho_melhor_envio, remover_item_carrinho_melhor_envio, criar_logistica_reversa
@@ -250,13 +250,13 @@ async def melhor_envio_callback(code: str, state: Optional[str] = None, error: O
     expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
 
     # Exemplo simples (crie uma tabela MelhorEnvioToken no seu models)
-    token_record = db.query(MelhorEnvioTokenModel).first()
+    token_record = db.query(MelhorEnvioToken).first()
     if token_record:
         token_record.access_token = access_token
         token_record.refresh_token = refresh_token
         token_record.expires_at = expires_at
     else:
-        token_record = MelhorEnvioTokenModel(
+        token_record = MelhorEnvioToken(
             access_token=access_token,
             refresh_token=refresh_token,
             expires_at=expires_at
