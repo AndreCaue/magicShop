@@ -10,6 +10,7 @@ from app.store.orders.models import Order, OrderShipment
 from app.store.cart.models import Cart, CartItem
 from datetime import datetime, timedelta
 from fastapi.responses import RedirectResponse
+from models import MelhorEnvioTokenModel
 from urllib.parse import urlencode
 
 from app.melhorenvio.service import cotar_frete_service, registrar_envio_cart, listar_itens_carrinho_melhor_envio, remover_item_carrinho_melhor_envio, criar_logistica_reversa
@@ -212,7 +213,7 @@ async def melhor_envio_callback(code: str, state: Optional[str] = None, error: O
     if not code:
         raise HTTPException(400, "Código de autorização não recebido")
 
-    token_url = f"{BASE_URL}/api/v2/oauth/token"   # Use BASE_URL também aqui
+    token_url = f"{BASE_URL}/api/v2/oauth/token"
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
@@ -226,7 +227,6 @@ async def melhor_envio_callback(code: str, state: Optional[str] = None, error: O
             },
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
-                # Obrigatório!
                 "User-Agent": f"{settings.STORE_NAME} ({settings.STORE_EMAIL})"
             },
             timeout=30.0,
@@ -241,7 +241,7 @@ async def melhor_envio_callback(code: str, state: Optional[str] = None, error: O
 
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
-    expires_in = token_data.get("expires_in", 2592000)  # ~30 dias
+    expires_in = token_data.get("expires_in", 2592000)
 
     if not access_token or not refresh_token:
         raise HTTPException(400, "Token inválido recebido")
@@ -250,7 +250,6 @@ async def melhor_envio_callback(code: str, state: Optional[str] = None, error: O
     expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
 
     # Exemplo simples (crie uma tabela MelhorEnvioToken no seu models)
-    # Como é uma conta só, pode ter só 1 registro
     token_record = db.query(MelhorEnvioTokenModel).first()
     if token_record:
         token_record.access_token = access_token
