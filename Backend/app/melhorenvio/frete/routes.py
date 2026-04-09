@@ -10,7 +10,7 @@ from app.store.orders.models import Order, OrderShipment
 from app.store.cart.models import Cart, CartItem
 from datetime import datetime, timedelta
 from fastapi.responses import RedirectResponse
-from models import MelhorEnvioTokenModel
+from app.melhorenvio.models import MelhorEnvioTokenModel
 from urllib.parse import urlencode
 
 from app.melhorenvio.service import cotar_frete_service, registrar_envio_cart, listar_itens_carrinho_melhor_envio, remover_item_carrinho_melhor_envio, criar_logistica_reversa
