@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 
 
-class MelhorEnvioToken(BaseModel):
+class MelhorEnvioTokenModel(BaseModel):
     access_token: str
     refresh_token: str
     expires_at: datetime
