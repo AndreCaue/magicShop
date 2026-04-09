@@ -8,17 +8,19 @@ from app.auth.dependencies import get_db, require_master_full_access, get_curren
 from app.models import User
 from app.store.orders.models import Order, OrderShipment
 from app.store.cart.models import Cart, CartItem
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi.responses import RedirectResponse
+from urllib.parse import urlencode
 
 from app.melhorenvio.service import cotar_frete_service, registrar_envio_cart, listar_itens_carrinho_melhor_envio, remover_item_carrinho_melhor_envio, criar_logistica_reversa
 from app.melhorenvio.schemas import CotacaoFreteResponse, MECartResponse, MECartCreateRequest, CotarFreteRequest
 import logging
 import httpx
 import os
+import secrets
 
 
-REDIRECT_URI = "https://api.doceilusao.store/melhor-envio/callback"
+BASE_URL = "https://www.melhorenvio.com.br" if settings.MELHOR_ENVIO_ENV == "production" else "https://sandbox.melhorenvio.com.br"
 
 TOKEN_URL = "https://melhorenvio.com.br/api/v2/oauth/token"
 router = APIRouter(prefix="/melhor-envio", tags=["Frete - Melhor Envio"])
@@ -203,47 +205,88 @@ async def gerar_reversa(order_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/callback")
-async def melhor_envio_callback(code: str):
-    """
-    Callback simples do Melhor Envio
-    Recebe o code → troca por token → mostra sucesso e redireciona para o Home
-    """
+async def melhor_envio_callback(code: str, state: Optional[str] = None, error: Optional[str] = None, db: Session = Depends(get_db)):
+    if error:
+        raise HTTPException(400, f"Erro do Melhor Envio: {error}")
+
     if not code:
-        raise HTTPException(
-            status_code=400, detail="Código de autorização não recebido")
+        raise HTTPException(400, "Código de autorização não recebido")
+
+    token_url = f"{BASE_URL}/api/v2/oauth/token"   # Use BASE_URL também aqui
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            TOKEN_URL,
+            token_url,
             data={
                 "grant_type": "authorization_code",
-                "client_id": settings.MELHOR_ENVIO_TOKEN,
-                "client_secret": settings.SECRET_KEY,
-                "redirect_uri": REDIRECT_URI,
+                "client_id": settings.MELHOR_ENVIO_CLIENT_ID,
+                "client_secret": settings.MELHOR_ENVIO_CLIENT_SECRET,
+                "redirect_uri": settings.MELHOR_ENVIO_REDIRECT_URI,
                 "code": code,
             },
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                # Obrigatório!
+                "User-Agent": f"{settings.STORE_NAME} ({settings.STORE_EMAIL})"
+            },
             timeout=30.0,
         )
 
         if response.status_code != 200:
-            error = response.json() if response.content else response.text
-            raise HTTPException(
-                status_code=400,
-                detail="Falha ao conectar com o Melhor Envio. Verifique os logs."
-            )
+            error_detail = response.json() if response.content else response.text
+            logging.error(f"Erro ao obter token: {error_detail}")
+            raise HTTPException(400, "Falha ao obter token do Melhor Envio")
 
         token_data = response.json()
 
     access_token = token_data.get("access_token")
+    refresh_token = token_data.get("refresh_token")
+    expires_in = token_data.get("expires_in", 2592000)  # ~30 dias
 
-    if not access_token:
-        raise HTTPException(
-            status_code=400, detail="Não foi possível obter o access token")
+    if not access_token or not refresh_token:
+        raise HTTPException(400, "Token inválido recebido")
 
-    print("=" * 80)
+    # === SALVAR NO BANCO ===
+    expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
 
-    print(access_token)
-    print("=" * 80)
+    # Exemplo simples (crie uma tabela MelhorEnvioToken no seu models)
+    # Como é uma conta só, pode ter só 1 registro
+    token_record = db.query(MelhorEnvioTokenModel).first()
+    if token_record:
+        token_record.access_token = access_token
+        token_record.refresh_token = refresh_token
+        token_record.expires_at = expires_at
+    else:
+        token_record = MelhorEnvioTokenModel(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_at=expires_at
+        )
+        db.add(token_record)
 
-    return RedirectResponse(url="https://doceilusao.store/?melhor_envio=success")
+    db.commit()
+
+    logging.info("Tokens do Melhor Envio salvos com sucesso!")
+
+    # Redirecione para o admin
+    return RedirectResponse(url="https://doceilusao.store/admin?melhor_envio=success")
+
+
+@router.get("/authorize")
+async def melhor_envio_authorize():
+    """Inicia o fluxo OAuth2 — acesse esta rota manualmente (ou botão no painel admin)"""
+
+    state = secrets.token_urlsafe(32)  # Proteção CSRF
+
+    params = {
+        "client_id": settings.MELHOR_ENVIO_CLIENT_ID,
+        "redirect_uri": settings.MELHOR_ENVIO_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "cart.read cart.write shipments.read shipments.write companies.read",
+        "state": state,
+    }
+
+    auth_url = f"{BASE_URL}/oauth/authorize?" + urlencode(params)
+
+    # Opcional: salvar o state temporariamente se quiser validar no callback
+    return RedirectResponse(auth_url)
