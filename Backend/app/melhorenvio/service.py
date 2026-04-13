@@ -9,14 +9,118 @@ from app.core.config import settings
 from app.store.orders.enums import PaymentStatus
 from app.store.orders.models import Order, OrderShipping, OrderShipment, OrderStatus
 from app.store.models import Product
-from datetime import datetime
+from app.melhorenvio.models import MelhorEnvioToken
+from datetime import datetime, timezone, timedelta
 from app.store.cart.models import Cart
-import logging
-import httpx
 import math
+import unicodedata
+import httpx
+import logging
 
 
 logger = logging.getLogger(__name__)
+
+
+def sanitize_user_agent(value: str) -> str:
+    return unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+
+
+def get_base_url() -> str:
+    return "https://sandbox.melhorenvio.com.br" if settings.MELHOR_ENVIO_ENV == "sandbox" else "https://www.melhorenvio.com.br"
+
+
+def get_me_client_id() -> str:
+    return settings.MELHOR_ENVIO_CLIENT_ID_DEV if settings.MELHOR_ENVIO_ENV == 'sandbox' else settings.MELHOR_ENVIO_CLIENT_ID
+
+
+def get_me_client_secret() -> str:
+    return settings.MELHOR_ENVIO_CLIENT_SECRET_DEV if settings.MELHOR_ENVIO_ENV == 'sandbox' else settings.MELHOR_ENVIO_CLIENT_SECRET
+
+
+def get_redirect_uri() -> str:
+    return settings.MELHOR_ENVIO_REDIRECT_URI_DEV if settings.MELHOR_ENVIO_ENV == 'sandbox' else settings.MELHOR_ENVIO_REDIRECT_URI
+
+
+async def refresh_melhor_envio_token(token_record: MelhorEnvioToken, db: Session) -> MelhorEnvioToken:
+    BASE_URL = get_base_url()
+    CLIENT_ID = get_me_client_id
+    CLIENT_SECRET = get_me_client_secret
+    token_url = f"{BASE_URL}/api/v2/oauth/token"
+    if settings.MELHOR_ENVIO_ENV == 'sandbox':
+        token_url = f"{BASE_URL}/oauth/token"
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                token_url,
+                data={
+                    "grant_type": "refresh_token",
+                    "client_id": CLIENT_ID,
+                    "client_secret": CLIENT_SECRET,
+                    "refresh_token": token_record.refresh_token,
+                },
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "User-Agent": f"{settings.STORE_NAME} ({settings.STORE_EMAIL})"
+                },
+                timeout=30.0,
+            )
+
+            if response.status_code != 200:
+                logger.error(f"Refresh token falhou: {response.text}")
+                raise HTTPException(
+                    401, "Falha ao renovar token do Melhor Envio. Faça nova autorização.")
+
+            token_data = response.json()
+
+        token_record.access_token = token_data["access_token"]
+        token_record.refresh_token = token_data.get(
+            "refresh_token") or token_record.refresh_token
+        token_record.expires_at = datetime.now(
+            timezone.utc) + timedelta(seconds=token_data.get("expires_in", 2592000))
+        token_record.updated_at = datetime.now(timezone.utc) if hasattr(
+            token_record, 'updated_at') else None
+
+        db.commit()
+        db.refresh(token_record)
+
+        logger.info("✅ Token do Melhor Envio renovado com sucesso")
+        return token_record
+
+    except Exception as e:
+        logger.error(f"Erro ao fazer refresh do token: {e}", exc_info=True)
+        raise HTTPException(
+            500, "Erro interno ao renovar token do Melhor Envio")
+
+
+async def get_valid_melhor_envio_token(db: Session) -> str:
+    token = db.query(MelhorEnvioToken).first()
+    if not token:
+        raise HTTPException(
+            401, "Melhor Envio não autorizado. Faça login primeiro.")
+
+    if token.is_expired():
+        token = await refresh_melhor_envio_token(token, db)
+
+    return token.access_token
+
+
+async def _make_authenticated_request(method: str, endpoint: str, db: Session, json: dict = None, **kwargs):
+    token = await get_valid_melhor_envio_token(db)
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "User-Agent": f"{sanitize_user_agent(settings.STORE_NAME)} ({settings.STORE_EMAIL})",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    if method.upper() == "POST":
+        return await melhor_envio_client.post(endpoint, json=json, headers=headers, **kwargs)
+    elif method.upper() == "GET":
+        return await melhor_envio_client.get(endpoint, headers=headers, **kwargs)
+    elif method.upper() == "DELETE":
+        return await melhor_envio_client.delete(endpoint, headers=headers, **kwargs)
 
 
 async def registrar_envio_cart(
@@ -119,7 +223,7 @@ async def registrar_envio_cart(
     }
 
     try:
-        response = await melhor_envio_client.post("/me/cart", json=payload)
+        response = await _make_authenticated_request("POST", "/me/cart", db, json=payload)
 
         logging.info(f"Resposta completa do /me/cart: {response}")
 
@@ -186,9 +290,9 @@ async def registrar_envio_cart(
         raise ValueError(f"Erro ao registrar envio: {str(api_error)}")
 
 
-async def listar_itens_carrinho_melhor_envio() -> List[Dict[str, Any]]:
+async def listar_itens_carrinho_melhor_envio(db: Session) -> List[Dict[str, Any]]:
     try:
-        response = await melhor_envio_client.get("/me/cart")
+        response = await _make_authenticated_request("GET", "/me/cart", db)
     except httpx.HTTPStatusError as e:
         status = e.response.status_code
         body = e.response.text
@@ -216,41 +320,6 @@ async def listar_itens_carrinho_melhor_envio() -> List[Dict[str, Any]]:
         f"Formato de resposta inválido: {type(response).__name__}")
 
 
-async def remover_item_carrinho_melhor_envio(cart_id: str) -> None:
-    """
-    Remove item do carrinho no Melhor Envio.
-    DELETE /me/cart/{id}
-
-    - 200/204 → sucesso
-    - 404     → já removido, tratado como sucesso (idempotente)
-    - outros  → lança ValueError
-    """
-    try:
-        response: httpx.Response = await melhor_envio_client.delete(f"/me/cart/{cart_id}")
-
-        if response.status_code in (200, 204, 404):
-            if response.status_code == 404:
-                logging.warning(
-                    f"[MelhorEnvio] cart_id={cart_id} já não existe no carrinho (404 → ok)")
-            return
-
-        try:
-            error_data = response.json()
-            message = error_data.get("message", "Erro desconhecido")
-        except Exception:
-            message = response.text or "Erro desconhecido"
-
-        logging.error(
-            f"[MelhorEnvio] DELETE /me/cart/{cart_id} → HTTP {response.status_code}: {message}")
-        raise ValueError(
-            f"Melhor Envio retornou HTTP {response.status_code}: {message}")
-
-    except httpx.RequestError as e:
-        logging.error(
-            f"[MelhorEnvio] Erro de conexão ao remover cart_id={cart_id}: {e}", exc_info=True)
-        raise ValueError(f"Erro de conexão com Melhor Envio: {e}")
-
-
 async def criar_logistica_reversa(order_me_id: str, customer) -> dict:  # rever dps
     payload = {
         "service": 1,  # 1 = PAC | 2 = SEDEX
@@ -276,25 +345,21 @@ async def criar_logistica_reversa(order_me_id: str, customer) -> dict:  # rever 
     )
 
 
-async def gerar_etiqueta_melhor_envio(cart_id: str) -> dict:
-    payload = {"orders": [cart_id]}
-
+async def remover_item_carrinho_melhor_envio(cart_id: str, db: Session) -> None:
     try:
-        response = await melhor_envio_client.post(
-            "/me/shipment/checkout",
-            json=payload
-        )
-        logger.info(f"Checkout response: {response}")
-        return response
+        await _make_authenticated_request("DELETE", f"/me/cart/{cart_id}", db)
+    except Exception as e:
+        logger.error(f"Erro ao remover item {cart_id}: {e}")
+        raise
 
-    except httpx.HTTPStatusError as e:
-        logger.error(
-            f"Erro no checkout Melhor Envio: status={e.response.status_code} body={e.response.text}"
-        )
-        raise HTTPException(
-            status_code=e.response.status_code,
-            detail=f"Erro Melhor Envio: {e.response.text}"
-        )
+
+async def gerar_etiqueta_melhor_envio(cart_id: str, db: Session) -> dict:
+    payload = {"orders": [cart_id]}
+    try:
+        return await _make_authenticated_request("POST", "/me/shipment/checkout", db, json=payload)
+    except Exception as e:
+        logger.error(f"Erro ao gerar etiqueta: {e}")
+        raise
 
 
 def _calcular_embalagem(produtos_qtd: list[tuple[Product, int]]) -> dict:
@@ -383,15 +448,27 @@ async def cotar_frete_service(
     }
 
     try:
-        raw_response = await melhor_envio_client.post(
-            "/me/shipment/calculate",
-            json=payload,
-            timeout=20,
+        raw_response = await _make_authenticated_request(
+            "POST", "/me/shipment/calculate", db, json=payload, timeout=20
+        )
+        logger.info(
+            f"Resposta da cotação recebida com {len(raw_response) if isinstance(raw_response, list) else 1} opções"
+        )
+    except HTTPException:
+        raise
+    except httpx.HTTPStatusError as http_err:
+        status_code = http_err.response.status_code
+        error_body = http_err.response.text
+        logger.error(f"Melhor Envio retornou {status_code}: {error_body}")
+        raise HTTPException(
+            status_code=502,
+            detail=f"Erro na cotação do Melhor Envio ({status_code}): {error_body[:300]}"
         )
     except Exception as e:
-        print(f"❌ Erro ao chamar ME /shipment/calculate: {e}")
+        logger.error(
+            f"Erro inesperado ao chamar /me/shipment/calculate: {e}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
+            status_code=502,
             detail="Erro ao consultar transportadoras. Tente novamente.",
         )
 

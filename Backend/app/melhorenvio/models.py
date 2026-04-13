@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from sqlalchemy import Column, Integer, String, DateTime
 from app.database import Base  # ajuste o import conforme seu projeto
 
@@ -16,4 +16,7 @@ class MelhorEnvioToken(Base):
         timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     def is_expired(self) -> bool:
-        return datetime.now(timezone.utc) > self.expires_at
+        expires = self.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        return datetime.now(timezone.utc) > (expires - timedelta(minutes=5))

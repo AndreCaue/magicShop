@@ -17,13 +17,17 @@ class Settings(BaseSettings):
     DATABASE_URL_DEV: str | None = None
     DATABASE_URL: str | None = None
 
-    MELHOR_ENVIO_TOKEN: str | None = None
+    MELHOR_ENVIO_CLIENT_ID_DEV: str
+    MELHOR_ENVIO_CLIENT_SECRET_DEV: str
     MELHOR_ENVIO_TOKEN_SANDBOX: str | None = None
-    MELHOR_ENVIO_ENV: Literal["production", "sandbox"] = "production"
+    MELHOR_ENVIO_REDIRECT_URI_DEV: str | None = None
+
+    MELHOR_ENVIO_ENV: Literal["production", "sandbox"]
 
     MELHOR_ENVIO_CLIENT_ID: str
     MELHOR_ENVIO_CLIENT_SECRET: str
-    MELHOR_ENVIO_REDIRECT_URI: str = "https://api.doceilusao.store/melhor-envio/callback"
+    MELHOR_ENVIO_TOKEN: str | None = None
+    MELHOR_ENVIO_REDIRECT_URI: str | None = None
 
     EFI_CLIENT_ID: str
     EFI_CLIENT_SECRET: str

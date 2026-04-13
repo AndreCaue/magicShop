@@ -26,7 +26,8 @@ async def finalizar_envio_pedido(order: Order, db: Session) -> dict:
         raise ValueError("Etiqueta já foi gerada para este pedido")
 
     response = await gerar_etiqueta_melhor_envio(
-        active_shipment.melhorenvio_cart_id
+        active_shipment.melhorenvio_cart_id,
+        db=db
     )
 
     purchase = response.get("purchase") or {}
@@ -66,7 +67,7 @@ def get_admin_orders(
         .options(
             joinedload(Order.items).joinedload(OrderItem.product),
             joinedload(Order.shipping),
-            joinedload(Order.shipments),  
+            joinedload(Order.shipments),
             joinedload(Order.refunds),
         )
     )
