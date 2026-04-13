@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -81,6 +82,7 @@ export default function AdminOrdersPage() {
     },
 
     onError: (error, id, context) => {
+      console.error(error, id);
       if (context?.previousCart) {
         queryClient.setQueryData(["cartME"], context.previousCart);
       }

@@ -2,7 +2,7 @@ import { NewButton } from "@/components/new/NewButton";
 import QuantitySelector from "@/components/new/QuantitySelector";
 import { PageContainer } from "@/Pages/Home/Components/PageContainer";
 import { getProductById } from "@/Repositories/shop/getters";
-import { ShoppingCart, Truck, CreditCard, Info } from "lucide-react";
+import { ShoppingCart, CreditCard, Info } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
