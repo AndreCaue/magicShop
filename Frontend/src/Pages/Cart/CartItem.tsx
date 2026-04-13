@@ -44,13 +44,13 @@ export default function CartItem({ item }: any) {
             </div>
           </div>
 
-          <div className="text-right flex md:grid">
+          <div className="lg:text-right flex md:grid justify-center text-center gap-4 items-center ">
             <p className="text-xl font-bold text-gray-900">
               R$ {total.toFixed(2).replace(".", ",")}
             </p>
             <button
               onClick={() => removeFromCartAction(item.id)}
-              className="text-red-600 hover:text-red-800 text-sm mt-4 flex items-center gap-1 cursor-pointer"
+              className="text-red-600 hover:text-red-800 text-sm lg:mt-4 flex items-center gap-1 cursor-pointer"
             >
               Remover
             </button>
