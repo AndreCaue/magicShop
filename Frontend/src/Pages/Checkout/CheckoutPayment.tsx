@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { CreditCard, QrCode } from "lucide-react";
 import { CardPayment } from "./Components/CreditCard/CardPayment";
@@ -48,7 +49,7 @@ export const CheckoutPayment = () => {
         setPixLoading(true);
 
         const res = await createPix({
-          order_uuid: data.id,
+          order_uuid: data.uuid,
         });
 
         if (!res?.success) return;

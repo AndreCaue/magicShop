@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   getInstallments,
   paymentCard,
@@ -14,7 +15,7 @@ import { InputForm } from "@/components/new/InputForm";
 import { InputCardForm } from "@/components/new/InputCardForm";
 import { Form } from "@/components/ui/form";
 import { DropdownForm } from "@/components/new/DropdownForm";
-import { handleErrorReq, type IDropdownOption } from "@/helpers/generics";
+import { type IDropdownOption } from "@/helpers/generics";
 import type { IPaymentMethod } from "../../CheckoutPayment";
 import { SmokeButton } from "@/components/new/SmokeButton";
 import type { IOrderResponse } from "../../types";
@@ -235,7 +236,7 @@ ${each.has_interest ? `- Juros de R$ ${(each.total_value - orderData.total).toFi
     if (!token) return;
     try {
       const res = await paymentCard({
-        order_uuid: orderData.id,
+        order_uuid: orderData.id, 
         installments: getValues("parcelas") || 1,
         payment_token: token,
         name_on_card:

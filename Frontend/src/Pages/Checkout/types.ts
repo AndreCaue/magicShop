@@ -41,7 +41,7 @@ interface OrderUser {
 }
 
 export interface IOrderResponse {
-  id: number;
+  id: string;
   uuid: string;
   status: OrderStatus;
   payment_status: PaymentStatus;
