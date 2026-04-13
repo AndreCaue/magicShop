@@ -87,6 +87,7 @@ export default function ClientStep({
             icon={<CircleArrowRight />}
             onClick={handleNext}
             disabled={!isStepFilled}
+            typeB="button"
             variant={isStepFilled ? "proceed" : "default"}
             className="w-full md:w-1/3"
           />
