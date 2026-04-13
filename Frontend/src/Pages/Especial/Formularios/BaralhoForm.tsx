@@ -85,6 +85,8 @@ export const BaralhoForm = () => {
     setIsLoading(false);
   }, []);
 
+  console.log(form.watch("models"), "id preset.");
+
   const handleChangePresets = async (v: number) => {
     if (!v) {
       form.reset({
