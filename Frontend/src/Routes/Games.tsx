@@ -6,7 +6,6 @@ import { TheWholeOfAParte } from "@/Pages/Games/Maze/TheWholeOfAPart";
 import { HiddenItIs } from "@/Pages/Games/Maze/HiddenItIs";
 import { HalfIsHere } from "@/Pages/Games/Maze/HalfIsHere";
 import { OClock } from "@/Pages/Games/Maze/OCloak";
-import KhemBattle from "@/Pages/Games/Khem/KhemBattle";
 
 export const Games = () => {
   return (
@@ -18,7 +17,6 @@ export const Games = () => {
       <Route element={<HalfIsHere />} path="metade-esta-aqui" />
       <Route element={<TheOtherHalf />} path="a-outra-metade" />
       <Route element={<OClock />} path="o-clock" />
-      <Route element={<KhemBattle />} path="khem-card" />
     </Routes>
   );
 };
