@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     DATABASE_URL_DEV: str | None = None
     DATABASE_URL: str | None = None
 
-    MELHOR_ENVIO_CLIENT_ID_DEV: str
-    MELHOR_ENVIO_CLIENT_SECRET_DEV: str
+    MELHOR_ENVIO_CLIENT_ID_DEV: str | None = None
+    MELHOR_ENVIO_CLIENT_SECRET_DEV: str | None = None
     MELHOR_ENVIO_TOKEN_SANDBOX: str | None = None
     MELHOR_ENVIO_REDIRECT_URI_DEV: str | None = None
 
