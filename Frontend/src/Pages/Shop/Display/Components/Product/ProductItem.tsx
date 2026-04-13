@@ -26,6 +26,8 @@ export const ProductItem = ({
 
   const hasValidStoke = stock > reserved_stock;
 
+  console.log(image, "imagem");
+
   return (
     <motion.div
       key={id}

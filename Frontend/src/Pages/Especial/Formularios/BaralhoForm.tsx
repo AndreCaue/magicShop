@@ -85,8 +85,6 @@ export const BaralhoForm = () => {
     setIsLoading(false);
   }, []);
 
-  console.log(form.watch("models"), "id preset.");
-
   const handleChangePresets = async (v: number) => {
     if (!v) {
       form.reset({
@@ -99,7 +97,6 @@ export const BaralhoForm = () => {
       });
       return;
     }
-    console.log(v, " dentro da func id preset.");
 
     const res = await getShippingPresetsById(v);
     if (!res) return;
