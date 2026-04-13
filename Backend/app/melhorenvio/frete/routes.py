@@ -223,7 +223,7 @@ async def melhor_envio_callback(
         raise HTTPException(400, "Código de autorização não recebido")
 
     BASE_URL = get_base_url()
-    token_url = f"{BASE_URL}/api/v2/oauth/token"
+    token_url = f"{BASE_URL}/oauth/token"  # /api/v2/
     if settings.MELHOR_ENVIO_ENV == 'sandbox':
         token_url = f"{BASE_URL}/oauth/token"
 
