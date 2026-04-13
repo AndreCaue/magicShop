@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     MELHOR_ENVIO_CLIENT_ID: str
     MELHOR_ENVIO_CLIENT_SECRET: str
     MELHOR_ENVIO_TOKEN: str | None = None
-    MELHOR_ENVIO_REDIRECT_URI: str | None = None
+    MELHOR_ENVIO_REDIRECT_URI: str
 
     EFI_CLIENT_ID: str
     EFI_CLIENT_SECRET: str
