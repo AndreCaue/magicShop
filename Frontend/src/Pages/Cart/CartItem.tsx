@@ -12,11 +12,11 @@ export default function CartItem({ item }: any) {
       {isFetching || isMutating ? (
         <>{<Skeleton className="h-48 w-full" />}</>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex gap-6 hover:shadow-md transition">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 md:p-6 grid md:flex gap-2 place-items-center md:gap-6 hover:shadow-md transition">
           <img
             src={item.product_image_urls[0]}
             alt={item.name}
-            className="w-32 h-32 object-cover rounded-lg flex-shrink-0"
+            className="w-32 h-32 object-cover rounded-lg flex-shrink-0 mt-5"
           />
 
           <div className="flex-1">
@@ -44,7 +44,7 @@ export default function CartItem({ item }: any) {
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="text-right flex md:grid">
             <p className="text-xl font-bold text-gray-900">
               R$ {total.toFixed(2).replace(".", ",")}
             </p>

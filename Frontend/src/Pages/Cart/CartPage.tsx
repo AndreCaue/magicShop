@@ -31,14 +31,14 @@ export default function CartPage() {
   return (
     <div className="flex justify-center">
       <div className="min-h-screen bg-gray-50 pt-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto lg:px-8">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 lg:text-3xl">
               Carrinho ({totalItems} {totalItems === 1 ? "item" : "itens"})
             </h1>
             <Link
               to="/"
-              className="text-indigo-600 hover:text-indigo-800 flex items-center gap-2"
+              className="text-indigo-600 hover:text-indigo-800 flex items-center lg:gap-2"
             >
               ← Continuar comprando
             </Link>
