@@ -8,8 +8,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import { verifyValidationEmail } from "@/Repositories/auth";
+import {
+  resendVerificationCode,
+  verifyValidationEmail,
+} from "@/Repositories/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -51,6 +55,17 @@ export const VerifyDialog = ({ isOpen, setIsOpen }: TVerifyDialog) => {
     onSubmit();
   }, [valueInput]);
 
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      await resendVerificationCode();
+    } catch (err: unknown) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-black">
@@ -79,9 +94,20 @@ export const VerifyDialog = ({ isOpen, setIsOpen }: TVerifyDialog) => {
         </Form>
 
         <DialogFooter>
-          <button className="text-white hover:cursor-pointer hover:scale-105">
-            Codigo expirou? Re-enviar
-          </button>
+          {isLoading ? (
+            <div className="text-white flex items-center gap-2">
+              <Loader2 className="w-8 h-8 animate-spin" />
+
+              <span>Carregando</span>
+            </div>
+          ) : (
+            <button
+              className="text-white hover:cursor-pointer hover:scale-105"
+              onClick={handleResendCode}
+            >
+              Codigo expirou? Re-enviar
+            </button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
