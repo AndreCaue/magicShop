@@ -1,6 +1,5 @@
 import { handleErrorReq } from "@/helpers/generics";
 import api from "../axiosInstance";
-import { toast } from "sonner";
 
 type TGetValidationLogin = {
   username: string;
@@ -50,7 +49,8 @@ export const verifyValidationEmail = async (code: string) => {
     );
     return response.data;
   } catch (err) {
-    toast.error(err as string);
+    handleErrorReq(err);
+    throw err;
   }
 };
 
@@ -69,9 +69,18 @@ export const recoveryPassword = async (params: TRecoveryParams) => {
   return response.data;
 };
 
+type TResendeCodeResponse = {
+  detail?: string;
+  message?: string;
+};
+
 export const resendVerificationCode = async () => {
   try {
-    return await api.post("/auth/resend-verification");
+    const response = await api.post<TResendeCodeResponse>(
+      "/auth/resend-verification",
+    );
+    if (!response) return;
+    return response.data;
   } catch (err) {
     handleErrorReq(err);
     throw err;

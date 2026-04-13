@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 const formSchema = z.object({
@@ -41,13 +42,17 @@ export const VerifyDialog = ({ isOpen, setIsOpen }: TVerifyDialog) => {
 
   const onSubmit = async () => {
     setIsLoading(true);
-    const res = await verifyValidationEmail(valueInput);
-
-    setIsLoading(false);
-    if (!res) return;
-
-    localStorage.setItem("is_verify", "true");
-    setIsOpen(false);
+    try {
+      const res = await verifyValidationEmail(valueInput);
+      if (!res) return;
+      setIsLoading(false);
+      setIsOpen(false);
+      localStorage.setItem("is_verify", "true");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -58,7 +63,14 @@ export const VerifyDialog = ({ isOpen, setIsOpen }: TVerifyDialog) => {
   const handleResendCode = async () => {
     setIsLoading(true);
     try {
-      await resendVerificationCode();
+      const res = await resendVerificationCode();
+      if (!res?.message) {
+        toast.warning(
+          res?.detail ||
+            "Algo deu errado tente novamente ou entre em contato com o suporte.",
+        );
+      }
+      toast.success(res?.message);
     } catch (err: unknown) {
       console.error(err);
     } finally {
@@ -95,7 +107,7 @@ export const VerifyDialog = ({ isOpen, setIsOpen }: TVerifyDialog) => {
 
         <DialogFooter>
           {isLoading ? (
-            <div className="text-white flex items-center gap-2">
+            <div className="text-white flex items-center gap-2 justify-center">
               <Loader2 className="w-8 h-8 animate-spin" />
 
               <span>Carregando</span>

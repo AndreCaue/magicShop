@@ -55,15 +55,19 @@ export const formatDate = (date: string) => {
   return format(date, "dd/MM/yyyy", { locale: ptBR });
 };
 
-export const handleErrorReq = (err: unknown) => {
+export const handleErrorReq = (err: unknown | any) => {
   if (axios.isAxiosError(err)) {
+    toast.error(`Erro inesperado, tente novamente em breve. :( ${err.message}`);
+
     return null;
   }
 
   if (err instanceof Error) {
-    toast.error(`Unexpected error :( ${err.message}`);
+    toast.error(`Erro inesperado, tente novamente em breve. :( ${err.message}`);
     return null;
   }
+
+  toast.error(`Erro inesperado, tente novamente em breve. :( ${err.detail}`);
 
   return null;
 };
