@@ -1,9 +1,16 @@
-import os
-import smtplib
-import resend
+
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from ..core.config import settings
+from .. import models
+from sqlalchemy.orm import Session
+import secrets
+import hashlib
+import binascii
+import resend
+import smtplib
+import os
+from datetime import datetime, timezone, timedelta
 
 
 def send_verification_email(to_email: str, code: str, subject: str = None):
@@ -89,6 +96,28 @@ def send_verification_email(to_email: str, code: str, subject: str = None):
             print("❌ EXCEÇÃO AO ENVIAR EMAIL VIA SMTP")
             print(str(e))
             raise
+
+
+def generate_verification_code():
+    code = str(secrets.randbelow(999999)).zfill(6)
+    salt = secrets.token_bytes(16)
+    hash_code = hashlib.pbkdf2_hmac("sha256", code.encode(), salt, 100_000)
+    code_hash_hex = binascii.hexlify(hash_code).decode()
+    salt_hex = binascii.hexlify(salt).decode()
+    return code, code_hash_hex, salt_hex
+
+
+def generate_and_send_verification(user: models.User, db: Session) -> None:
+    """Gera novo código, salva no banco e envia o email."""
+    code, code_hash_hex, salt_hex = generate_verification_code()
+    expiry = datetime.now(timezone.utc) + timedelta(minutes=15)
+
+    user.verification_code = code_hash_hex
+    user.salt = salt_hex
+    user.code_expiry = expiry
+    db.commit()
+
+    send_verification_email(user.email, code)
 
 
 async def send_reset_password_email(to_email: str, username: str, reset_link: str):

@@ -2,17 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, status, Security, Respons
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta, timezone
-import secrets
+from datetime import datetime, timedelta, timezone, timedelta
 import hashlib
 import binascii
-from uuid import uuid4
 
 from .. import models, schemas
 from .schemas import ForgotPasswordRequest, ResetPasswordRequest
 from ..database import SessionLocal
 from .dependencies import get_current_user, get_current_user_from_cookie, require_master_full_access
-from .email_service import send_verification_email, send_reset_password_email
+from .email_service import send_reset_password_email, generate_and_send_verification
 from .jwt import decode_token, hash_password, verify_password, create_access_token, save_refresh_token, RefreshToken, revoke_refresh_token, is_refresh_token_valid, create_reset_password_token, verify_reset_password_token
 from ..core.config import settings
 from app.core.limiter import limiter
@@ -33,13 +31,34 @@ def get_db():
         db.close()
 
 
-def generate_verification_code():
-    code = str(secrets.randbelow(999999)).zfill(6)
-    salt = secrets.token_bytes(16)
-    hash_code = hashlib.pbkdf2_hmac("sha256", code.encode(), salt, 100_000)
-    code_hash_hex = binascii.hexlify(hash_code).decode()
-    salt_hex = binascii.hexlify(salt).decode()
-    return code, code_hash_hex, salt_hex
+@router.post("/resend-verification")
+@limiter.limit("3/minute")
+def resend_verification(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Security(
+        get_current_user, scopes=["basic"])
+):
+    if current_user.is_verified:
+        raise HTTPException(status_code=400, detail="Conta já verificada.")
+
+    if current_user.code_expiry:
+        expiry = current_user.code_expiry
+        if expiry.tzinfo is None:
+            expiry = expiry.replace(tzinfo=timezone.utc)
+        if expiry > datetime.now(timezone.utc) + timedelta(minutes=1):
+            raise HTTPException(
+                status_code=429,
+                detail="Aguarde antes de solicitar um novo código."
+            )
+
+    try:
+        generate_and_send_verification(current_user, db)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Erro ao enviar e-mail: {str(e)}")
+
+    return {"message": "Novo código enviado para o seu e-mail."}
 
 
 @router.post("/register", response_model=schemas.UserOut)
@@ -62,16 +81,8 @@ def register(request: Request, user: schemas.UserCreate, db: Session = Depends(g
     db.commit()
     db.refresh(new_user)
 
-    code, code_hash_hex, salt_hex = generate_verification_code()
-    expiry = datetime.now(timezone.utc) + timedelta(minutes=15)
-
-    new_user.verification_code = code_hash_hex
-    new_user.salt = salt_hex
-    new_user.code_expiry = expiry
-    db.commit()
-
     try:
-        send_verification_email(user.email, code)
+        generate_and_send_verification(new_user, db)
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Erro ao enviar e-mail: {str(e)}")
@@ -259,7 +270,8 @@ def basic_area(current_user: models.User = Security(get_current_user, scopes=["b
 def premium_area(current_user: models.User = Security(get_current_user, scopes=["premium"])):
     return {"message": f"Acesso premium concedido para {current_user.email}"}
 
-class UpgradeUserRequest(BaseModel): # mover de lugar.
+
+class UpgradeUserRequest(BaseModel):  # mover de lugar.
     user_uuid: str
 
 
@@ -281,6 +293,7 @@ def upgrade_user_to_premium(
         db.refresh(db_user)
 
     return {"message": f"Usuário {db_user.email} agora é premium!", "scopes": db_user.scopes}
+
 
 @router.post("/refresh", response_model=schemas.Token)
 def refresh_token(
