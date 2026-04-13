@@ -99,8 +99,11 @@ export const BaralhoForm = () => {
       });
       return;
     }
+    console.log(v, " dentro da func id preset.");
+
     const res = await getShippingPresetsById(v);
     if (!res) return;
+    setValue("models", res.id);
     setValue("height_cm", res.height_cm);
     setValue("length_cm", res.length_cm);
     setValue("weight_grams", res.weight_grams);
