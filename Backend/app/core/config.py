@@ -38,9 +38,9 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str | None = None
     AWS_REGION: str | None = "sa-east-1"
     S3_BUCKET_PUBLIC_DEV: str | None = None
-    S3_BUCKET_PUBLIC_PROD: str | None = None
+    S3_BUCKET_PUBLIC_PROD: str
     S3_BUCKET_PRIVATE_DEV: str | None = None
-    S3_BUCKET_PRIVATE_PROD: str | None = None
+    S3_BUCKET_PRIVATE_PROD: str
 
     STORE_NAME: str
     STORE_PHONE: str
