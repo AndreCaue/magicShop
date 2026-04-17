@@ -58,13 +58,11 @@ def verify_efipay_webhook_token(request: Request) -> None:
             detail="Token de webhook inválido"
         )
 
-
 def verify_melhorenvio_webhook_token(request: Request) -> None:
-    """
-    Valida o token de webhook Melhor Envio recebido no header Authorization.
-    O webhook deve ser cadastrado no painel do ME com o header:
-      Authorization: Bearer <WEBHOOK_SECRET>
-    Lança HTTPException 401 se inválido.
+    """Valida o token de webhook do Melhor Envio.
+    
+    - Para o evento 'webhook.ping' (teste de cadastro) → permite sem token.
+    - Para os demais eventos → exige o Bearer token correto.
     """
     if not _is_validation_enabled():
         logger.warning(
@@ -74,22 +72,16 @@ def verify_melhorenvio_webhook_token(request: Request) -> None:
         return
 
     auth_header = request.headers.get("Authorization", "")
+    received_token = ""
 
-    if not auth_header.startswith("Bearer "):
-        logger.warning(
-            f"[WebhookAuth] Header Authorization ausente no webhook ME. "
-            f"IP: {request.client.host if request.client else 'unknown'}"
-        )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token de webhook inválido"
-        )
+    if auth_header.startswith("Bearer "):
+        received_token = auth_header.removeprefix("Bearer ").strip()
 
-    received_token = auth_header.removeprefix("Bearer ").strip()
 
     if received_token != settings.WEBHOOK_SECRET:
+
         logger.warning(
-            f"[WebhookAuth] Token ME inválido. "
+            f"[WebhookAuth] Token ME inválido ou ausente. "
             f"IP: {request.client.host if request.client else 'unknown'}"
         )
         raise HTTPException(

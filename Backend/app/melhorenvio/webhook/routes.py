@@ -14,29 +14,46 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/melhorenvio", tags=["Melhor Envio - Webhook"])
 
 
-@router.post(
-    "/webhook",
-    status_code=status.HTTP_200_OK,
-    summary="Webhook de atualização de envio — Melhor Envio",
-)
+@router.post("/webhook", status_code=status.HTTP_200_OK)
 async def melhorenvio_webhook(
     request: Request,
     db: Session = Depends(get_db),
 ):
-    """
-    Endpoint registrado no painel do Melhor Envio.
-    O webhook deve ser configurado com o header: Authorization: Bearer <WEBHOOK_SECRET>
-    """
-    verify_melhorenvio_webhook_token(request)
+    """Endpoint do webhook Melhor Envio."""
+    raw_body = await request.body()  
 
     try:
-        raw_body = await request.json()
+        payload_dict = json.loads(raw_body)
+        event = payload_dict.get("event")
     except Exception:
         logger.warning("Webhook ME: payload não é JSON válido.")
         return {"ok": True}
 
+    if event != "webhook.ping":
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            logger.warning(
+                f"[WebhookAuth] Header Authorization ausente (evento: {event}). "
+                f"IP: {request.client.host if request.client else 'unknown'}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token de webhook inválido"
+            )
+
+        received_token = auth_header.removeprefix("Bearer ").strip()
+        if received_token != settings.WEBHOOK_SECRET:
+            logger.warning(
+                f"[WebhookAuth] Token ME inválido (evento: {event}). "
+                f"IP: {request.client.host if request.client else 'unknown'}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token de webhook inválido"
+            )
+
     try:
-        payload = MelhorEnvioWebhookPayload(**raw_body)
+        payload = MelhorEnvioWebhookPayload(**payload_dict)
         await handle_melhorenvio_webhook(payload, db)
     except Exception as e:
         logger.error(f"Erro ao processar webhook ME: {e}", exc_info=True)

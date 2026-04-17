@@ -13,7 +13,7 @@ import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
 import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/RecoveryPassword";
 import { Register } from "@/Pages/Login/subPages/Register/Register";
-import { Games } from "./Games";
+// import { Games } from "./Games";
 import { CheckoutPayment } from "@/Pages/Checkout/CheckoutPayment";
 import OrdersPage from "@/Pages/User/Orders/OrdersPage";
 import AdminOrdersPage from "@/Pages/Admin/Pedidos";
@@ -51,7 +51,7 @@ export const AppRoutes = () => {
 
           {/* Jogos Rota de proteção+++ */}
           {/* <Route path="/teste" element={<TesteDef />} /> */}
-          <Route path="/jogos/*" element={<Games />} />
+          {/* <Route path="/jogos/*" element={<Games />} /> */}
           {/* Jogos */}
 
           {/*User */}
