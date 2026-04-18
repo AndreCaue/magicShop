@@ -27,3 +27,13 @@ interface IProduct {
 interface IResMessage {
   message: string;
 }
+
+interface ITickItem {
+  value?: any;
+  coordinate: number;
+  index?: number;
+}
+interface IName {
+  name: string;
+  value: number;
+}

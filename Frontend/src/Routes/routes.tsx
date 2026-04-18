@@ -13,10 +13,16 @@ import CartPage from "@/Pages/Cart/CartPage";
 import { Checkout } from "@/Pages/Checkout/Checkout";
 import { RecoveryPassword } from "@/Pages/Login/subPages/ForgotPassword/RecoveryPassword";
 import { Register } from "@/Pages/Login/subPages/Register/Register";
-// import { Games } from "./Games";
 import { CheckoutPayment } from "@/Pages/Checkout/CheckoutPayment";
 import OrdersPage from "@/Pages/User/Orders/OrdersPage";
 import AdminOrdersPage from "@/Pages/Admin/Pedidos";
+import { PageDevelopment } from "@/global/PageInDevelopment";
+
+import { PrivacyPolicy } from "@/Pages/Legal/PrivacyPolicy";
+import { LogisticsPolicy } from "@/Pages/Legal/LogisticsPolicy";
+import { PaymentPolicy } from "@/Pages/Legal/PaymentPolicy";
+import { RefundPolicy } from "@/Pages/Legal/RefundPolicy";
+import MetricDashboard from "@/Pages/Dashboard/Dashboard";
 
 export const AppRoutes = () => {
   return (
@@ -25,7 +31,12 @@ export const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot_password" element={<ForgotPassword />} />
       <Route path="/reset_password/:token?" element={<RecoveryPassword />} />
-      {/* <Route path="/terms-and-politics" element={<RecoveryPassword />} /> */}
+      <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
+      <Route path="/politica-de-transporte" element={<LogisticsPolicy />} />
+      <Route path="/politica-de-pagamento" element={<PaymentPolicy />} />
+      <Route path="/politica-de-troca" element={<RefundPolicy />} />
+
+      <Route path="/examples/dashboard" element={<MetricDashboard />} />
 
       {/* <Route path="/" element={<Home />} />
       <Route path="/shop/*" element={<Shop />} /> */}
@@ -49,9 +60,8 @@ export const AppRoutes = () => {
 
           {/*Carrinho */}
 
-          {/* Jogos Rota de proteção+++ */}
           {/* <Route path="/teste" element={<TesteDef />} /> */}
-          {/* <Route path="/jogos/*" element={<Games />} /> */}
+          <Route path="/jogos/*" element={<PageDevelopment />} />
           {/* Jogos */}
 
           {/*User */}

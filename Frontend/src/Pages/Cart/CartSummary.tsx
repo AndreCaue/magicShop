@@ -165,7 +165,13 @@ export default function CartSummary() {
               {shippingOptions.map((option) => {
                 const isSelected = selectedShipping?.id === option.id;
 
-                return <RadioSuit isSelected={isSelected} opt={option} />;
+                return (
+                  <RadioSuit
+                    key={option.id}
+                    isSelected={isSelected}
+                    opt={option}
+                  />
+                );
               })}
             </div>
           )}

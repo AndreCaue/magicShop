@@ -1,5 +1,6 @@
 import { Award } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export const DisplayFooter = () => {
   return (
@@ -14,6 +15,12 @@ export const DisplayFooter = () => {
         Todos os produtos são originais e com garantia
         <Award className="w-5 h-5" />
       </p>
+      <Link 
+        to="/politica-de-privacidade" 
+        className="text-xs text-muted-foreground hover:text-primary transition-colors mt-4 inline-block"
+      >
+        Política de Privacidade
+      </Link>
     </motion.div>
   );
 };

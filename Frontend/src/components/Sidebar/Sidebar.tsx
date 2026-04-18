@@ -6,6 +6,7 @@ import {
   MonitorPlay,
   GamepadDirectional,
   ListOrdered,
+  ChartArea,
 } from "lucide-react";
 
 import {
@@ -58,6 +59,7 @@ const iconMap: Record<string, any> = {
   Settings,
   User2,
   ListOrdered,
+  ChartArea,
 };
 
 export function AppSidebar() {
