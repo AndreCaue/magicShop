@@ -7,7 +7,7 @@
 
 > Single Page Application de e-commerce completa — catálogo, carrinho, frete em tempo real e pagamentos via PIX e Cartão de Crédito.
 
-Parte do ecossistema **MagicShop**, este frontend cobre todo o fluxo de um comércio eletrônico moderno: múltiplos domínios (loja, administração, perfil de usuário), carrinho robusto com reserva de estoque, cálculo de frete automatizado e integração transparente com o gateway de pagamento EFI/Gerencianet.
+Parte do ecossistema **MagicShop** (operando como **Doce Ilusão**), este frontend cobre todo o fluxo de um comércio eletrônico moderno: múltiplos domínios (loja, administração, perfil de usuário), visualização e dashboard administrativo (com dados provisoriamente mockados para métricas de desempenho por região), carrinho robusto com reserva de estoque, cálculo de frete automatizado e integração transparente com o gateway de pagamento EFI/Gerencianet.
 
 > **Repositório relacionado:** [MagicShop Backend →](../Backend)
 
@@ -49,6 +49,9 @@ Consulta automática de cotação de frete com base no CEP de destino, retornand
 ### 💳 Pagamento — EFI / Gerencianet
 - **PIX:** Geração de QR Codes estáticos e dinâmicos diretamente na tela de fechamento de pedido.
 - **Cartão de Crédito:** Tokenização segura via plugin `payment-token-efi` — dados sensíveis nunca trafegam pelo backend próprio.
+
+### 📊 Dashboard e Métricas
+Painel de visualização de desempenho com métricas atualizadas por região geográfica. Atualmente, os dados listados em tela são *mocados* (de exemplo) e estão estruturando a UI para a feature futura baseada nas requisições do novo serviço do Backend de `admin`.
 
 ---
 

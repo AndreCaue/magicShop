@@ -24,7 +24,8 @@ Built with **FastAPI**, MagicShop handles everything from product catalogs and c
 
 ## Features
 
-- **Authentication & Authorization** — JWT-based auth with granular scopes: `basic`, `premium`, and `master`.
+- **Authentication & Authorization** — JWT-based auth with granular scopes: `basic`, `premium`, and `admin`.
+- **Dashboard & Metrics** — Specific roles and services mapped out for regional performance visualization and sales metrics (future feature: currently awaiting frontend integration but guarded by `admin` scope).
 - **E-commerce Core** — Full product catalog, cart logic, idempotent stock reservation, and checkout flow.
 - **Digital Content Locking** — Videos and premium PDFs gated behind subscription tiers or one-time purchases.
 - **Secure S3 Integration**
@@ -196,6 +197,7 @@ uvicorn app.main:app --reload
 | Store | `/products`, `/category` | Public catalog listing; admin product registration with S3 image upload |
 | Cart & Checkout | `/cart` | Assemble orders, reserve stock, dispatch to payment |
 | Contents | `/contents` | Digital content metadata and secure video access |
+| Dashboard | `/dashboard` | Sales metrics and regional performance KPIs (Admin only - future integration) |
 
 ### Key Content Routes
 
