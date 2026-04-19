@@ -1,5 +1,5 @@
 // MasterDashboard.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Users, Package, DollarSign, Clock } from "lucide-react";
