@@ -30,6 +30,13 @@ USER_ITEMS: list[SidebarItem] = [
                            url="/", disabled=True),
         ]
     ),
+    SidebarItem(
+        id=1235, title="Dashboard (Admin)", url="#", icon="ChartArea",
+        subItem=[
+            SidebarSubItem(id=1234, title="Dashboard (Mock)",
+                           url="/examples/dashboard", disabled=False),
+        ]
+    ),
 ]
 
 MASTER_ITEMS: list[SidebarItem] = [
@@ -45,6 +52,11 @@ MASTER_ITEMS: list[SidebarItem] = [
                         id=981, title="Gerar Etiqueta", url="/master/pedidos"),
                 ],
                 ),
+
+    SidebarItem(id=97, title="Charts", url='/', icon="ChartArea", subItem=[
+        SidebarSubItem(
+            id=971, title="Dashboard", url="/examples/dashboard"),
+    ],)
 ]
 
 USER_OPTIONS = SidebarItem(

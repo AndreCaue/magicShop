@@ -1,10 +1,11 @@
 from typing import List, Dict, Any
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
 from .client import melhor_envio_client
 from .schemas import CotacaoFreteResponse, MECartResponse, CarrinhoItem
 from fastapi import HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.store.orders.enums import PaymentStatus
 from app.store.orders.models import Order, OrderShipping, OrderShipment, OrderStatus
@@ -16,7 +17,6 @@ import math
 import unicodedata
 import httpx
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -498,3 +498,29 @@ async def cotar_frete_service(
 
     opcoes.sort(key=lambda x: x.preco)
     return opcoes
+
+
+async def get_order_by_melhor_envio_id(
+    db: Session,
+    melhor_envio_order_id: str
+) -> Order | None:
+    """
+    Busca o Order pelo melhorenvio_order_id (campo 'data.id' do webhook do Melhor Envio).
+
+    Retorna o Order completo com os relacionamentos necessários.
+    """
+    if not melhor_envio_order_id:
+        return None
+
+    stmt = (
+        select(Order)
+        .join(Order.shipments)
+        .where(OrderShipment.melhorenvio_order_id == melhor_envio_order_id)
+        .options(
+            selectinload(Order.shipping),
+            selectinload(Order.shipments),
+        )
+    )
+
+    result = await db.execute(stmt)
+    return result.scalar_one_or_none()

@@ -22,6 +22,7 @@ from .payment.refund.routes import router as refund_router
 from .sidebar.routes import router as sidebar_router
 from .melhorenvio.webhook.routes import router as menvio_webhook_router
 from .contents.routes import router as contents_router
+from .dashboard.routes import router as dashboard_router
 from .contents import models as _contents_models
 from app.tasks.scheduler import start_scheduler, scheduler
 from contextlib import asynccontextmanager
@@ -32,8 +33,8 @@ from slowapi import _rate_limit_exceeded_handler
 from app.core.limiter import limiter
 import logging
 
-# if settings.ENVIRONMENT == "development":
-models.Base.metadata.create_all(bind=engine)
+if settings.ENVIRONMENT == "development":
+    models.Base.metadata.create_all(bind=engine)
 
 
 @asynccontextmanager
@@ -136,6 +137,7 @@ app.include_router(refund_router)
 app.include_router(sidebar_router)
 app.include_router(menvio_webhook_router)
 app.include_router(contents_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/")

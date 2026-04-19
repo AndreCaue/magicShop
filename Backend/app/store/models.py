@@ -24,6 +24,7 @@ class Product(Base):
     length_cm = Column(Integer, nullable=False,)
 
     discount = Column(Float, nullable=True, default=None)
+    sold_stock = Column(Integer, nullable=True, default=0)
 
     image_urls = Column(JSON, nullable=True)
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)

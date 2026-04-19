@@ -1,19 +1,23 @@
 
 import json
+import logging
 from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
+from fastapi import Request
 
 from app.store.orders.models import Order, OrderShipment, ShippingStatusHistory
 from app.store.orders.enums import OrderStatus
 from app.store.models import Product
 from .schemas import MelhorEnvioWebhookPayload
 from .email import send_shipping_status_email, STATUS_INFO
+from app.core.config import settings
 
+logger = logging.getLogger(__name__)
 
 
 MELHORENVIO_TO_ORDER_STATUS: dict[str, OrderStatus] = {
-    "posted": OrderStatus.PROCESSING,   
+    "posted": OrderStatus.PROCESSING,
     "shipped": OrderStatus.SHIPPED,
     "delivered": OrderStatus.DELIVERED,
     "returned": OrderStatus.RETURNED,
@@ -152,7 +156,10 @@ def _confirm_stock(order: Order, db: Session) -> None:
 
             product.stock = max(0, (product.stock or 0) - qty)
 
-            product.reserved_stock = max(0, (product.reserved_stock or 0) - qty)
+            product.reserved_stock = max(
+                0, (product.reserved_stock or 0) - qty)
+
+            product.sold_stock = (product.sold_stock or 0) + qty
 
         order.stock_reserved = False
         db.commit()
@@ -160,7 +167,8 @@ def _confirm_stock(order: Order, db: Session) -> None:
 
     except Exception as e:
         db.rollback()
-        print(f"[Stock Error] Falha ao confirmar estoque para order {order.uuid}: {e}")
+        print(
+            f"[Stock Error] Falha ao confirmar estoque para order {order.uuid}: {e}")
 
 
 def _send_status_email(
@@ -170,37 +178,44 @@ def _send_status_email(
 ) -> None:
     """Dispara e-mail de notificação para o destinatário do pedido."""
     try:
-        shipping = order.shipping 
+        shipping = order.shipping
 
         if not shipping or not shipping.recipient_email:
-            print(
-                f"⚠️ Order {order.uuid} sem shipping/email — e-mail não enviado.")
+            logger.warning(
+                f"⚠️ Order {order.uuid} sem shipping ou e-mail do destinatário.")
             return
 
-        latest_shipment = (
-            order.shipments[-1] if order.shipments else None
-        )
-        tracking_code = (
-            payload.get_tracking()
-            or (latest_shipment.tracking_code if latest_shipment else None)
-        )
-        tracking_url = (
-            payload.get_tracking_url()
-            or (latest_shipment.tracking_url if latest_shipment else None)
-        )
+        tracking_code = payload.get_tracking() or getattr(
+            order.shipments[-1], 'tracking_code', None) if order.shipments else None
+        tracking_url = payload.get_tracking_url() or getattr(
+            order.shipments[-1], 'tracking_url', None) if order.shipments else None
+
+        status_labels = {
+            "received": "Recebido no ponto de coleta",
+            "delivered": "Entregue com sucesso",
+            "paused": "Entrega pausada - Ação necessária",
+        }
+
+        status_label = status_labels.get(status, status.capitalize())
+
+        extra_info = None
+        if status == "paused" and hasattr(payload.data, 'reason') and payload.data.reason:
+            extra_info = f"Motivo: {payload.data.reason}"
 
         send_shipping_status_email(
             to_email=shipping.recipient_email,
-            recipient_name=shipping.recipient_name,
+            recipient_name=shipping.recipient_name or "Cliente",
             order_uuid=order.uuid,
             status=status,
-            status_label=payload.get_status_label(),
+            status_label=status_label,
             tracking_code=tracking_code,
             tracking_url=tracking_url,
+            extra_info=extra_info,
         )
 
-        print(
-            f"📧 E-mail de '{status}' enviado para {shipping.recipient_email}")
+        logger.info(
+            f"📧 E-mail de status '{status}' enviado para {shipping.recipient_email} (Order: {order.uuid})")
 
     except Exception as e:
-        print(f"❌ Falha ao enviar e-mail de status '{status}': {e}")
+        logger.error(
+            f"❌ Falha ao enviar e-mail de status '{status}' para order {order.uuid}: {e}", exc_info=True)

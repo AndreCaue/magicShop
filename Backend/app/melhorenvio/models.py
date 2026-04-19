@@ -7,8 +7,8 @@ class MelhorEnvioToken(Base):
     __tablename__ = "melhor_envio_tokens"
 
     id = Column(Integer, primary_key=True, index=True)
-    access_token = Column(String(500), nullable=False)
-    refresh_token = Column(String(500), nullable=False)
+    access_token = Column(String(2000), nullable=False)
+    refresh_token = Column(String(2000), nullable=False)
     expires_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True),
                         default=lambda: datetime.now(timezone.utc))
