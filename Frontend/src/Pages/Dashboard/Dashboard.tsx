@@ -98,8 +98,7 @@ export default function MetricDashboard() {
             </p>
           </div>
           <span className="text-center text-gray-800">
-            Gráficos são preenchidos com dados falsos
-            <br /> para melhor aprensentação
+            Gráficos gerados com dados falsos
           </span>
           <Button
             variant="outline"

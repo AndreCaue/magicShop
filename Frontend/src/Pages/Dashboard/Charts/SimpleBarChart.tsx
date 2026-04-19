@@ -6,6 +6,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   type TooltipContentProps,
+  LabelList,
 } from "recharts";
 import { ChartCard } from "./ChartCard";
 
@@ -77,6 +78,28 @@ export function SimpleBarChart({
     );
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const CustomBarLabel = (props: any) => {
+    const { x, y, width, height, value } = props;
+
+    if (!value || height < 20) return null;
+
+    return (
+      <text
+        x={x + width / 2}
+        y={y + height / 2}
+        fill="#fff"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize={13}
+        fontWeight={600}
+        pointerEvents="none"
+      >
+        {value}
+      </text>
+    );
+  };
+
   return (
     <ChartCard
       title={title}
@@ -89,7 +112,9 @@ export function SimpleBarChart({
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip content={CustomTooltip} cursor={<CustomCursor />} />
-          <Bar dataKey="value" fill={color} radius={6} />
+          <Bar dataKey="value" fill={color} radius={6}>
+            <LabelList content={CustomBarLabel} />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
